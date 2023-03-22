@@ -21,7 +21,7 @@ def main_page_view(request):
 class IncomesView(ListView):
     model = Income
     template_name = 'accounting/incomes_list.html'
-    paginate_by = 10
+    paginate_by = 5
 
 
     def get_queryset(self):
@@ -51,20 +51,30 @@ class IncomeEditView(UpdateView):
     model = Income
     form_class = IncomeForm
     template_name = 'accounting/incomes_edit.html'
-    success_url = reverse_lazy('IncomesView')
+    success_url = reverse_lazy('list_incomes')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['date_of_operation'].initial = self.object.date_of_operation
+        return form
 
 
 class IncomeDeleteView(DeleteView):
     model = Income
     template_name = 'accounting/income_delete.html'
-    success_url = reverse_lazy('IncomesView')
+    success_url = reverse_lazy('list_incomes')
 
 
 class IncomeCreateView(CreateView):
     model = Income
-    fields = ['date_of_operation', 'source', 'category', 'sum', 'description' 'status']
+    fields = ['date_of_operation', 'source', 'category', 'sum', 'description', 'status']
     template_name = 'accounting/income_create.html'
     success_url = reverse_lazy('main_page')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['description'].required = False
+        return form
 
     def form_valid(self, form):
         form.instance.user = self.request.user

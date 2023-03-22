@@ -9,9 +9,17 @@ class IncomeForm(forms.ModelForm):
         model = Income
         fields = ['status', 'date_of_operation', 'source', 'category', 'sum', 'currency', 'user', 'description']
         widgets = {
-            'date_of_operation': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'},
-                                                     format='%d-%m-%Y %H:%M:%S'),
+            'date_of_operation': forms.DateTimeInput(
+                format='%d-%m-%YT%H:%M:%S',
+                attrs={'type':'datetime-local'}
+            )
         }
+
+    description = forms.CharField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['description'].required = False
 
 
 class RegisterUserForm(UserCreationForm):

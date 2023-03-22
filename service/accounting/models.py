@@ -46,6 +46,7 @@ class Income(models.Model):
         'Описание',
         max_length=300,
         default=''
+        # blank=True,
     )
 
     def __str__(self):

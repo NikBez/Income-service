@@ -5,7 +5,7 @@ from .views import main_page_view, IncomesView, IncomeEditView,\
 
 urlpatterns = [
     path('', main_page_view, name='main_page'),
-    path('incomes/', IncomesView.as_view(), name='IncomesView'),
+    path('incomes/', IncomesView.as_view(), name='list_incomes'),
     path('income/<int:pk>/edit/', IncomeEditView.as_view(), name='edit_income'),
     path('income/<int:pk>/delete/', IncomeDeleteView.as_view(), name='delete_income'),
     path('income/create', IncomeCreateView.as_view(), name='create_income'),
