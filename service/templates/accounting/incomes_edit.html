@@ -1,0 +1,12 @@
+{% extends 'accounting/index.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block body %}
+  <h1>Edit income</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit">Сохранить изменения</button>
+  </form>
+{% endblock %}
