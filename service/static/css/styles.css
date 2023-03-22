@@ -8,3 +8,11 @@
   margin-top: -30px;
 }
 
+.paid_incomes {
+  color: green;
+}
+
+.not_paid_incomes {
+  color: red
+}
+

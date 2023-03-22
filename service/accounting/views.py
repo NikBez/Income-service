@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from django.contrib.auth import logout, login
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -12,12 +12,15 @@ from django.utils import timezone
 
 
 def main_page_view(request):
-    return render('Hello')
+
+
+    return render(request, 'accounting/main_page.html')
 
 
 class IncomesView(ListView):
     model = Income
     template_name = 'accounting/incomes_list.html'
+    paginate_by = 10
 
 
     def get_queryset(self):
@@ -58,9 +61,13 @@ class IncomeDeleteView(DeleteView):
 
 class IncomeCreateView(CreateView):
     model = Income
-    fields = '__all__'
+    fields = ['date_of_operation', 'source', 'category', 'sum', 'currency', 'status']
     template_name = 'accounting/income_create.html'
+    success_url = reverse_lazy('main_page')
 
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 
 class RegisterUser(CreateView):

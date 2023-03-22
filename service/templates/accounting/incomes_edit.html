@@ -3,7 +3,7 @@
 
 
 {% block body %}
-  <h1>Edit income</h1>
+  <h1>Редактирование записи {{ object }}</h1>
   <form method="post">
     {% csrf_token %}
     {{ form|crispy }}

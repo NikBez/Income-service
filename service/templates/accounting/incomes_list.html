@@ -3,9 +3,12 @@
 
 
 {% block body %}
+
+<!--Список записей-->
     <h2 class="mb-4">Список операций за {{ period }}</h2>
     <table class="table table-hover">
         <thead>
+        <th>Статус</th>
         <th>Дата операции</th>
         <th>Источник</th>
         <th>Категория</th>
@@ -15,6 +18,11 @@
         </thead>
         {% for line in object_list %}
         <tr>
+            {% if line.status %}
+              <td class="paid_incomes"> Оплачен </td>
+            {% else %}
+               <td class="not_paid_incomes"> Не оплачен </td>
+            {% endif %}
             <td>{{ line.date_of_operation | date:'d-m-Y h:m:s' }}</td>
             <td>{{ line.source }}</td>
             <td>{{ line.category }}</td>
@@ -27,6 +35,21 @@
         {% endfor %}
     </table>
 
+<!--Пагинация-->
+    <div class="pagination mb-4 justify-content-md-center">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1" class="btn btn-light btn-sm">&laquo; Первая</a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-light btn-sm">&lsaquo; Предыдущая</a>
+            {% endif %}
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-light btn-sm">Следующая &rsaquo;</a>
+                <a href="?page={{ paginator.num_pages }}" class="btn btn-light btn-sm">Последняя &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+<!--Периоды отображения-->
       <div class="row row-cols-3">
             <a class="btn btn-outline-secondary" href="{% url 'IncomesView'%}?period=all">Все время</a>
             <a class="btn btn-outline-secondary" href="{% url 'IncomesView'%}?period=month">Месяц</a>

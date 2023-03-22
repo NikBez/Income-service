@@ -5,34 +5,42 @@ from django.utils import timezone
 
 class Income(models.Model):
     date_of_operation = models.DateTimeField(
-        'Date of operation',
+        'Дата операции',
         default=timezone.now()
     )
     source = models.ForeignKey(
         'Source',
+        verbose_name='Источник',
         on_delete=models.SET_NULL,
         null=True,
         related_name='incomes_by_source'
     )
     category = models.ForeignKey(
         'Category',
+        verbose_name='Категория',
         on_delete=models.SET_NULL,
         null=True,
         related_name='incomes_by_category'
     )
-    sum = models.FloatField('Sum',
+    sum = models.FloatField('Сумма',
                             default=0
                             )
     currency = models.ForeignKey(
         'Currency',
+        verbose_name='Валюта',
         on_delete=models.SET_NULL,
         null=True,
         related_name='incomes_by_currency'
     )
     user = models.ForeignKey(
         django.contrib.auth.models.User,
+        verbose_name='Пользователь',
         on_delete=models.CASCADE,
         related_name='incomes_by_user'
+    )
+    status = models.BooleanField(
+        'Оплачен',
+        default=False
     )
 
     def __str__(self):
@@ -42,22 +50,22 @@ class Income(models.Model):
 
 class Source(models.Model):
     title = models.CharField('Source title', max_length=200, unique=True)
-    currency = models.ForeignKey('Currency', null=True, on_delete=models.SET_NULL)
+    currency = models.ForeignKey('Currency', verbose_name='Валюта', null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.title
 
 
 class Category(models.Model):
-    title = models.CharField('Category title', max_length=200, unique=True)
+    title = models.CharField('Название', max_length=200, unique=True)
 
     def __str__(self):
         return self.title
 
 
 class Currency(models.Model):
-    name = models.CharField('Name', max_length=50, null=True)
-    short_name = models.CharField('Short view', max_length=3, unique=True)
+    name = models.CharField('Название', max_length=50, null=True)
+    short_name = models.CharField('Короткий код', max_length=3, unique=True)
 
     def __str__(self):
         return self.short_name
@@ -71,30 +79,31 @@ class RegularOutcome(models.Model):
         ('y', 'Year'),
     ]
     title = models.CharField(
-        'Outcome',
+        'Расход',
         max_length=100
     )
     period = models.CharField(
-        'Period of outcome',
+        'Периодичность',
         max_length=10,
         choices=period_choises
     )
     category = models.ForeignKey(
         Category,
+        verbose_name='Категория',
         on_delete=models.SET_NULL,
         null=True,
         related_name='outcomes'
     )
     sum = models.FloatField(
-        'Sum of outcome',
+        'Сумма расхода',
         default=0
     )
     start_date = models.DateField(
-        'Date of beginning',
+        'Дата начала',
         auto_now_add=True
     )
     end_date = models.DateField(
-        'Date of ending',
+        'Дата окончания',
         null=True,
         blank=True
     )

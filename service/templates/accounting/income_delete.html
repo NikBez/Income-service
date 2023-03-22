@@ -3,11 +3,11 @@
 
 
 {% block body %}
-  <h1>Delete "{{ object }}"</h1>
-  <p>Are you sure you want to delete this object?</p>
+  <h1>Удаляем "{{ object }}"</h1>
+  <p>Уверены что хотите удалить эу запись?</p>
   <form method="post">
     {% csrf_token %}
-    <button type="submit">Yes, delete</button>
-    <a href="{% url 'IncomesView' %}">Cancel</a>
+    <button type="submit">Да, удалить</button>
+    <a href="{% url 'IncomesView' %}">Отменить</a>
   </form>
 {% endblock %}
