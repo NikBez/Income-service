@@ -3,6 +3,9 @@
 
 
 {% block body %}
+    <div>
+        <a class="btn btn-outline-secondary" href="{% url 'main_page'%}">На главную</a>
+    </div>
 
 <!--Список записей-->
     <h2 class="mb-4">Список операций за {{ period }}</h2>
@@ -15,6 +18,7 @@
         <th>Сумма</th>
         <th>Валюта</th>
         <th>Получатель</th>
+        <th>Описание</th>
         </thead>
         {% for line in object_list %}
         <tr>
@@ -29,6 +33,7 @@
             <td>{{ line.sum }}</td>
             <td>{{ line.currency }}</td>
             <td>{{ line.user }}</td>
+            <td>{{ line.description }}</td>
             <td><a href="{% url 'edit_income' line.id %}" class="btn btn-outline-secondary btn-sm"> Edit </a></td>
             <td><a href="{% url 'delete_income' line.id %}" class="btn btn-outline-secondary btn-sm"> Del </a></td>
         </tr>

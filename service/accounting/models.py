@@ -42,6 +42,11 @@ class Income(models.Model):
         'Оплачен',
         default=False
     )
+    description = models.TextField(
+        'Описание',
+        max_length=300,
+        default=''
+    )
 
     def __str__(self):
         formated_date = self.date_of_operation.strftime("%d-%m-%Y %H:%M:%S")

@@ -9,6 +9,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Income
 from .forms import IncomeForm, RegisterUserForm
 from django.utils import timezone
+from .models import Source, Currency
 
 
 def main_page_view(request):
@@ -61,12 +62,14 @@ class IncomeDeleteView(DeleteView):
 
 class IncomeCreateView(CreateView):
     model = Income
-    fields = ['date_of_operation', 'source', 'category', 'sum', 'currency', 'status']
+    fields = ['date_of_operation', 'source', 'category', 'sum', 'description' 'status']
     template_name = 'accounting/income_create.html'
     success_url = reverse_lazy('main_page')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
+        # source = Source.objects.get(pk=form.instance.source.pk).select_related('currency')
+        form.instance.currency = form.instance.source.currency
         return super().form_valid(form)
 
 
