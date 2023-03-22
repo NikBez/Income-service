@@ -21,16 +21,17 @@
             <td>{{ line.sum }}</td>
             <td>{{ line.currency }}</td>
             <td>{{ line.user }}</td>
-            <td><a href="{% url 'edit_income' line.id %}" class="btn btn-outline-secondary"> Edit </a></td>
-            <td><a href="{% url 'delete_income' line.id %}" class="btn btn-outline-secondary"> Del </a></td>
+            <td><a href="{% url 'edit_income' line.id %}" class="btn btn-outline-secondary btn-sm"> Edit </a></td>
+            <td><a href="{% url 'delete_income' line.id %}" class="btn btn-outline-secondary btn-sm"> Del </a></td>
         </tr>
         {% endfor %}
     </table>
 
-      <div class="row row-cols-3 row-cols-lg-3">
+      <div class="row row-cols-3">
             <a class="btn btn-outline-secondary" href="{% url 'IncomesView'%}?period=all">Все время</a>
             <a class="btn btn-outline-secondary" href="{% url 'IncomesView'%}?period=month">Месяц</a>
             <a class="btn btn-outline-secondary" href="{% url 'IncomesView'%}?period=week">Неделя</a>
+
       </div>
 
 {% endblock %}

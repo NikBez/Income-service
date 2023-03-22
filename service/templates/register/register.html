@@ -1,0 +1,15 @@
+{% extends 'accounting/index.html' %}
+{% load crispy_forms_tags %}
+
+{% block body %}
+
+    <h1> Добро пожаловать в систему учета доходов</h1>
+    <h4 style="text-muted text-center">Заполните пару полей для регистрации</h4>
+    <br>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <br>
+        <button type="submit" style="btn btn-outline-secondary btn-sm">Регистрация</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,10 @@
+.main-menu li {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.main-menu li.menu-right {
+  float: right;
+  margin-top: -30px;
+}
+

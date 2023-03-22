@@ -1,0 +1,16 @@
+{% extends 'accounting/index.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block body %}
+    
+    <h1 style=""> Рад видеть тебя снова</h1>
+    <h4 style="text-muted text-center">Введи данные для авторизации</h4>
+    <br>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <br>
+        <button type="submit" style="btn btn-outline-secondary btn-sm">Войти</button>
+    </form>
+{% endblock %}
