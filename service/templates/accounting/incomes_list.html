@@ -3,12 +3,15 @@
 
 
 {% block body %}
-    <div class="mb-4">
-        <a class="btn btn-outline-secondary" href="{% url 'main_page'%}">На главную</a>
-    </div>
 
-<!--Список записей-->
     <h2 class="mb-4">Список операций за {{ period }}</h2>
+<!--Периоды отображения-->
+      <div class="row row-cols-3 mb-4">
+            <a class="btn btn-outline-secondary" href="{% url 'list_incomes'%}?period=all">Все время</a>
+            <a class="btn btn-outline-secondary" href="{% url 'list_incomes'%}?period=month">Месяц</a>
+            <a class="btn btn-outline-secondary" href="{% url 'list_incomes'%}?period=week">Неделя</a>
+      </div>
+<!--Список записей-->
     <table class="table table-hover">
         <thead>
         <th>Статус</th>
@@ -53,12 +56,5 @@
             {% endif %}
         </span>
     </div>
-
-<!--Периоды отображения-->
-      <div class="row row-cols-3 mb-4">
-            <a class="btn btn-outline-secondary" href="{% url 'list_incomes'%}?period=all">Все время</a>
-            <a class="btn btn-outline-secondary" href="{% url 'list_incomes'%}?period=month">Месяц</a>
-            <a class="btn btn-outline-secondary" href="{% url 'list_incomes'%}?period=week">Неделя</a>
-      </div>
 
 {% endblock %}

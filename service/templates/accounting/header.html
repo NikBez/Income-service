@@ -1,0 +1,32 @@
+<div class="container">
+    <div class="row">
+
+        <div class="col-9 menu-left gap-4">
+            <nav>
+                <ul class="main-menu">
+                    <li class="menu-left">
+                        <a href="{% url 'main_page'%}" class="btn btn-light btn-sm">На главную</a>
+                        <a href="{% url 'create_income' %}" class="btn btn-success btn-sm">Добавить операцию</a>
+                        <a href="{% url 'list_incomes' %}" class="btn btn-light btn-sm">Список всех операций</a>
+                        <a>Статистика</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="col-3 menu-right">
+            <nav>
+                <ul class="main-menu">
+                    <li class="menu-right">
+            {% if request.user.is_authenticated %}
+                {{ user.username }} <a href="{% url 'logout' %}" class="btn btn-outline-secondary btn-sm">Выйти</a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn btn-outline-secondary btn-sm">Регистрация</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-sm">Логин</a>
+            {% endif %}
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>

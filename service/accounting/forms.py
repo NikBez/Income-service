@@ -8,12 +8,12 @@ class IncomeForm(forms.ModelForm):
     class Meta:
         model = Income
         fields = ['status', 'date_of_operation', 'source', 'category', 'sum', 'currency', 'user', 'description']
-        widgets = {
-            'date_of_operation': forms.DateTimeInput(
-                format='%d-%m-%YT%H:%M:%S',
-                attrs={'type':'datetime-local'}
-            )
-        }
+        # widgets = {
+        #     'date_of_operation': forms.DateTimeInput(
+        #         format='%d-%m-%YT%H:%M:%S',
+        #         attrs={'type':'datetime-local'}
+        #     )
+        # }
 
     description = forms.CharField(required=False)
 

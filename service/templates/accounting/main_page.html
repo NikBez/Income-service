@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                За текущий месяц
+                За текущий месяц {{ static_data.sum_of_income }}
             </div>
             <div class="col">
                 Средний заработок за все время
@@ -15,7 +15,7 @@
         </div>
         <div class="row">
             <div class="col">
-                Заработок по категориям
+                Заработок по категориям {{ static_data.sum_of_income }}
             </div>
             <div class="col">
                 Заработок по источникам
@@ -27,7 +27,12 @@
 
          <div class="row">
             <div class="col">
-                В ожидании выплаты
+                В ожидании выплаты {{ static_data.sum_of_debt }}
+                <ul>
+                    {% for operation in dept_operations %}
+                    <li><a href="{% url 'edit_income' operation.pk %}">{{operation}}</a></li>
+                    {% endfor %}
+                </ul>
             </div>
             <div class="col">
                 Сумма регулярных расходов в этом месяце
@@ -35,17 +40,5 @@
             <div class="col">
                 Сумма дохода в текущем месяце
             </div>
-
-              <div class="row">
-            <div class="col">
-                <a href="{% url 'create_income' %}">Добавить операцию</a>
-            </div>
-            <div class="col">
-               <a href="{% url 'list_incomes' %}">Список всех операций</a>
-            </div>
-            <div class="col">
-                Расширенная аналитика(в разработке)
-            </div>
-        </div>
     </div>
 {% endblock %}

@@ -3,7 +3,7 @@
 
 
 {% block body %}
-  <h1>Редактирование записи {{ object }}</h1>
+  <h3>Редактирование записи "{{ object }}"</h3>
   <form method="post">
     {% csrf_token %}
     {{ form|crispy }}

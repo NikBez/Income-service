@@ -3,19 +3,18 @@ from datetime import timedelta
 from django.contrib.auth import logout, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,reverse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Income
 from .forms import IncomeForm, RegisterUserForm
 from django.utils import timezone
-from .models import Source, Currency
+from django.db.models import Sum
+from .serializers import IncomeSummarySerializer
 
-
-def main_page_view(request):
-
-
-    return render(request, 'accounting/main_page.html')
+from rest_framework.views import APIView
+from rest_framework.response import Response
+import requests
 
 
 class IncomesView(ListView):
@@ -53,7 +52,7 @@ class IncomeEditView(UpdateView):
     template_name = 'accounting/incomes_edit.html'
     success_url = reverse_lazy('list_incomes')
 
-    def get_form(self, form_class=None):
+    def get_form(self, form_class=IncomeForm):
         form = super().get_form(form_class)
         form.fields['date_of_operation'].initial = self.object.date_of_operation
         return form
@@ -78,7 +77,6 @@ class IncomeCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        # source = Source.objects.get(pk=form.instance.source.pk).select_related('currency')
         form.instance.currency = form.instance.source.currency
         return super().form_valid(form)
 
@@ -105,6 +103,80 @@ class LoginUser(LoginView):
 def logout_user(request):
     logout(request)
     return redirect('login')
+
+
+def main_page_view(request):
+    api_url = reverse('api_incomes')
+    response = requests.get(request.build_absolute_uri(api_url))
+    response.raise_for_status()
+    response = response.json()
+
+    dept_pks = response['list_of_debt_operations']['pk']
+    dept_operations = Income.objects.filter(pk__in=dept_pks).select_related('source', 'currency')
+
+    context = {
+        'static_data': response,
+        'dept_operations': dept_operations
+    }
+    return render(request,  'accounting/main_page.html', context)
+
+
+class IncomeSummaryView(APIView):
+    def get(self, request):
+        current_month = timezone.now().month
+        current_year = timezone.now().year
+
+        # Получаем сумму доходов за текущий месяц
+        sum_of_income = Income.objects.filter(
+            status=True,
+            date_of_operation__month=current_month,
+            date_of_operation__year=current_year
+        ).aggregate(sum_of_income=Sum('sum'))['sum_of_income'] or 0.0
+
+        # Получаем сумму доходов за текущий месяц в разрезе источника
+        sum_of_income_by_source = Income.objects.filter(
+            status=True,
+            date_of_operation__month=current_month,
+            date_of_operation__year=current_year
+        ).values('source__title').annotate(sum_of_income=Sum('sum'))
+
+        # Получаем сумму доходов за текущий месяц в разрезе категории
+        sum_of_income_by_category = Income.objects.filter(
+            status=True,
+            date_of_operation__month=current_month,
+            date_of_operation__year=current_year
+        ).values('category__title').annotate(sum_of_income=Sum('sum'))
+
+        # Получаем сумму доходов за текущий месяц в разрезе пользователей
+        sum_of_income_by_user = Income.objects.filter(
+            status=True,
+            date_of_operation__month=current_month,
+            date_of_operation__year=current_year
+        ).values('user__username').annotate(sum_of_income=Sum('sum'))
+
+        # Получаем сумму невыплаченных операций
+        sum_of_debt = Income.objects.filter(
+            status=False
+        ).aggregate(sum_of_debt=Sum('sum'))['sum_of_debt'] or 0.0
+
+        # Получаем список операций без проведенной оплаты
+        debt_operations = Income.objects.filter(status=False).values('pk')
+
+        serializer = IncomeSummarySerializer({
+            'sum_of_income': sum_of_income,
+            'sum_of_debt': sum_of_debt,
+            'sum_of_income_by_source': sum_of_income_by_source,
+            'sum_of_income_by_category': sum_of_income_by_category,
+            'sum_of_income_by_user': sum_of_income_by_user,
+            'list_of_debt_operations': {'pk': [item['pk'] for item in debt_operations]},
+        })
+        return Response(serializer.data)
+
+
+
+
+
+
 
 
 

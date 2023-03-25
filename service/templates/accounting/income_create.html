@@ -3,10 +3,17 @@
 
 
 {% block body %}
-  <h1>Новая запись:</h1>
-  <form method="post">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <button type="submit">Записать</button>
-  </form>
+  <div class="container mt-5">
+        <div class="row px-4">
+            <div class="col-md-auto">
+             <h3>Новая запись:</h3>
+              <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit">Записать</button>
+              </form>
+            </div>
+        </div>
+  </div>
+
 {% endblock %}

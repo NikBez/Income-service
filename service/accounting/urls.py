@@ -1,7 +1,7 @@
 
 from django.urls import path
-from .views import main_page_view, IncomesView, IncomeEditView,\
-    IncomeDeleteView, RegisterUser, LoginUser, logout_user, IncomeCreateView
+from .views import main_page_view, IncomesView, IncomeEditView, \
+    IncomeDeleteView, RegisterUser, LoginUser, logout_user, IncomeCreateView, main_page_view, IncomeSummaryView
 
 urlpatterns = [
     path('', main_page_view, name='main_page'),
@@ -12,4 +12,5 @@ urlpatterns = [
     path('login/', LoginUser.as_view(), name='login'),
     path('logout/', logout_user, name='logout'),
     path('register/', RegisterUser.as_view(), name='register'),
+    path('api/income/', IncomeSummaryView.as_view(), name='api_incomes'),
 ]
