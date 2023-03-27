@@ -1,44 +1,108 @@
 {% extends 'accounting/index.html' %}
 
 {% block body %}
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                За текущий месяц {{ static_data.sum_of_income }}
+
+<!--Период отображения-->
+
+    <div class="container mt-5">
+        <div class="row justify-content-between align-items-end">
+            <div class="col-3">
+                <a class="btn btn-outline-secondary" href="{% url 'main_page' %}?date={{ previous_month }}">Предыдущий месяц</a>
             </div>
-            <div class="col">
-                Средний заработок за все время
+            <div class="col-6 text-center">
+                <div class="p-2  align-self-start"><h5>{{current_month|date:"F Y"}}</h5></div>
             </div>
-            <div class="col">
-                Коэффициент изменения
+            <div class="col-3 text-end">
+               <a class="btn btn-outline-secondary" href="{% url 'main_page' %}?date={{ next_month }}">Следующий месяц</a>
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                Заработок по категориям {{ static_data.sum_of_income }}
+    </div>
+
+     <div class="container">
+        <div class="row my-1 g-4">
+            <div class="col border border-1 border-dark mx-4">
+                <div class="p-2  align-self-start"><h5>Доход за {{current_month|date:"F"|lower}}:</h5></div>
+                <div class="p-2 fs-1 "> {{ static_data.sum_of_income|floatformat:"g" }} руб.</div>
             </div>
-            <div class="col">
-                Заработок по источникам
+            <div class="col border border-1 border-dark mx-4">
+                <div class="p-2  align-self-start"><h5>Ср.заработок</h5></div>
             </div>
-            <div class="col">
-                Заработок по пользователям
+            <div class="col border border-1 border-dark mx-4">
+                <div class="p-2  align-self-start"><h5>Динамика </h5></div>
+            </div>
+        </div>
+        <div class="row my-2">
+            <div class="col border border-1 border-dark mx-4">
+                <div class="p-2  align-self-start"><h5>Заработок по категориям</h5></div>
+                <table class="table table-hover">
+                    <thead>
+                    <th>Название</th>
+                    <th>Сумма</th>
+                    </thead>
+                    {% for category in static_data.sum_of_income_by_category %}
+                        <tr>
+                            <td>  <a class="link_on_main" href="{% url 'list_incomes'%}?category={{ category.category__title }}&month_filter={{current_month|date:'m_Y'}}">{{ category.category__title }}</a></td>
+                            <td> {{ category.sum_of_income|floatformat:"g" }} {{sys_currency}}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+            </div>
+            <div class="col border border-1 border-dark mx-4">
+                <div class="p-2  align-self-start"><h5>Заработок по источникам</h5></div>
+                <table class="table table-hover">
+                    <thead>
+                    <th>Название</th>
+                    <th>Сумма</th>
+                    </thead>
+                    {% for source in static_data.sum_of_income_by_source %}
+                        <tr>
+                            <td> <a class="link_on_main" href="{% url 'list_incomes'%}?source={{ source.source__title }}&month_filter={{current_month|date:'m_Y'}}"> {{ source.source__title }} </a></td>
+                            <td>  {{ source.sum_of_income|floatformat:"g" }} {{sys_currency}}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="col border border-1 border-dark mx-4">
+                <div class="p-2  align-self-start"><h5>Заработок по пользователям</h5></div>
+                <table class="table table-hover">
+                    <thead>
+                    <th>Название</th>
+                    <th>Сумма</th>
+                    </thead>
+                    {% for user in static_data.sum_of_income_by_user %}
+                        <tr>
+                            <td> <a class="link_on_main" href="{% url 'list_incomes'%}?user={{ user.user__username }}&month_filter={{current_month|date:'m_Y'}}"> {{ user.user__username }} </a> </td>
+                            <td>   {{ user.sum_of_income|floatformat:"g" }} {{sys_currency}} </td>
+                        </tr>
+                    {% endfor %}
+                </table>
             </div>
         </div>
 
-         <div class="row">
-            <div class="col">
-                В ожидании выплаты {{ static_data.sum_of_debt }}
-                <ul>
-                    {% for operation in dept_operations %}
-                    <li><a href="{% url 'edit_income' operation.pk %}">{{operation}}</a></li>
-                    {% endfor %}
-                </ul>
+         <div class="row my-2">
+            <div class="col border border-1 border-dark mx-4">
+               <div class="p-2  align-self-start"><h5>Не выплаченные</h5></div>
+                <div class="p-2 fs-2">  {{ static_data.sum_of_debt|floatformat:"g" }} руб.</div>
+                {% if dept_operations %}
+                    <table class="table table-hover">
+                        <thead>
+                        <th>Все операции</th>
+                        </thead>
+                        {% for operation in dept_operations %}
+                            <tr>
+                                <td> <a class="link_on_main" href="{% url 'edit_income' operation.pk %}">{{operation}}</a> </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
             </div>
-            <div class="col">
-                Сумма регулярных расходов в этом месяце
+            <div class="col border border-1 border-dark mx-4">
+                <div class="p-2  align-self-start"><h5>Сумма регулярных расходов</h5></div>
             </div>
-            <div class="col">
-                Сумма дохода в текущем месяце
+            <div class="col border border-1 border-dark mx-4">
+                <div class="p-2  align-self-start"><h5> Итоговое сальдо за{{current_month|date:"F"|lower}}:</h5></div>
             </div>
-    </div>
+        </div>
 {% endblock %}

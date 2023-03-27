@@ -19,3 +19,17 @@
   color: red
 }
 
+.header {
+  background-color: #d3e8dd; /* задайте цвет фона, например, оранжевый */
+  color: #1d1d1d; /* задайте цвет текста, например, белый */
+  margin-bottom: 10px; /* задайте отступы между блоками */
+}
+
+.link_on_main {
+    text-decoration: None;
+    font-size: 14px;
+    color: black
+}
+
+
+

@@ -1,14 +1,16 @@
-<div class="container">
+<div class="container md-4">
     <div class="row">
 
         <div class="col-9 menu-left gap-4">
             <nav>
                 <ul class="main-menu">
                     <li class="menu-left">
-                        <a href="{% url 'main_page'%}" class="btn btn-light btn-sm">На главную</a>
-                        <a href="{% url 'create_income' %}" class="btn btn-success btn-sm">Добавить операцию</a>
-                        <a href="{% url 'list_incomes' %}" class="btn btn-light btn-sm">Список всех операций</a>
-                        <a>Статистика</a>
+                        <a href="{% url 'main_page'%}" class="btn btn-light btn-sm">Главная</a>
+                        <a href="{% url 'create_income' %}" class="btn btn-success btn-sm">+ Доход</a>
+                         <a href="{% url 'create_outcome' %}" class="btn btn-danger btn-sm">+ Расход</a>
+                        <a href="{% url 'list_incomes' %}" class="btn btn-light btn-sm">Поступления</a>
+                        <a href="{% url 'main_page' %}" class="btn btn-light btn-sm">Расходы</a>
+                         <a href="{% url 'main_page' %}" class="btn btn-light btn-sm">Аналитика</a>
                     </li>
                 </ul>
             </nav>
