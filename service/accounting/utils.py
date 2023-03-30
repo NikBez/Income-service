@@ -7,7 +7,7 @@ from django.utils import dateformat, timezone
 env = Env()
 env.read_env()
 
-CURRATERU_API_ID = env('CURRATERU_API_ID')
+FREECURRENCY_API_ID = env('FREECURRENCY_API_ID')
 DEFAULT_CURRENCY = env('DEFAULT_CURRENCY')
 
 def get_sum_in_default_currency(sum, source, date_of_operation):
@@ -22,7 +22,7 @@ def get_sum_in_default_currency(sum, source, date_of_operation):
 
         params = {
             'currencies': DEFAULT_CURRENCY,
-            'apikey': CURRATERU_API_ID,
+            'apikey': FREECURRENCY_API_ID,
             'date_from': formated_date_of_rate,
             'date_to': formated_date_of_rate
         }

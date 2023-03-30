@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+    container_name: django-app
+    volumes:
+      - ./service:/service
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=admin
+      - DB_PASS=admin
+      - DB_NAME=main
+      - DJANGO_SECRET_KEY=django-insecure-8cf=6_2^*kvqa=!uktxrjv&enbwf)ito&hz1t=#9s!j36pm6p@
+      - AVERAGE_PERIOD_LENGTH=6
+      - DEFAULT_CURRENCY=RUB
+      - FREECURRENCY_API_ID=2f9JphFAslZOps6kVcOWM7hlMZ8bxPIvNPAdP0Ws
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15.2-alpine
+    container_name: postgresql
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=main
+    volumes:
+      - backend_django_is:/var/lib/postgresql/data
+
+volumes:
+  backend_django_is:
