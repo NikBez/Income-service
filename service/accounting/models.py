@@ -47,6 +47,11 @@ class Income(models.Model):
         max_length=300,
         default=''
     )
+    sum_in_default_currency = models.FloatField(
+        'Сумма в пересчета на валюту учета',
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         formated_date = self.date_of_operation.strftime("%d-%m-%Y")

@@ -7,7 +7,18 @@ from .models import Income
 class IncomeForm(forms.ModelForm):
     class Meta:
         model = Income
-        fields = ['status', 'date_of_operation', 'source', 'category', 'sum', 'currency', 'user', 'description']
+        fields = [
+            'status',
+            'date_of_operation',
+            'source',
+            'category',
+            'sum',
+            'currency',
+            'user',
+            'description',
+            'sum_in_default_currency'
+        ]
+
         # widgets = {
         #     'date_of_operation': forms.DateTimeInput(
         #         format='%d-%m-%YT%H:%M:%S',
@@ -20,6 +31,7 @@ class IncomeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['description'].required = False
+        self.fields['sum_in_default_currency'].widget = forms.HiddenInput()
 
 
 class RegisterUserForm(UserCreationForm):

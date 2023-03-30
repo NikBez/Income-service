@@ -31,10 +31,13 @@ class DebtOperationsSerializer(serializers.Serializer):
 class IncomeSummarySerializer(serializers.Serializer):
     sum_of_income = serializers.FloatField()
     sum_of_debt = serializers.FloatField()
+    average_income = serializers.FloatField()
     sum_of_income_by_source = SumBySourceSerializer(many=True)
     sum_of_income_by_category = SumByCategorySerializer(many=True)
     sum_of_income_by_user = SumByUserSerializer(many=True)
     list_of_debt_operations = DebtOperationsSerializer()
+
+
 
 
 

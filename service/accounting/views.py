@@ -1,4 +1,7 @@
 from datetime import timedelta, datetime
+from environs import Env
+import requests
+from dateutil.relativedelta import relativedelta
 
 from django.contrib.auth import logout, login
 from django.contrib.auth.forms import AuthenticationForm
@@ -6,23 +9,26 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect,reverse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from .models import Income, RegularOutcome
-from .forms import IncomeForm, RegisterUserForm
 from django.utils import timezone, dateformat
 from django.db.models import Sum
-from .serializers import IncomeSummarySerializer
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
-import requests
-from dateutil.relativedelta import relativedelta
 
+from .models import Income, RegularOutcome
+from .forms import IncomeForm, RegisterUserForm
+from .serializers import IncomeSummarySerializer
+from .utils import get_sum_in_default_currency
+
+env = Env()
+env.read_env()
+
+AVERAGE_PERIOD_LENGTH = int(env('AVERAGE_PERIOD_LENGTH'))
+DEFAULT_CURRENCY = env('DEFAULT_CURRENCY')
 
 class IncomesView(ListView):
     model = Income
     template_name = 'accounting/incomes_list.html'
     paginate_by = 10
-
 
     def get_queryset(self):
         period = self.request.GET.get('period')
@@ -104,14 +110,20 @@ class IncomesView(ListView):
 
 class IncomeEditView(UpdateView):
     model = Income
-    form_class = IncomeForm
+    # form_class = IncomeForm
+    fields = ['date_of_operation', 'source', 'category', 'sum', 'description', 'status']
     template_name = 'accounting/incomes_edit.html'
     success_url = reverse_lazy('main_page')
 
-    def get_form(self, form_class=IncomeForm):
+    def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.fields['date_of_operation'].initial = self.object.date_of_operation
         return form
+
+    def form_valid(self, form):
+        form.instance.sum_in_default_currency = get_sum_in_default_currency(form.instance.sum, form.instance.source, form.instance.date_of_operation)
+        return super().form_valid(form)
+
 
 
 class IncomeDeleteView(DeleteView):
@@ -134,6 +146,7 @@ class IncomeCreateView(CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         form.instance.currency = form.instance.source.currency
+        form.instance.sum_in_default_currency = get_sum_in_default_currency(form.instance.sum, form.instance.source, form.instance.date_of_operation)
         return super().form_valid(form)
 
 
@@ -188,6 +201,8 @@ def main_page_view(request):
         'next_month': dateformat.format(month_and_year + relativedelta(months=1), 'Y-m-d'),
         'previous_month': dateformat.format(month_and_year - relativedelta(months=1), 'Y-m-d'),
         'current_month': month_and_year,
+        'avg_period_length': AVERAGE_PERIOD_LENGTH,
+        'default_currancy': DEFAULT_CURRENCY
     }
     return render(request,  'accounting/main_page.html', context)
 
@@ -197,42 +212,50 @@ class IncomeSummaryView(APIView):
     def get(self, request):
         month = request.query_params.get('month')
         year = request.query_params.get('year')
+        start_avg_month_number = datetime.strptime(f'01-{month}-{year}', '%d-%m-%Y') - relativedelta(months=AVERAGE_PERIOD_LENGTH)
 
         # Получаем сумму доходов за текущий месяц
         sum_of_income = Income.objects.filter(
             status=True,
             date_of_operation__month=month,
             date_of_operation__year=year
-        ).aggregate(sum_of_income=Sum('sum'))['sum_of_income'] or 0.0
+        ).aggregate(sum_of_income=Sum('sum_in_default_currency'))['sum_of_income'] or 0.0
 
         # Получаем сумму доходов за текущий месяц в разрезе источника
         sum_of_income_by_source = Income.objects.filter(
             status=True,
             date_of_operation__month=month,
             date_of_operation__year=year
-        ).values('source__title').annotate(sum_of_income=Sum('sum')).order_by('-sum_of_income')
+        ).values('source__title').annotate(sum_of_income=Sum('sum_in_default_currency')).order_by('-sum_of_income')
 
         # Получаем сумму доходов за текущий месяц в разрезе категории
         sum_of_income_by_category = Income.objects.filter(
             status=True,
             date_of_operation__month=month,
             date_of_operation__year=year
-        ).values('category__title').annotate(sum_of_income=Sum('sum')).order_by('-sum_of_income')
+        ).values('category__title').annotate(sum_of_income=Sum('sum_in_default_currency')).order_by('-sum_of_income')
 
         # Получаем сумму доходов за текущий месяц в разрезе пользователей
         sum_of_income_by_user = Income.objects.filter(
             status=True,
             date_of_operation__month=month,
             date_of_operation__year=year
-        ).values('user__username').annotate(sum_of_income=Sum('sum')).order_by('-sum_of_income')
+        ).values('user__username').annotate(sum_of_income=Sum('sum_in_default_currency')).order_by('-sum_of_income')
 
         # Получаем сумму невыплаченных операций
         sum_of_debt = Income.objects.filter(
             status=False
-        ).aggregate(sum_of_debt=Sum('sum'))['sum_of_debt'] or 0.0
+        ).aggregate(sum_of_debt=Sum('sum_in_default_currency'))['sum_of_debt'] or 0.0
 
         # Получаем список операций без проведенной оплаты
         debt_operations = Income.objects.filter(status=False).values('pk')
+
+        # Получаем среднюю сумму заработка за последние 6 месяцев
+        average_income = Income.objects.filter(
+            date_of_operation__gte=start_avg_month_number,
+            date_of_operation__lt=datetime.strptime(f'01-{month}-{year}', '%d-%m-%Y') + relativedelta(months=1),
+            status=True,
+        ).aggregate(average_income=Sum('sum_in_default_currency')/AVERAGE_PERIOD_LENGTH)['average_income'] or 0.0
 
         serializer = IncomeSummarySerializer({
             'sum_of_income': sum_of_income,
@@ -241,6 +264,8 @@ class IncomeSummaryView(APIView):
             'sum_of_income_by_category': sum_of_income_by_category,
             'sum_of_income_by_user': sum_of_income_by_user,
             'list_of_debt_operations': {'pk': [item['pk'] for item in debt_operations]},
+            'average_income': average_income,
+
         })
         return Response(serializer.data)
 
