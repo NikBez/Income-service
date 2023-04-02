@@ -18,7 +18,7 @@ from rest_framework.response import Response
 from .models import Income, RegularOutcome
 from .forms import RegisterUserForm, IncomeForm, RegularOutcomeForm
 from .serializers import IncomeSummarySerializer
-from .utils import get_sum_in_default_currency, get_dongs_in_default_currency, convert_currency_by_fixer
+from .utils import get_sum_in_default_currency, convert_currency_by_fixer
 
 env = Env()
 env.read_env()
