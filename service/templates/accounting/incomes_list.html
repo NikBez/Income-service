@@ -63,6 +63,7 @@
                             <td>{{ line.user }}</td>
                         {% endif %}
                         <td>{{ line.description }}</td>
+                        <td><a href="{% url 'copy_income' line.id %}" class="btn btn-outline-secondary btn-sm"> Copy </a></td>
                         <td><a href="{% url 'edit_income' line.id %}" class="btn btn-outline-secondary btn-sm"> Edit </a></td>
                         <td><a href="{% url 'delete_income' line.id %}" class="btn btn-outline-secondary btn-sm"> Del </a></td>
                     </tr>

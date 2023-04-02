@@ -18,6 +18,7 @@ services:
       - AVERAGE_PERIOD_LENGTH=6
       - DEFAULT_CURRENCY=RUB
       - FREECURRENCY_API_ID=2f9JphFAslZOps6kVcOWM7hlMZ8bxPIvNPAdP0Ws
+      - FIXER_API_KEY=7VxQjk5NxCaBmAHYLPNAWkyPCpkvqfvP
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
     depends_on:

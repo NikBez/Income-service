@@ -2,6 +2,7 @@
 
 {% block body %}
 
+{{ static_data.test }}
 <!--Период отображения-->
     <div class="container mt-5">
         <div class="row justify-content-between align-items-end">
@@ -21,15 +22,16 @@
         <div class="row my-1 g-4">
             <div class="col border border-1 border-dark mx-4">
                 <div class="p-2  align-self-start"><h5>Доход за {{current_month|date:"F"|lower}}:</h5></div>
-                <div class="p-2 fs-1 "> {{ static_data.sum_of_income|floatformat:"g" }} {{ default_currancy }}.</div>
+                <div class="p-2 fs-1 "> {{ static_data.sum_of_income|floatformat:"g" }} {{ default_currency }}.</div>
             </div>
             <div class="col border border-1 border-dark mx-4">
                 <div class="p-2  align-self-start"><h5>Ср.заработок за {{ avg_period_length }} месяцев</h5></div>
-                 <div class="p-2 fs-1 "> {{ static_data.average_income|floatformat:"g" }} {{ default_currancy }}.</div>
+                 <div class="p-2 fs-1 "> {{ static_data.average_income|floatformat:"g" }} {{ default_currency }}.</div>
 
             </div>
             <div class="col border border-1 border-dark mx-4">
                 <div class="p-2  align-self-start"><h5>Динамика </h5></div>
+                <div class="p-2 fs-1"> {{ static_data.income_change_rate|floatformat:2 }} %</div>
             </div>
         </div>
         <div class="row my-2">
@@ -43,7 +45,7 @@
                     {% for category in static_data.sum_of_income_by_category %}
                         <tr>
                             <td>  <a class="link_on_main" href="{% url 'list_incomes'%}?category={{ category.category__title }}&month_filter={{current_month|date:'m_Y'}}">{{ category.category__title }}</a></td>
-                            <td> {{ category.sum_of_income|floatformat:"g" }} {{ default_currancy }}</td>
+                            <td> {{ category.sum_of_income|floatformat:"g" }} {{ default_currency }}</td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -59,7 +61,7 @@
                     {% for source in static_data.sum_of_income_by_source %}
                         <tr>
                             <td> <a class="link_on_main" href="{% url 'list_incomes'%}?source={{ source.source__title }}&month_filter={{current_month|date:'m_Y'}}"> {{ source.source__title }} </a></td>
-                            <td>  {{ source.sum_of_income|floatformat:"g" }} {{ default_currancy }}</td>
+                            <td>  {{ source.sum_of_income|floatformat:"g" }} {{ default_currency }}</td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -75,7 +77,7 @@
                     {% for user in static_data.sum_of_income_by_user %}
                         <tr>
                             <td> <a class="link_on_main" href="{% url 'list_incomes'%}?user={{ user.user__username }}&month_filter={{current_month|date:'m_Y'}}"> {{ user.user__username }} </a> </td>
-                            <td>   {{ user.sum_of_income|floatformat:"g" }} {{ default_currancy }} </td>
+                            <td>   {{ user.sum_of_income|floatformat:"g" }} {{ default_currency }} </td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -85,7 +87,7 @@
          <div class="row my-2">
             <div class="col border border-1 border-dark mx-4">
                <div class="p-2  align-self-start"><h5>Не выплаченные</h5></div>
-                <div class="p-2 fs-2">  {{ static_data.sum_of_debt|floatformat:"g" }} {{ default_currancy }}.</div>
+                <div class="p-2 fs-2">  {{ static_data.sum_of_debt|floatformat:"g" }} {{ default_currency }}.</div>
                 {% if dept_operations %}
                     <table class="table table-hover">
                         <thead>
@@ -101,9 +103,12 @@
             </div>
             <div class="col border border-1 border-dark mx-4">
                 <div class="p-2  align-self-start"><h5>Сумма регулярных расходов</h5></div>
+                <div class="p-2 fs-1"> {{ static_data.sum_of_outcomes|floatformat:"g" }} {{ default_currency }}. </div>
+
             </div>
             <div class="col border border-1 border-dark mx-4">
                 <div class="p-2  align-self-start"><h5> Итоговое сальдо за {{current_month|date:"F"|lower}}:</h5></div>
+                <div class="p-2 fs-1"> {{ static_data.total_profit|floatformat:"g" }} {{ default_currency }}. </div>
             </div>
         </div>
 {% endblock %}

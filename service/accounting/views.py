@@ -2,28 +2,36 @@ from datetime import timedelta, datetime
 from environs import Env
 import requests
 from dateutil.relativedelta import relativedelta
+from django import forms
 
 from django.contrib.auth import logout, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
-from django.shortcuts import render, redirect,reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.utils import timezone, dateformat
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Income, RegularOutcome
-from .forms import IncomeForm, RegisterUserForm
+from .forms import RegisterUserForm, IncomeForm, RegularOutcomeForm
 from .serializers import IncomeSummarySerializer
-from .utils import get_sum_in_default_currency
+from .utils import get_sum_in_default_currency, get_dongs_in_default_currency, convert_currency_by_fixer
 
 env = Env()
 env.read_env()
 
 AVERAGE_PERIOD_LENGTH = int(env('AVERAGE_PERIOD_LENGTH'))
 DEFAULT_CURRENCY = env('DEFAULT_CURRENCY')
+
+PERIOD_MULTIPLIERS = {
+            'Day': 30,
+            'Week': 4,
+            'Month': 1,
+            'Year': 0.083
+        }
 
 class IncomesView(ListView):
     model = Income
@@ -70,7 +78,7 @@ class IncomesView(ListView):
                 source__title=source
             ).order_by('-date_of_operation')
 
-        return Income.objects.all().order_by('-date_of_operation')
+        return Income.objects.all().order_by('-date_of_operation', 'source')
 
 
     def get_context_data(self, **kwargs):
@@ -110,10 +118,9 @@ class IncomesView(ListView):
 
 class IncomeEditView(UpdateView):
     model = Income
-    # form_class = IncomeForm
-    fields = ['date_of_operation', 'source', 'category', 'sum', 'description', 'status']
+    form_class = IncomeForm
     template_name = 'accounting/incomes_edit.html'
-    success_url = reverse_lazy('main_page')
+    success_url = reverse_lazy('list_incomes')
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -125,7 +132,6 @@ class IncomeEditView(UpdateView):
         return super().form_valid(form)
 
 
-
 class IncomeDeleteView(DeleteView):
     model = Income
     template_name = 'accounting/income_delete.html'
@@ -134,14 +140,17 @@ class IncomeDeleteView(DeleteView):
 
 class IncomeCreateView(CreateView):
     model = Income
-    fields = ['date_of_operation', 'source', 'category', 'sum', 'description', 'status']
+    fields = ['status', 'date_of_operation', 'source', 'category', 'sum', 'description']
     template_name = 'accounting/income_create.html'
-    success_url = reverse_lazy('main_page')
+    success_url = reverse_lazy('list_incomes')
+
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.fields['description'].required = False
+        form.fields['date_of_operation'].widget = forms.DateInput()
         return form
+
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -202,7 +211,7 @@ def main_page_view(request):
         'previous_month': dateformat.format(month_and_year - relativedelta(months=1), 'Y-m-d'),
         'current_month': month_and_year,
         'avg_period_length': AVERAGE_PERIOD_LENGTH,
-        'default_currancy': DEFAULT_CURRENCY
+        'default_currency': DEFAULT_CURRENCY
     }
     return render(request,  'accounting/main_page.html', context)
 
@@ -257,6 +266,25 @@ class IncomeSummaryView(APIView):
             status=True,
         ).aggregate(average_income=Sum('sum_in_default_currency')/AVERAGE_PERIOD_LENGTH)['average_income'] or 0.0
 
+        # Коэффициент изменения прибыли
+        prev_month = datetime.strptime(f'01-{month}-{year}', '%d-%m-%Y') - relativedelta(months=1)
+        prev_month_income = Income.objects.filter(
+            status=True,
+            date_of_operation__month=prev_month.month,
+            date_of_operation__year=prev_month.year
+        ).aggregate(prev_month_income=Sum('sum_in_default_currency'))['prev_month_income'] or 0.0
+
+        if prev_month_income:
+            income_change_rate = sum_of_income / prev_month_income * 100 - 100
+        else:
+            income_change_rate = 100
+
+        # Сумма ежемесячных расходов в пересчете на дефолтную валюту
+        actual_outcomes_sum = RegularOutcome.objects.filter(
+                Q(end_date__gte=timezone.now()) | Q(end_date=None),
+                start_date__lte=timezone.now()
+            ).aggregate(sum_of_reg_outcomes=Sum('sum_in_default_currency'))['sum_of_reg_outcomes'] or 0.0
+
         serializer = IncomeSummarySerializer({
             'sum_of_income': sum_of_income,
             'sum_of_debt': sum_of_debt,
@@ -265,6 +293,9 @@ class IncomeSummaryView(APIView):
             'sum_of_income_by_user': sum_of_income_by_user,
             'list_of_debt_operations': {'pk': [item['pk'] for item in debt_operations]},
             'average_income': average_income,
+            'income_change_rate': income_change_rate,
+            'sum_of_outcomes': actual_outcomes_sum,
+            'total_profit': sum_of_income - actual_outcomes_sum,
 
         })
         return Response(serializer.data)
@@ -272,13 +303,69 @@ class IncomeSummaryView(APIView):
 
 class OutcomeCreateView(CreateView):
     model = RegularOutcome
-    fields = '__all__'
+    form_class = RegularOutcomeForm
     template_name = 'accounting/income_create.html'
-    success_url = reverse_lazy('main_page')
+    success_url = reverse_lazy('list_outcomes')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        return form
+
+    def form_valid(self, form):
+        if form.instance.currency.short_name == DEFAULT_CURRENCY:
+            form.instance.sum_in_default_currency = form.instance.sum * PERIOD_MULTIPLIERS.get(form.instance.period, 1)
+        else:
+            converted_sum = convert_currency_by_fixer(form.instance.sum, form.instance.currency.short_name)
+            form.instance.sum_in_default_currency = converted_sum * PERIOD_MULTIPLIERS.get(form.instance.period, 1)
+        return super().form_valid(form)
 
 
+class RegularOutcomesView(ListView):
+    model = RegularOutcome
+    template_name = 'accounting/outcomes_list.html'
+    paginate_by = 10
+    ordering = ('start_date', '-sum')
 
 
+class OutcomeEditView(UpdateView):
+    model = RegularOutcome
+    template_name = 'accounting/incomes_edit.html'
+    success_url = reverse_lazy('list_outcomes')
+    form_class = RegularOutcomeForm
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        return form
+
+    def form_valid(self, form):
+        if form.instance.currency.short_name == DEFAULT_CURRENCY:
+            form.instance.sum_in_default_currency = form.instance.sum * PERIOD_MULTIPLIERS.get(form.instance.period, 1)
+        else:
+            converted_sum = convert_currency_by_fixer(form.instance.sum, form.instance.currency.short_name)
+            form.instance.sum_in_default_currency = converted_sum * PERIOD_MULTIPLIERS.get(form.instance.period, 1)
+        return super().form_valid(form)
+
+
+class OutcomeDeleteView(DeleteView):
+    model = RegularOutcome
+    template_name = 'accounting/income_delete.html'
+    success_url = reverse_lazy('list_outcomes')
+
+
+def income_copy_view(request, pk):
+    new_item = get_object_or_404(Income, pk=pk)
+    new_item.pk = None  # autogen a new pk (item_id)
+
+    form = IncomeForm(request.POST or None, instance=new_item)
+
+    if form.is_valid():
+        form.save()
+        return redirect('list_incomes')
+
+    context = {
+        "form": form,
+    }
+    return render(request, "accounting/income_create.html", context)
 
 
 

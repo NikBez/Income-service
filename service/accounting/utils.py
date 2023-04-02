@@ -9,6 +9,8 @@ env.read_env()
 
 FREECURRENCY_API_ID = env('FREECURRENCY_API_ID')
 DEFAULT_CURRENCY = env('DEFAULT_CURRENCY')
+FIXER_API_KEY = env('FIXER_API_KEY')
+
 
 def get_sum_in_default_currency(sum, source, date_of_operation):
 
@@ -32,3 +34,17 @@ def get_sum_in_default_currency(sum, source, date_of_operation):
         return responce['data'][formated_date_of_rate][DEFAULT_CURRENCY] * sum
     return sum
 
+
+def convert_currency_by_fixer(sum, from_currency):
+    headers = {
+        'apikey': FIXER_API_KEY
+    }
+    params = {
+        'from': from_currency,
+        'to': DEFAULT_CURRENCY,
+        'amount': int(sum)
+    }
+    response = requests.get('https://api.apilayer.com/fixer/convert', params=params, headers=headers)
+    response.raise_for_status()
+    response = response.json()
+    return float(response['result'])

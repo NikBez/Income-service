@@ -82,12 +82,18 @@ class Currency(models.Model):
 
 
 class RegularOutcome(models.Model):
-    period_choises = [
-        ('d', 'Day'),
-        ('w', 'Week'),
-        ('m', 'Month'),
-        ('y', 'Year'),
+
+    day = 'Day'
+    week = 'Week'
+    month = 'Month'
+    year = 'Year'
+    periods = [
+        (day, 'день'),
+        (week, 'неделя'),
+        (month, 'месяц'),
+        (year, 'год'),
     ]
+
     title = models.CharField(
         'Расход',
         max_length=100
@@ -95,7 +101,8 @@ class RegularOutcome(models.Model):
     period = models.CharField(
         'Периодичность',
         max_length=10,
-        choices=period_choises
+        choices=periods,
+        default=month,
     )
     category = models.ForeignKey(
         Category,
@@ -108,6 +115,13 @@ class RegularOutcome(models.Model):
         'Сумма расхода',
         default=0
     )
+    currency = models.ForeignKey(
+        'Currency',
+        verbose_name='Валюта',
+        on_delete=models.SET_NULL,
+        related_name='outcomes_by_currency',
+        null=True
+    )
     start_date = models.DateField(
         'Дата начала',
         default=timezone.now()
@@ -118,6 +132,11 @@ class RegularOutcome(models.Model):
         null=True,
         blank=True
     )
+    sum_in_default_currency = models.FloatField(
+        'Сумма в пересчета на валюту учета',
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
-        return f'{self.title} / {self.sum}'
+        return f'{self.title} / {self.sum} {self.currency}. в {self.period}'

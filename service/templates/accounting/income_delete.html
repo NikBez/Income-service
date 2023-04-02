@@ -3,11 +3,17 @@
 
 
 {% block body %}
-  <h1>Удаляем "{{ object }}"</h1>
-  <p>Уверены что хотите удалить эу запись?</p>
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit">Да, удалить</button>
-    <a href="{% url 'list_incomes' %}">Отменить</a>
-  </form>
+  <div class="container mt-5">
+        <div class="row my-2">
+            <div class="col">
+              <h1>Удаляем "{{ object }}"</h1>
+              <p>Уверены что хотите удалить эу запись?</p>
+              <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-secondary btn-lg">Да, удалить</button>
+                <a href="{% url 'list_incomes' %}">Отменить</a>
+              </form>
+            </div>
+        </div>
+  </div>
 {% endblock %}

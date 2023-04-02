@@ -2,9 +2,12 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Income
+from .models import Income, RegularOutcome
 
 class IncomeForm(forms.ModelForm):
+    description = forms.CharField(required=False)
+    sum = forms.CharField()
+
     class Meta:
         model = Income
         fields = [
@@ -19,19 +22,13 @@ class IncomeForm(forms.ModelForm):
             'sum_in_default_currency'
         ]
 
-        # widgets = {
-        #     'date_of_operation': forms.DateTimeInput(
-        #         format='%d-%m-%YT%H:%M:%S',
-        #         attrs={'type':'datetime-local'}
-        #     )
-        # }
-
-    description = forms.CharField(required=False)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['description'].required = False
+        self.fields['date_of_operation'].widget = forms.DateInput()
         self.fields['sum_in_default_currency'].widget = forms.HiddenInput()
+        self.fields['currency'].widget = forms.HiddenInput()
+        self.fields['user'].widget = forms.HiddenInput()
+        self.fields['description'].widget = forms.Textarea(attrs={'rows': 5})
 
 
 class RegisterUserForm(UserCreationForm):
@@ -45,5 +42,9 @@ class RegisterUserForm(UserCreationForm):
 
 
 
+class RegularOutcomeForm(forms.ModelForm):
+    class Meta:
+        model = RegularOutcome
+        exclude = ('sum_in_default_currency',)
 
 
