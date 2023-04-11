@@ -20,6 +20,7 @@ from .forms import RegisterUserForm, IncomeForm, RegularOutcomeForm
 from .serializers import IncomeSummarySerializer
 from .utils import get_sum_in_default_currency, convert_currency_by_fixer
 
+
 env = Env()
 env.read_env()
 
@@ -32,6 +33,7 @@ PERIOD_MULTIPLIERS = {
             'Month': 1,
             'Year': 0.083
         }
+
 
 class IncomesView(ListView):
     model = Income
@@ -79,7 +81,6 @@ class IncomesView(ListView):
             ).order_by('-date_of_operation')
 
         return Income.objects.all().order_by('-date_of_operation', 'source')
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -144,13 +145,11 @@ class IncomeCreateView(CreateView):
     template_name = 'accounting/income_create.html'
     success_url = reverse_lazy('list_incomes')
 
-
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.fields['description'].required = False
         form.fields['date_of_operation'].widget = forms.DateInput()
         return form
-
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -373,9 +372,3 @@ def income_copy_view(request, pk):
         "form": form,
     }
     return render(request, "accounting/income_create.html", context)
-
-
-
-
-
-

@@ -1,5 +1,8 @@
 from django.urls import path
-from .views import *
+from .views import main_page_view, IncomesView, RegularOutcomesView, IncomeEditView, \
+    IncomeDeleteView, OutcomeEditView, OutcomeDeleteView, IncomeCreateView, income_copy_view, \
+    OutcomeCreateView, LoginUser, logout_user, RegisterUser, IncomeSummaryView
+
 
 urlpatterns = [
     path('', main_page_view, name='main_page'),

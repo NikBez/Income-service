@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Source, Category, RegularOutcome, Currency, Income
 
+
 admin.site.site_header = 'Outcomes accounting'
 admin.site.index_title = 'Date tables'
 

@@ -27,6 +27,7 @@ class SumByUserSerializer(serializers.Serializer):
 class DebtOperationsSerializer(serializers.Serializer):
     pk = serializers.ListField()
 
+
 class OutcomeSumByCategory(serializers.Serializer):
     category__title = serializers.CharField()
     sum_of_outcome = serializers.FloatField()
@@ -44,10 +45,3 @@ class IncomeSummarySerializer(serializers.Serializer):
     list_of_debt_operations = DebtOperationsSerializer()
     sum_of_outcomes = serializers.FloatField()
     total_profit = serializers.FloatField()
-
-
-
-
-
-
-
