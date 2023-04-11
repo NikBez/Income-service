@@ -2,7 +2,6 @@
 
 {% block body %}
 
-{{ static_data.test }}
 <!--Период отображения-->
     <div class="container mt-5">
         <div class="row justify-content-between align-items-end">
@@ -104,6 +103,18 @@
             <div class="col border border-1 border-dark mx-4">
                 <div class="p-2  align-self-start"><h5>Сумма регулярных расходов</h5></div>
                 <div class="p-2 fs-1"> {{ static_data.sum_of_outcomes|floatformat:"g" }} {{ default_currency }}. </div>
+                <table class="table table-hover">
+                    <thead>
+                    <th>Категория</th>
+                    <th>Сумма</th>
+                    </thead>
+                    {% for source in static_data.actual_outcomes_by_category %}
+                        <tr>
+                            <td>  {{ source.category__title }} </td>
+                            <td>  {{ source.sum_of_outcome|floatformat:"g" }} {{ default_currency }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
 
             </div>
             <div class="col border border-1 border-dark mx-4">

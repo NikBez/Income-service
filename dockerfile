@@ -3,9 +3,8 @@ COPY requirements.txt /temp/requirements.txt
 COPY service ./service
 RUN apk add postgresql-client build-base postgresql-dev
 RUN pip install --upgrade pip
+RUN adduser -D nikitabit
+USER nikitabit
 EXPOSE 8000
 RUN pip install -r /temp/requirements.txt
 WORKDIR /service
-
-
-

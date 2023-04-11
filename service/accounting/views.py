@@ -2,8 +2,8 @@ from datetime import timedelta, datetime
 from environs import Env
 import requests
 from dateutil.relativedelta import relativedelta
-from django import forms
 
+from django import forms
 from django.contrib.auth import logout, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
@@ -259,7 +259,7 @@ class IncomeSummaryView(APIView):
         # Получаем список операций без проведенной оплаты
         debt_operations = Income.objects.filter(status=False).values('pk')
 
-        # Получаем среднюю сумму заработка за последние 6 месяцев
+        # Получаем среднюю сумму заработка за последние N месяцев
         average_income = Income.objects.filter(
             date_of_operation__gte=start_avg_month_number,
             date_of_operation__lt=datetime.strptime(f'01-{month}-{year}', '%d-%m-%Y') + relativedelta(months=1),
@@ -285,6 +285,12 @@ class IncomeSummaryView(APIView):
                 start_date__lte=timezone.now()
             ).aggregate(sum_of_reg_outcomes=Sum('sum_in_default_currency'))['sum_of_reg_outcomes'] or 0.0
 
+        # Получаем сумму доходов за текущий месяц в разрезе категории
+        actual_outcomes_by_category = RegularOutcome.objects.filter(
+            Q(end_date__gte=timezone.now()) | Q(end_date=None),
+            start_date__lte=timezone.now()
+        ).values('category__title').annotate(sum_of_outcome=Sum('sum_in_default_currency')).order_by('-sum_of_outcome')
+
         serializer = IncomeSummarySerializer({
             'sum_of_income': sum_of_income,
             'sum_of_debt': sum_of_debt,
@@ -295,6 +301,7 @@ class IncomeSummaryView(APIView):
             'average_income': average_income,
             'income_change_rate': income_change_rate,
             'sum_of_outcomes': actual_outcomes_sum,
+            'actual_outcomes_by_category': actual_outcomes_by_category,
             'total_profit': sum_of_income - actual_outcomes_sum,
 
         })

@@ -2,6 +2,7 @@
     <div class="row">
 
         <div class="col-9 menu-left gap-4">
+            {% if user.is_authenticated %}
             <nav>
                 <ul class="main-menu">
                     <li class="menu-left">
@@ -15,7 +16,9 @@
                     </li>
                 </ul>
             </nav>
+             {% endif %}
         </div>
+
 
         <div class="col-3 menu-right">
             <nav>
