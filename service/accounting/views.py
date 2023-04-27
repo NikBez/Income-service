@@ -200,12 +200,8 @@ def main_page_view(request):
     response.raise_for_status()
     response = response.json()
 
-    dept_pks = response['list_of_debt_operations']['pk']
-    dept_operations = Income.objects.filter(pk__in=dept_pks).select_related('source', 'currency').order_by('date_of_operation')
-
     context = {
         'static_data': response,
-        'dept_operations': dept_operations,
         'next_month': dateformat.format(month_and_year + relativedelta(months=1), 'Y-m-d'),
         'previous_month': dateformat.format(month_and_year - relativedelta(months=1), 'Y-m-d'),
         'current_month': month_and_year,
@@ -256,7 +252,7 @@ class IncomeSummaryView(APIView):
         ).aggregate(sum_of_debt=Sum('sum_in_default_currency'))['sum_of_debt'] or 0.0
 
         # Получаем список операций без проведенной оплаты
-        debt_operations = Income.objects.filter(status=False).values('pk')
+        debt_operations = Income.objects.filter(status=False).order_by('date_of_operation')
 
         # Получаем среднюю сумму заработка за последние N месяцев
         average_income = Income.objects.filter(
@@ -296,7 +292,7 @@ class IncomeSummaryView(APIView):
             'sum_of_income_by_source': sum_of_income_by_source,
             'sum_of_income_by_category': sum_of_income_by_category,
             'sum_of_income_by_user': sum_of_income_by_user,
-            'list_of_debt_operations': {'pk': [item['pk'] for item in debt_operations]},
+            'debt_operations': debt_operations,
             'average_income': average_income,
             'income_change_rate': income_change_rate,
             'sum_of_outcomes': actual_outcomes_sum,

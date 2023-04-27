@@ -87,14 +87,14 @@
             <div class="col border border-1 border-dark mx-4">
                <div class="p-2  align-self-start"><h5>Не выплаченные</h5></div>
                 <div class="p-2 fs-2">  {{ static_data.sum_of_debt|floatformat:"g" }} {{ default_currency }}.</div>
-                {% if dept_operations %}
+                {% if static_data.debt_operations %}
                     <table class="table table-hover">
                         <thead>
                         <th>Все операции</th>
                         </thead>
-                        {% for operation in dept_operations %}
+                        {% for operation in static_data.debt_operations %}
                             <tr>
-                                <td> <a class="link_on_main" href="{% url 'edit_income' operation.pk %}">{{operation}}</a> </td>
+                                <td> <a class="link_on_main" href="{% url 'edit_income' operation.pk %}">{{operation.operation_name}}</a> </td>
                             </tr>
                         {% endfor %}
                     </table>

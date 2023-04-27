@@ -25,7 +25,10 @@ class SumByUserSerializer(serializers.Serializer):
 
 
 class DebtOperationsSerializer(serializers.Serializer):
-    pk = serializers.ListField()
+    pk = serializers.IntegerField()
+    operation_name = serializers.SerializerMethodField()
+    def get_operation_name(self, obj):
+        return str(obj)
 
 
 class OutcomeSumByCategory(serializers.Serializer):
@@ -42,6 +45,6 @@ class IncomeSummarySerializer(serializers.Serializer):
     sum_of_income_by_category = SumByCategorySerializer(many=True)
     sum_of_income_by_user = SumByUserSerializer(many=True)
     actual_outcomes_by_category = OutcomeSumByCategory(many=True)
-    list_of_debt_operations = DebtOperationsSerializer()
+    debt_operations = DebtOperationsSerializer(many=True)
     sum_of_outcomes = serializers.FloatField()
     total_profit = serializers.FloatField()
