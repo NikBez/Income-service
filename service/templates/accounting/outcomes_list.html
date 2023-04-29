@@ -32,7 +32,7 @@
                         <td>{{ line.sum|floatformat:"g" }}</td>
                         <td>{{ line.currency }}</td>
                         <td>{{ line.start_date | date:'d-m-Y' }}</td>
-                        <td>{{ line.end_dat| date:'d-m-Y' }}</td>
+                        <td>{{ line.end_date| date:'d-m-Y' }}</td>
                         <td><a href="{% url 'edit_outcome' line.id %}" class="btn btn-outline-secondary btn-sm"> Edit </a></td>
                         <td><a href="{% url 'delete_outcome' line.id %}" class="btn btn-outline-secondary btn-sm"> Del </a></td>
                     </tr>

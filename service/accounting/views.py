@@ -186,13 +186,11 @@ def main_page_view(request):
 
     source_date = request.GET.get('date', None)
     if source_date:
-        month_and_year = datetime.strptime(source_date, '%Y-%m-%d')
+        month_and_year = datetime.strptime(source_date, '%Y-%m-%d').date()
     else:
         month_and_year = timezone.now().date()
-
     params = {
-        'month': month_and_year.month,
-        'year': month_and_year.year,
+        'date': month_and_year,
     }
 
     api_url = reverse('api_incomes')
@@ -214,36 +212,36 @@ def main_page_view(request):
 class IncomeSummaryView(APIView):
 
     def get(self, request):
-        month = request.query_params.get('month')
-        year = request.query_params.get('year')
-        start_avg_month_number = datetime.strptime(f'01-{month}-{year}', '%d-%m-%Y') - relativedelta(months=AVERAGE_PERIOD_LENGTH)
+        path_date = request.query_params.get('date')
+        path_date = datetime.strptime(path_date, '%Y-%m-%d')
+        prev_month = path_date - relativedelta(months=1)
 
         # Получаем сумму доходов за текущий месяц
         sum_of_income = Income.objects.filter(
             status=True,
-            date_of_operation__month=month,
-            date_of_operation__year=year
+            date_of_operation__month=path_date.month,
+            date_of_operation__year=path_date.year
         ).aggregate(sum_of_income=Sum('sum_in_default_currency'))['sum_of_income'] or 0.0
 
         # Получаем сумму доходов за текущий месяц в разрезе источника
         sum_of_income_by_source = Income.objects.filter(
             status=True,
-            date_of_operation__month=month,
-            date_of_operation__year=year
+            date_of_operation__month=path_date.month,
+            date_of_operation__year=path_date.year
         ).values('source__title').annotate(sum_of_income=Sum('sum_in_default_currency')).order_by('-sum_of_income')
 
         # Получаем сумму доходов за текущий месяц в разрезе категории
         sum_of_income_by_category = Income.objects.filter(
             status=True,
-            date_of_operation__month=month,
-            date_of_operation__year=year
+            date_of_operation__month=path_date.month,
+            date_of_operation__year=path_date.year
         ).values('category__title').annotate(sum_of_income=Sum('sum_in_default_currency')).order_by('-sum_of_income')
 
         # Получаем сумму доходов за текущий месяц в разрезе пользователей
         sum_of_income_by_user = Income.objects.filter(
             status=True,
-            date_of_operation__month=month,
-            date_of_operation__year=year
+            date_of_operation__month=path_date.month,
+            date_of_operation__year=path_date.year
         ).values('user__username').annotate(sum_of_income=Sum('sum_in_default_currency')).order_by('-sum_of_income')
 
         # Получаем сумму невыплаченных операций
@@ -256,13 +254,12 @@ class IncomeSummaryView(APIView):
 
         # Получаем среднюю сумму заработка за последние N месяцев
         average_income = Income.objects.filter(
-            date_of_operation__gte=start_avg_month_number,
-            date_of_operation__lt=datetime.strptime(f'01-{month}-{year}', '%d-%m-%Y') + relativedelta(months=1),
+            date_of_operation__gte=path_date - relativedelta(months=AVERAGE_PERIOD_LENGTH),
+            date_of_operation__lt=datetime.strptime(f'01-{path_date.month + 1}-{path_date.year}', '%d-%m-%Y') - relativedelta(day=1),
             status=True,
         ).aggregate(average_income=Sum('sum_in_default_currency')/AVERAGE_PERIOD_LENGTH)['average_income'] or 0.0
 
         # Коэффициент изменения прибыли
-        prev_month = datetime.strptime(f'01-{month}-{year}', '%d-%m-%Y') - relativedelta(months=1)
         prev_month_income = Income.objects.filter(
             status=True,
             date_of_operation__month=prev_month.month,
@@ -276,14 +273,12 @@ class IncomeSummaryView(APIView):
 
         # Сумма ежемесячных расходов в пересчете на дефолтную валюту
         actual_outcomes_sum = RegularOutcome.objects.filter(
-                Q(end_date__gte=timezone.now()) | Q(end_date=None),
-                start_date__lte=timezone.now()
+                Q(start_date__lte=path_date) & (Q(end_date__gte=path_date) | Q(end_date__isnull=True))
             ).aggregate(sum_of_reg_outcomes=Sum('sum_in_default_currency'))['sum_of_reg_outcomes'] or 0.0
 
         # Получаем сумму доходов за текущий месяц в разрезе категории
         actual_outcomes_by_category = RegularOutcome.objects.filter(
-            Q(end_date__gte=timezone.now()) | Q(end_date=None),
-            start_date__lte=timezone.now()
+            Q(start_date__lte=path_date) & (Q(end_date__gte=path_date) | Q(end_date__isnull=True))
         ).values('category__title').annotate(sum_of_outcome=Sum('sum_in_default_currency')).order_by('-sum_of_outcome')
 
         serializer = IncomeSummarySerializer({
