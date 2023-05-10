@@ -1,0 +1,14 @@
+{% extends 'accounting/index.html' %}
+
+{% block body %}
+  <div class="container">
+      <div class="row my-2">
+          <h3 class="mt-4">Список доступных справочников:</h3>
+          <ul>
+              {% for vac in vocabularies %}
+                <li><a href="{% url vac.0 %}" class=" my-3 btn btn-outline-secondary"> {{ vac.1 }} </a></li>
+              {% endfor %}
+          </ul>
+      </div>
+  </div>
+{% endblock %}

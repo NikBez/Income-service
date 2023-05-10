@@ -42,7 +42,6 @@ class RegisterUserForm(UserCreationForm):
         fields = ['username', 'password1', 'password2']
 
 
-
 class RegularOutcomeForm(forms.ModelForm):
     class Meta:
         model = RegularOutcome

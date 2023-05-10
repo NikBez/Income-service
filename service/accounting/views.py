@@ -15,7 +15,7 @@ from django.db.models import Sum, Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Income, RegularOutcome
+from .models import Income, RegularOutcome, Category, Source
 from .forms import RegisterUserForm, IncomeForm, RegularOutcomeForm
 from .serializers import IncomeSummarySerializer
 from .utils import get_sum_in_default_currency, convert_currency_by_fixer
@@ -33,7 +33,6 @@ PERIOD_MULTIPLIERS = {
             'Month': 1,
             'Year': 0.083
         }
-
 
 class IncomesView(ListView):
     model = Income
@@ -363,3 +362,68 @@ def income_copy_view(request, pk):
         "form": form,
     }
     return render(request, "accounting/income_create.html", context)
+
+def list_of_vocabularies(request):
+    context = {
+        'title': 'Список доступных словарей',
+        'vocabularies': [
+            ('categories', 'Категории доходов/расходов'),
+            ('sources', 'Источники доходов'),
+        ],
+    }
+    return render(request, 'accounting/vocabularies.html', context=context)
+
+
+class CategoriesView(ListView):
+    model = Category
+    template_name = 'accounting/categories.html'
+    paginate_by = 10
+
+
+class CategoryEditView(UpdateView):
+    model = Category
+    template_name = 'accounting/category_edit.html'
+    success_url = reverse_lazy('categories')
+    fields = '__all__'
+
+
+class CategoryDeleteView(DeleteView):
+    model = Category
+    template_name = 'accounting/category_delete.html'
+    success_url = reverse_lazy('categories')
+
+
+class CategoryCreateView(CreateView):
+    model = Category
+    template_name = 'accounting/category_create.html'
+    success_url = reverse_lazy('categories')
+    fields = '__all__'
+
+
+class SourcesView(ListView):
+    model = Source
+    template_name = 'accounting/sources.html'
+    paginate_by = 10
+
+
+class SourceEditView(UpdateView):
+    model = Source
+    template_name = 'accounting/source_edit.html'
+    success_url = reverse_lazy('sources')
+    fields = '__all__'
+
+
+class SourceDeleteView(DeleteView):
+    model = Source
+    template_name = 'accounting/source_delete.html'
+    success_url = reverse_lazy('sources')
+
+class SourceCreateView(CreateView):
+    model = Source
+    template_name = 'accounting/source_create.html'
+    success_url = reverse_lazy('sources')
+    fields = '__all__'
+
+
+
+
