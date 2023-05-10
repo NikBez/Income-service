@@ -1,8 +1,7 @@
 import requests
 from dateutil.relativedelta import relativedelta
-from environs import Env
 from django.utils import dateformat, timezone
-
+from environs import Env
 
 env = Env()
 env.read_env()

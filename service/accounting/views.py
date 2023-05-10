@@ -1,25 +1,24 @@
-from datetime import timedelta, datetime
-from environs import Env
+from datetime import datetime, timedelta
+
 import requests
 from dateutil.relativedelta import relativedelta
-
 from django import forms
-from django.contrib.auth import logout, login
+from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
-from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.db.models import Q, Sum
+from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.utils import timezone, dateformat
-from django.db.models import Sum, Q
-from rest_framework.views import APIView
+from django.utils import dateformat, timezone
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from environs import Env
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .models import Income, RegularOutcome, Category, Source
-from .forms import RegisterUserForm, IncomeForm, RegularOutcomeForm
+from .forms import IncomeForm, RegisterUserForm, RegularOutcomeForm
+from .models import Category, Income, RegularOutcome, Source
 from .serializers import IncomeSummarySerializer
-from .utils import get_sum_in_default_currency, convert_currency_by_fixer
-
+from .utils import convert_currency_by_fixer, get_sum_in_default_currency
 
 env = Env()
 env.read_env()
@@ -363,6 +362,7 @@ def income_copy_view(request, pk):
     }
     return render(request, "accounting/income_create.html", context)
 
+
 def list_of_vocabularies(request):
     context = {
         'title': 'Список доступных словарей',
@@ -418,12 +418,9 @@ class SourceDeleteView(DeleteView):
     template_name = 'accounting/source_delete.html'
     success_url = reverse_lazy('sources')
 
+
 class SourceCreateView(CreateView):
     model = Source
     template_name = 'accounting/source_create.html'
     success_url = reverse_lazy('sources')
     fields = '__all__'
-
-
-
-

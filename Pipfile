@@ -16,6 +16,8 @@ whitenoise = "*"
 mysqlclient = "*"
 
 [dev-packages]
+isort = "*"
+flake8 = "*"
 
 [requires]
 python_version = "3.11.2"

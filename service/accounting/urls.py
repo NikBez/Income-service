@@ -1,10 +1,13 @@
 from django.urls import path
-from .views import main_page_view, IncomesView, RegularOutcomesView, IncomeEditView, \
-    IncomeDeleteView, OutcomeEditView, OutcomeDeleteView, IncomeCreateView, income_copy_view, \
-    OutcomeCreateView, LoginUser, logout_user, RegisterUser, IncomeSummaryView, list_of_vocabularies, \
-    CategoriesView, CategoryEditView, CategoryDeleteView, CategoryCreateView, SourcesView, SourceEditView, \
-    SourceDeleteView, SourceCreateView
 
+from .views import (CategoriesView, CategoryCreateView, CategoryDeleteView,
+                    CategoryEditView, IncomeCreateView, IncomeDeleteView,
+                    IncomeEditView, IncomeSummaryView, IncomesView, LoginUser,
+                    OutcomeCreateView, OutcomeDeleteView, OutcomeEditView,
+                    RegisterUser, RegularOutcomesView, SourceCreateView,
+                    SourceDeleteView, SourceEditView, SourcesView,
+                    income_copy_view, list_of_vocabularies, logout_user,
+                    main_page_view)
 
 urlpatterns = [
     path('', main_page_view, name='main_page'),
