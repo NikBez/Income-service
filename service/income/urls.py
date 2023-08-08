@@ -17,8 +17,10 @@ from django.contrib import admin
 from django.urls import include, path
 
 from accounting import urls as accounting_urls
+from wildberries import urls as wb_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include(accounting_urls))
+    path('', include(accounting_urls)),
+    path('wb/', include(wb_urls))
 ]

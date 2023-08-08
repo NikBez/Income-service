@@ -6,7 +6,7 @@ from django.utils import timezone
 class Income(models.Model):
     date_of_operation = models.DateTimeField(
         'Дата операции',
-        default=timezone.now(),
+        default=timezone.now,
     )
     source = models.ForeignKey(
         'Source',
@@ -124,7 +124,7 @@ class RegularOutcome(models.Model):
     )
     start_date = models.DateField(
         'Дата начала',
-        default=timezone.now()
+        default=timezone.now
 
     )
     end_date = models.DateField(

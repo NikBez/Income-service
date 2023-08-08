@@ -6,14 +6,12 @@
             <nav>
                 <ul class="main-menu">
                     <li class="menu-left">
-                        <a href="{% url 'main_page'%}" class="btn btn-light btn-sm">Главная</a>
-                        <a href="{% url 'create_income' %}" class="btn btn-success btn-sm">+ Доход</a>
-                        <a href="{% url 'create_outcome' %}" class="btn btn-danger btn-sm">- Расход</a>
-                        <a href="{% url 'list_incomes' %}" class="btn btn-light btn-sm">Поступления</a>
-                        <a href="{% url 'list_outcomes' %}" class="btn btn-light btn-sm">Расходы</a>
-                        <a href="{% url 'list_of_vocabularies' %}" class="btn btn-light btn-sm">Справочники</a>
-                        <a href="{% url 'main_page' %}" class="btn btn-light btn-sm">Аналитика</a>
-                        <a href="{% url 'wb_monitor' %}" class="btn btn-light btn-sm">Wildberries</a>
+                        <a href="{% url 'wb_monitor' %}" class="btn btn-outline-secondary">Главная</a>
+                        <a href="{% url 'wb_monitor' %}" class="btn btn-outline-success">+ Поступление от WB</a>
+                        <a href="{% url 'wb_monitor' %}" class="btn btn-outline-danger">- Выплата зарплат</a>
+                        <a href="{% url 'list_pvz' %}" class="btn btn-outline-secondary">Мои ПВЗ</a>
+                        <a href="{% url 'wb_monitor' %}" class="btn btn-outline-secondary">Сотрудники</a>
+                         <a href="{% url 'main_page'%}" class="btn btn-outline-secondary">Личный учет</a>
                     </li>
                 </ul>
             </nav>

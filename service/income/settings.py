@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # local
     'accounting',
+    'wildberries',
     # outer
     'crispy_forms',
     'crispy_bootstrap4',
