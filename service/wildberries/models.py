@@ -8,12 +8,7 @@ class PVZ(models.Model):
     extra_serving_price = models.FloatField('Стоимость доп. обслуживания(месяц)', default=0)
 
     def __str__(self):
-        total = self.calc_total_serv()
-        return f'ПВЗ: {self.title}, Стоит содержать:{total} руб.'
-
-    def calc_total_serv(self):
-        return self.extra_serving_price + self.video_price + self.rent_price
-
+        return self.title
 
 class Employee(models.Model):
     name = models.CharField('ФИО сотрудника', max_length=200, unique=True, default='Unnamed')
@@ -25,7 +20,7 @@ class Employee(models.Model):
     )
     date_of_start = models.DateField('Дата трудоустройства', null=True, blank=True)
     salary = models.FloatField('Ставка за смену', default=0)
-    penalty = models.FloatField('Сумма штрафа', default=0)
+    penalty = models.FloatField('Сумма к удержанию', default=0)
 
     def __str__(self):
         return self.name
@@ -61,12 +56,15 @@ class WBPayment(models.Model):
     extra_nds = models.FloatField('Доплата НДС', default=0)
     package_compensation = models.FloatField('Компенсация за пакеты', default=0)
     hold_non_returned = models.FloatField('Удержано за невозврат товара', default=0)
-    total = models.FloatField('Итого', default=0)
+    total_charge = models.FloatField('Всего начислено', default=0)
+    total_hold = models.FloatField('Всего удержано', default=0)
+    total = models.FloatField('Доход', default=0)
 
     def __str__(self):
         formatted_from_date = self.from_date.strftime("%d-%m-%Y")
         formatted_to_date = self.to_date.strftime("%d-%m-%Y")
         return f'Оплата от WB по ПВЗ: {self.pvz_id.title} за период {formatted_from_date} - {formatted_to_date}, на сумму: {self.total}'
+
 
 class PVZPaiment(models.Model):
     pvz_id = models.ForeignKey(
@@ -95,4 +93,3 @@ class PVZPaiment(models.Model):
         formatted_from_date = self.from_date.strftime("%d-%m-%Y")
         formatted_to_date = self.to_date.strftime("%d-%m-%Y")
         return f'Выплата зп по сотруднику {self.employee_id.name} за период {formatted_from_date} - {formatted_to_date}'
-
