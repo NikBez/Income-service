@@ -1,0 +1,232 @@
+{% extends 'wb/index.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block body %}
+  <div class="container mt-5">
+        <div class="row my-2">
+            <div class="col">
+             <h1 class="mb-5">Редактирование платежа от WB {{ object }}:</h1>
+              <form method="post">
+                {% csrf_token %}
+
+<!--                Выбор ПВЗ-->
+                <div class="input-group input-group-lg mb-3">
+                  <label class="input-group-text" for="PVZ_selector">Пункт выдачи</label>
+                   {{ form.pvz_id }}
+                </div>
+                <hr>
+
+<!--                 Блок с полями from_date и to_date-->
+                <div class="row mb-5 mt-5">
+                      <div class="col">
+                        <div class="input-group">
+                             <span class="input-group-text">Период расчета</span>
+                        <span class="input-group-text"> {{ form.from_date.label_tag }}</span>
+                        {{ form.from_date }}
+                            <span class="input-group-text" >  {{ form.to_date.label_tag }}</span>
+                       {{ form.to_date }}
+                        </div>
+                      </div>
+
+                </div>
+                <hr>
+
+                <!-- Поля начислений -->
+                   <div class="row">
+                      <div class="col">
+                          <h2 class="mb-5">Начисления:</h2>
+
+                        <div class="input-group mb-3">
+                        <span class="input-group-text"> {{ form.charged_rate.label_tag }}</span>
+                         {{ form.charged_rate }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.charged_courier.label_tag }}</span>
+                         {{ form.charged_courier }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.surcharge_motivation.label_tag }}</span>
+                         {{ form.surcharge_motivation }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                            <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.surcharge_signage.label_tag }}</span>
+                         {{ form.surcharge_signage }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                            <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.surcharge_goods.label_tag }}</span>
+                         {{ form.surcharge_goods }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                            <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.subsidies.label_tag }}</span>
+                         {{ form.subsidies }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                        <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.extra_motivation.label_tag }}</span>
+                         {{ form.extra_motivation }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.return_incorrect_mark.label_tag }}</span>
+                         {{ form.return_incorrect_mark }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+
+                           <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.extra_nds.label_tag }}</span>
+                         {{ form.extra_nds }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                           <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.package_compensation.label_tag }}</span>
+                         {{ form.package_compensation }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                      </div>
+                      <div class="col">
+
+                           <h2 class="mb-5">Удержания:</h2>
+
+                           <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.hold_motivation.label_tag }}</span>
+                         {{ form.hold_motivation }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.hold_rating.label_tag }}</span>
+                         {{ form.hold_rating }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.hold_goods.label_tag }}</span>
+                         {{ form.hold_goods }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.hold_substitution.label_tag }}</span>
+                         {{ form.hold_substitution }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.hold_furniture.label_tag }}</span>
+                         {{ form.hold_furniture }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.hold_for_defects.label_tag }}</span>
+                         {{ form.hold_for_defects }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.penalty.label_tag }}</span>
+                         {{ form.penalty }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.hold_non_returned.label_tag }}</span>
+                         {{ form.hold_non_returned }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+                      </div>
+                    </div>
+
+
+                  <div class="row mb-2">
+                       <h2 class="mb-2">Прочее:</h2>
+                      <div class="col">
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.debt.label_tag }}</span>
+                         {{ form.debt }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.zero_substitution_effect.label_tag }}</span>
+                         {{ form.zero_substitution_effect }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.return_incorrect_mark.label_tag }}</span>
+                         {{ form.return_incorrect_mark }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                          <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.penalty.label_tag }}</span>
+                         {{ form.penalty }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                           <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.supplier_returns.label_tag }}</span>
+                         {{ form.supplier_returns }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+                      </div>
+                  <!--                ИТОГОВЫЕ ЗНАЧЕНИЯ-->
+                  <div class="row mb-2">
+                       <h2 class="mb-2">Итоги:</h2>
+                      <div class="col">
+                        <div class="input-group">
+                        <span class="input-group-text">{{ form.total_charge.label_tag }}</span>
+                         {{ form.total_charge }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="input-group">
+                        <span class="input-group-text" > {{ form.total_hold.label_tag }}</span>
+                        {{ form.total_hold }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+                      </div>
+                      <div class="col">
+                          <div class="input-group">
+                        <span class="input-group-text" >  {{ form.total.label_tag }}</span>
+                        {{ form.total }}
+                         <span class="input-group-text">₽</span>
+                    </div>
+                      </div>
+                    </div>
+                <hr>
+                  <div class="row mb-5">
+                      <button type="submit" class="btn btn-secondary btn-lg btn-block">Записать</button>
+                  </div>
+              </form>
+                {{ form.media }}
+            </div>
+        </div>
+  </div>
+
+    <script>
+        // Apply input masks to form fields
+        $(document).ready(function () {
+            $("#from_date").inputmask("99-99-9999");
+            $("#to_date").inputmask("99-99-9999");
+        });
+    </script>
+{% endblock %}

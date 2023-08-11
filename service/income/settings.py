@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap4',
     'rest_framework',
+    'calculation',
 ]
 
 MIDDLEWARE = [
@@ -95,7 +96,7 @@ WSGI_APPLICATION = 'income.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'main.sqlite3',
+        'NAME': Path(BASE_DIR, 'main.sqlite3')
     }
 }
 

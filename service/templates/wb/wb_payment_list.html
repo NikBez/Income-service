@@ -7,32 +7,32 @@
     <div class="container mt-5">
         <div class="row my-2">
             <div class="col">
-                <h2 class=" col">Список сотрудников </h2>
+                <h2 class=" col">Список платежей от WB </h2>
             </div>
         </div>
 
         <div>
-            <a class="btn btn-outline-primary btn-sm" href="{% url 'create_employee' %}">  + Добавить </a>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'create_wb_payment' %}">  + Добавить новый платеж </a>
         </div>
         <!--Список записей-->
         <div class="row my-2">
             <table class="table table-hover">
                 <thead>
-                <th>ФИО</th>
+                <th>Период</th>
                 <th>ПВЗ</th>
-                <th>Ставка за смену</th>
-                 <th>Сумма к удержанию</th>
-                <th>Дата трудоустройства</th>
+                <th>Начислено</th>
+                 <th>Удержано</th>
+                <th>Итого</th>
                 </thead>
                 {% for line in object_list %}
                     <tr>
-                        <td>{{ line.name }}</td>
+                        <td>{{ line.from_date|date:"j M Y" }} - {{ line.to_date|date:"j M Y" }}</td>
                         <td>{{ line.pvz_id }}</td>
-                        <td>{{ line.salary }}</td>
-                        <td>{{ line.penalty }}</td>
-                        <td>{{ line.date_of_start }}</td>
-                        <td><a href="{% url 'edit_employee' line.id %}" class="btn btn-outline-secondary btn-sm"> Edit </a></td>
-                        <td><a href="{% url 'delete_employee' line.id %}" class="btn btn-outline-secondary btn-sm"> Del </a></td>
+                        <td>{{ line.total_charge }}</td>
+                        <td>{{ line.total_hold }}</td>
+                        <td>{{ line.total }}</td>
+                        <td><a href="{% url 'edit_wb_payment' line.id %}" class="btn btn-outline-secondary btn-sm"> Edit </a></td>
+                        <td><a href="{% url 'delete_wb_payment' line.id %}" class="btn btn-outline-secondary btn-sm"> Del </a></td>
                     </tr>
                 {% endfor %}
             </table>

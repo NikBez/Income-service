@@ -1,0 +1,19 @@
+{% extends 'wb/index.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block body %}
+  <div class="container mt-5">
+        <div class="row my-2">
+            <div class="col">
+              <h1>Удаляем выплату зарплаты "{{ object }}"</h1>
+              <p>Уверены что хотите удалить эу запись?</p>
+              <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="mt-4 btn btn-outline-secondary btn-lg">Да, удалить</button>
+                <a class="mt-4 btn btn-outline-secondary btn-lg" href="{% url 'sources' %}">Отменить</a>
+              </form>
+            </div>
+        </div>
+  </div>
+{% endblock %}

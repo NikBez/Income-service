@@ -1,0 +1,63 @@
+{% extends 'wb/index.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block body %}
+
+    <div class="container mt-5">
+        <div class="row my-2">
+            <div class="col">
+                <h2 class=" col">Список зарплатных выплат </h2>
+            </div>
+        </div>
+
+        <div>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'create_wb_payment' %}">  + Добавить новую выплату </a>
+        </div>
+        <!--Список записей-->
+        <div class="row my-2">
+            <table class="table table-hover">
+                <thead>
+                <th>Период</th>
+                <th>Сотрудник</th>
+                <th>Cмен</th>
+                <th>Коробки</th>
+                <th>Коробочки</th>
+                <th>Бонус</th>
+                <th>Штраф</th>
+                <th>Нак-ный штраф</th>
+                <th>Итого</th>
+                </thead>
+                {% for line in object_list %}
+                    <tr>
+                        <td>{{ line.from_date|date:"j M Y" }} - {{ line.to_date|date:"j M Y" }}</td>
+                        <td>{{ line.employee_id }}</td>
+                        <td>{{ line.number_days }}</td>
+                        <td>{{ line.count_big_boxes }}</td>
+                        <td>{{ line.extra_boxes }}</td>
+                        <td>{{ line.extra_payment }}</td>
+                        <td>{{ line.add_penalty }}</td>
+                        <td>{{ line.surcharge_penalty }}</td>
+                         <td>{{ line.total }}</td>
+                        <td><a href="{% url 'edit_pvz_payment' line.id %}" class="btn btn-outline-secondary btn-sm"> Edit </a></td>
+                        <td><a href="{% url 'delete_pvz_payment' line.id %}" class="btn btn-outline-secondary btn-sm"> Del </a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+    <!--Пагинация-->
+        <div class="pagination mb-4 justify-content-md-center">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="btn btn-light btn-sm">&laquo; Первая</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-light btn-sm">&lsaquo; Предыдущая</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-light btn-sm">Следующая &rsaquo;</a>
+                    <a href="?page={{ paginator.num_pages }}" class="btn btn-light btn-sm">Последняя &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+
+{% endblock %}
