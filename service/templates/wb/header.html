@@ -1,37 +1,46 @@
-<div class="container md-4">
-    <div class="row">
+<nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark" >
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'wb_monitor' %}">WB</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse">
+       {% if user.is_authenticated %}
+      <ul class="navbar-nav me-auto mx-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'wb_monitor' %}">Мониторинг</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'list_pvz' %}">Мои ПВЗ</a>
+        </li>
 
-        <div class="col-9 menu-left gap-4">
-            {% if user.is_authenticated %}
-            <nav>
-                <ul class="main-menu">
-                    <li class="menu-left">
-                        <a href="{% url 'wb_monitor' %}" class="btn btn-outline-secondary">Главная</a>
-                        <a href="{% url 'list_wb_payment' %}" class="btn btn-outline-success">+ Поступление от WB</a>
-                        <a href="{% url 'list_pvz_payment' %}" class="btn btn-outline-danger">- Выплата зарплат</a>
-                        <a href="{% url 'list_pvz' %}" class="btn btn-outline-secondary">Мои ПВЗ</a>
-                        <a href="{% url 'list_employee' %}" class="btn btn-outline-secondary">Сотрудники</a>
-                         <a href="{% url 'main_page'%}" class="btn btn-outline-secondary">Личный учет</a>
-                    </li>
-                </ul>
-            </nav>
-             {% endif %}
-        </div>
+         <li class="nav-item">
+          <a class="nav-link" href="{% url 'list_employee' %}">Сотрудники</a>
+        </li>
+         <li class="nav-item">
+          <a class="nav-link" href="{% url 'main_page'%}">Личный учет</a>
+        </li>
+      </ul>
+      {% endif %}
 
 
-        <div class="col-3 menu-right">
-            <nav>
-                <ul class="main-menu">
-                    <li class="menu-right">
-            {% if request.user.is_authenticated %}
-                {{ user.username }} <a href="{% url 'logout' %}" class="btn btn-outline-secondary btn-sm">Выйти</a>
-            {% else %}
-                <a href="{% url 'register' %}" class="btn btn-outline-secondary btn-sm">Регистрация</a>
-                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-sm">Логин</a>
-            {% endif %}
-                    </li>
-                </ul>
-            </nav>
-        </div>
+      <ul class="navbar-nav mb-lg-0">
+         {% if request.user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="">{{ user.username }}</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
+        </li>
+         {% else %}
+         <li class="nav-item">
+          <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
+        </li>
+         <li class="nav-item">
+          <a class="nav-link" href="{% url 'login'%}">Вход</a>
+        </li>
+      </ul>
+      {% endif %}
     </div>
-</div>
+  </div>
+</nav>

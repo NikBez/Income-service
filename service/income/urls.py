@@ -19,6 +19,7 @@ from django.urls import include, path
 from accounting import urls as accounting_urls
 from wildberries import urls as wb_urls
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(accounting_urls)),

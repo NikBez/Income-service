@@ -17,9 +17,18 @@ from environs import Env
 env = Env()
 env.read_env()
 
+AVERAGE_PERIOD_LENGTH = int(env('AVERAGE_PERIOD_LENGTH'))
+DEFAULT_CURRENCY = env('DEFAULT_CURRENCY')
+
+PERIOD_MULTIPLIERS = {
+            'Day': 30,
+            'Week': 4,
+            'Month': 1,
+            'Year': 0.083
+        }
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -36,7 +45,6 @@ ALLOWED_HOSTS = [
     'a0802178.xsph.ru',
 ]
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,7 +59,7 @@ INSTALLED_APPS = [
     'wildberries',
     # outer
     'crispy_forms',
-    'crispy_bootstrap4',
+    'crispy_bootstrap5',
     'rest_framework',
     'calculation',
 ]
@@ -89,7 +97,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'income.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -118,7 +125,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -129,7 +135,6 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -148,7 +153,7 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

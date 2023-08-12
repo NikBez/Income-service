@@ -20,18 +20,12 @@ from .models import Category, Income, RegularOutcome, Source
 from .serializers import IncomeSummarySerializer
 from .utils import convert_currency_by_fixer, get_sum_in_default_currency
 
+from django.conf import settings
+
 env = Env()
 env.read_env()
 
-AVERAGE_PERIOD_LENGTH = int(env('AVERAGE_PERIOD_LENGTH'))
-DEFAULT_CURRENCY = env('DEFAULT_CURRENCY')
 
-PERIOD_MULTIPLIERS = {
-            'Day': 30,
-            'Week': 4,
-            'Month': 1,
-            'Year': 0.083
-        }
 
 class IncomesView(ListView):
     model = Income
@@ -201,8 +195,8 @@ def main_page_view(request):
         'next_month': dateformat.format(month_and_year + relativedelta(months=1), 'Y-m-d'),
         'previous_month': dateformat.format(month_and_year - relativedelta(months=1), 'Y-m-d'),
         'current_month': month_and_year,
-        'avg_period_length': AVERAGE_PERIOD_LENGTH,
-        'default_currency': DEFAULT_CURRENCY
+        'avg_period_length': settings.AVERAGE_PERIOD_LENGTH,
+        'default_currency': settings.DEFAULT_CURRENCY
     }
     return render(request,  'accounting/main_page.html', context)
 
@@ -252,10 +246,10 @@ class IncomeSummaryView(APIView):
 
         # Получаем среднюю сумму заработка за последние N месяцев
         average_income = Income.objects.filter(
-            date_of_operation__gte=path_date - relativedelta(months=AVERAGE_PERIOD_LENGTH),
+            date_of_operation__gte=path_date - relativedelta(months=settings.AVERAGE_PERIOD_LENGTH),
             date_of_operation__lt=datetime.strptime(f'01-{path_date.month + 1}-{path_date.year}', '%d-%m-%Y') - relativedelta(day=1),
             status=True,
-        ).aggregate(average_income=Sum('sum_in_default_currency')/AVERAGE_PERIOD_LENGTH)['average_income'] or 0.0
+        ).aggregate(average_income=Sum('sum_in_default_currency')/settings.AVERAGE_PERIOD_LENGTH)['average_income'] or 0.0
 
         # Коэффициент изменения прибыли
         prev_month_income = Income.objects.filter(
@@ -307,11 +301,11 @@ class OutcomeCreateView(CreateView):
         return form
 
     def form_valid(self, form):
-        if form.instance.currency.short_name == DEFAULT_CURRENCY:
-            form.instance.sum_in_default_currency = form.instance.sum * PERIOD_MULTIPLIERS.get(form.instance.period, 1)
+        if form.instance.currency.short_name == settings.DEFAULT_CURRENCY:
+            form.instance.sum_in_default_currency = form.instance.sum * settings.PERIOD_MULTIPLIERS.get(form.instance.period, 1)
         else:
             converted_sum = convert_currency_by_fixer(form.instance.sum, form.instance.currency.short_name)
-            form.instance.sum_in_default_currency = converted_sum * PERIOD_MULTIPLIERS.get(form.instance.period, 1)
+            form.instance.sum_in_default_currency = converted_sum * settings.PERIOD_MULTIPLIERS.get(form.instance.period, 1)
         return super().form_valid(form)
 
 
@@ -333,11 +327,11 @@ class OutcomeEditView(UpdateView):
         return form
 
     def form_valid(self, form):
-        if form.instance.currency.short_name == DEFAULT_CURRENCY:
-            form.instance.sum_in_default_currency = form.instance.sum * PERIOD_MULTIPLIERS.get(form.instance.period, 1)
+        if form.instance.currency.short_name == settings.DEFAULT_CURRENCY:
+            form.instance.sum_in_default_currency = form.instance.sum * settings.PERIOD_MULTIPLIERS.get(form.instance.period, 1)
         else:
             converted_sum = convert_currency_by_fixer(form.instance.sum, form.instance.currency.short_name)
-            form.instance.sum_in_default_currency = converted_sum * PERIOD_MULTIPLIERS.get(form.instance.period, 1)
+            form.instance.sum_in_default_currency = converted_sum * settings.PERIOD_MULTIPLIERS.get(form.instance.period, 1)
         return super().form_valid(form)
 
 
