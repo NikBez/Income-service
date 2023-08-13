@@ -2,28 +2,30 @@ from datetime import datetime
 
 import requests
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.utils import dateformat, timezone
 from django.views.generic import ListView, UpdateView, DeleteView, CreateView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db import connection
 
 from .forms import WBPaymentForm, PVZPaymentForm
 from .models import PVZ, Employee, WBPayment, PVZPaiment
-
-from django.conf import settings
-
+from .queries import month_total_by_pvz_query
+from .assets import dictfetchall
+from .serializers import WBMonitorSerializer
 
 
 def wb_monitor(request):
     source_date = request.GET.get('date', None)
     if source_date:
-        month_and_year = datetime.strptime(source_date, '%Y-%m-%d').date()
+        request_date = datetime.strptime(source_date, '%Y-%m-%d').date()
     else:
-        month_and_year = timezone.now().date()
+        request_date = timezone.now().date()
     params = {
-        'date': month_and_year,
+        'date': request_date,
     }
     api_url = reverse('api_wb_monitor')
     response = requests.get(request.build_absolute_uri(api_url), params=params)
@@ -32,21 +34,41 @@ def wb_monitor(request):
 
     context = {
         'static_data': response,
-        'next_month': dateformat.format(month_and_year + relativedelta(months=1), 'Y-m-d'),
-        'previous_month': dateformat.format(month_and_year - relativedelta(months=1), 'Y-m-d'),
-        'current_month': month_and_year,
+        'next_month': dateformat.format(request_date + relativedelta(months=1), 'Y-m-d'),
+        'previous_month': dateformat.format(request_date - relativedelta(months=1), 'Y-m-d'),
+        'current_month': request_date,
         'avg_period_length': settings.AVERAGE_PERIOD_LENGTH,
     }
     return render(request, 'wb/wb_monitor.html', context)
 
+
 class GetWBAnalitic(APIView):
 
     def get(self, request):
-        path_date = request.query_params.get('date')
-        path_date = datetime.strptime(path_date, '%Y-%m-%d')
-        prev_month = path_date - relativedelta(months=1)
+        query_date = request.query_params.get('date')
+        query_date = datetime.strptime(query_date, '%Y-%m-%d')
+
+        start_date = query_date + relativedelta(day=1)
+        end_date = query_date + relativedelta(day=31)
+
+        prev_month = query_date - relativedelta(month=1)
         sample_data = {}
-        return Response(sample_data)
+
+        with connection.cursor() as cursor:
+            cursor.execute(month_total_by_pvz_query, [start_date, end_date, start_date, end_date, end_date, start_date, end_date,
+                                        start_date, start_date, end_date, start_date, end_date, end_date, start_date,
+                                        end_date, start_date, start_date, end_date, start_date, end_date, end_date,
+                                        start_date, end_date, start_date, start_date, end_date, start_date, end_date,
+                                        end_date, start_date, end_date, start_date, start_date, end_date])
+            pvz_total = dictfetchall(cursor)
+
+        serializer = WBMonitorSerializer({
+            'pvz_total': pvz_total,
+        })
+
+
+        return Response(serializer.data)
+
 
 class PVZPaimentList(ListView):
     model = PVZPaiment

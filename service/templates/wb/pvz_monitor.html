@@ -45,14 +45,14 @@
                         <th>Удержано</th>
                          <th>Сумма</th>
                     </tr>
-                    {% for pvz in static_data.pvz_total %}
+                    {% for point in wb_points %}
                         <tr>
-                            <td><a href="" type="button" class="btn btn-dark btn-sm">>>></a></td>
-                            <td>{{pvz.title}}</td>
-                            <td>{{pvz.boxes}}</td>
-                            <td>{{pvz.charged}}</td>
-                            <td>{{pvz.holded}}</td>
-                            <td>{{pvz.total}}</td>
+                            <td><a href="" type="button" class="btn btn-dark btn-sm">\>>></a></td>
+                            <td>{{point.title}}</td>
+                            <td>{{point.month_boxes}}</td>
+                            <td>{{point.month_charge}}</td>
+                            <td>{{point.month_hold}}</td>
+                            <td>{{point.month_total}}</td>
                         </tr>
                     {% endfor %}
                 </table>
