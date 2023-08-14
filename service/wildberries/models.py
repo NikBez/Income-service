@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 
@@ -10,6 +12,7 @@ class PVZ(models.Model):
     def __str__(self):
         return self.title
 
+
 class Employee(models.Model):
     name = models.CharField('ФИО сотрудника', max_length=200, unique=True, default='Unnamed')
     pvz_id = models.ForeignKey(
@@ -20,7 +23,7 @@ class Employee(models.Model):
     )
     date_of_start = models.DateField('Дата трудоустройства', null=True, blank=True)
     salary = models.FloatField('Ставка за смену', default=0)
-    penalty = models.FloatField('Сумма к удержанию', default=0)
+    penalty = models.FloatField('Накопленный штраф', default=0)
 
     def __str__(self):
         return self.name
@@ -69,12 +72,11 @@ class WBPayment(models.Model):
 class PVZPaiment(models.Model):
     pvz_id = models.ForeignKey(
         PVZ,
-        verbose_name='ПВЗ',
+        verbose_name='Пункт выдачи',
         on_delete=models.CASCADE,
         related_name='pvz_payments'
     )
-    from_date = models.DateField('Дата начала периода')
-    to_date = models.DateField('Дата окончания периода')
+    date = models.DateField('Дата выплаты', default=datetime.datetime.utcnow)
     employee_id = models.ForeignKey(
         Employee,
         verbose_name='Сотрудник',
@@ -82,14 +84,13 @@ class PVZPaiment(models.Model):
         related_name='payments'
     )
     number_days = models.IntegerField('Отработано смен', null=False, default=0)
-    count_big_boxes = models.IntegerField('Количество коробок', default=0)
-    extra_boxes = models.IntegerField('Количество доп.коробок', default=0)
+    boxes_count = models.IntegerField('Количество коробок', default=0)
     extra_payment = models.IntegerField('Бонус(руб.)', default=0)
-    add_penalty = models.IntegerField('Сумма начисленного штраф', default=0)
-    surcharge_penalty = models.IntegerField('Сумма удержанного штрафа', default=0)
+    add_penalty = models.IntegerField('Штраф к начислеению', default=0)
+    surcharge_penalty = models.IntegerField('Штраф к удержанию', default=0)
     total = models.IntegerField('Итого к выплате', null=False, default=0)
 
     def __str__(self):
-        formatted_from_date = self.from_date.strftime("%d-%m-%Y")
-        formatted_to_date = self.to_date.strftime("%d-%m-%Y")
-        return f'Выплата зп по сотруднику {self.employee_id.name} за период {formatted_from_date} - {formatted_to_date}'
+        formatted_date = self.date.strftime("%d-%m-%Y")
+
+        return f'Выплата расчет ЗП сотруднику {self.employee_id.name} от {formatted_date}'

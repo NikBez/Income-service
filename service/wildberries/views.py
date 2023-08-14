@@ -52,19 +52,11 @@ class GetWBAnalitic(APIView):
         end_date = query_date + relativedelta(day=31)
 
         with connection.cursor() as cursor:
-            cursor.execute(month_total_by_pvz_query,
-                           [start_date, end_date, start_date, end_date, end_date, start_date, end_date,
-                            start_date, start_date, end_date, start_date, end_date, end_date, start_date,
-                            end_date, start_date, start_date, end_date, start_date, end_date, end_date,
-                            start_date, end_date, start_date, start_date, end_date, start_date, end_date,
-                            end_date, start_date, end_date, start_date, start_date, end_date, start_date, end_date,
-                            start_date, end_date, start_date, end_date])
+
+            cursor.execute(month_total_by_pvz_query, {'start_date': start_date, 'end_date': end_date})
             pvz_total = dictfetchall(cursor)
 
-            cursor.execute(month_total_query,
-                           [start_date, end_date, start_date, end_date, end_date, start_date, end_date, start_date,
-                            start_date, end_date, start_date, end_date, start_date, end_date, start_date, end_date,
-                            end_date, start_date, end_date, start_date, start_date, end_date, start_date, end_date])
+            cursor.execute(month_total_query, {'start_date': start_date, 'end_date': end_date})
             month_results = dictfetchone(cursor)
 
         serializer = WBMonitorSerializer({
