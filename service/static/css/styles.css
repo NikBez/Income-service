@@ -48,5 +48,30 @@
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+#profit-card-on-monitor{
+    background-color: #4cb4c7;
+}
+
+#tax-card-on-monitor{
+    background-color: #7abecc;
+}
+
+#salary-card-on-monitor{
+    background-color: #7CD1C0;
+}
+
+body{
+    background-color: #000000;
+}
+
+.text-center{
+    text-align: center;
+}
+
+.text-white{
+    text-color: white;
+}
+
+
 
 

@@ -1,5 +1,5 @@
 {% extends 'wb/index.html' %}
-
+{% load static %}
 {% block body %}
 
 
@@ -19,18 +19,46 @@
 
 <div class="container">
     <div class="row mb-5">
+        <div class="col">
+            <div class="col-md">
+                <div class="card text-center text-white mb-3" id='profit-card-on-monitor'>
+                    <div class="card-header">
+                        <h5 class="card-title">Выручка</h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ static_data.month_results.profit |default:"0" }} ₽</h3>
+                    </div>
+                </div>
+            </div>
 
-        <div class="col md-5">
-            <div class="card card-body">
+        </div>
 
+        <div class="col">
+            <div class="col-md">
+                <div class="card text-center text-white mb-3" id="tax-card-on-monitor">
+                    <div class="card-header">
+                        <h5 class="card-title">Налоги к уплате</h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ static_data.month_results.taxes |default:"0" }} ₽</h3>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col md-5">
-            <div class="card card-body">
+
+         <div class="col">
+            <div class="col-md">
+                <div class="card text-center text-white mb-3" id="salary-card-on-monitor">
+                    <div class="card-header">
+                        <h5 class="card-title">Зарплатный фонд</h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ static_data.month_results.salaryes |default:"0" }} ₽</h3>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
 
     <div class="row ">
         <h5>Пункты выдачи</h5>
@@ -49,10 +77,10 @@
                         <tr>
                             <td><a href="" type="button" class="btn btn-dark btn-sm">>>></a></td>
                             <td>{{pvz.title}}</td>
-                            <td>{{pvz.boxes}}</td>
-                            <td>{{pvz.charged}}</td>
-                            <td>{{pvz.holded}}</td>
-                            <td>{{pvz.total}}</td>
+                            <td>{{pvz.boxes}} шт.</td>
+                            <td>{{pvz.charged}}₽</td>
+                            <td>{{pvz.holded}}₽</td>
+                            <td>{{pvz.total}}₽</td>
                         </tr>
                     {% endfor %}
                 </table>

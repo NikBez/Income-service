@@ -10,5 +10,12 @@ class PVZTotalSerializer(serializers.Serializer):
     boxes = serializers.IntegerField()
 
 
+class MonthResultsSerializer(serializers.Serializer):
+    salaryes = serializers.FloatField()
+    taxes = serializers.FloatField()
+    profit = serializers.FloatField()
+
+
 class WBMonitorSerializer(serializers.Serializer):
     pvz_total = PVZTotalSerializer(many=True)
+    month_results = MonthResultsSerializer()

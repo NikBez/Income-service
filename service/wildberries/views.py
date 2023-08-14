@@ -3,18 +3,18 @@ from datetime import datetime
 import requests
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.db import connection
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.utils import dateformat, timezone
 from django.views.generic import ListView, UpdateView, DeleteView, CreateView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db import connection
 
+from .assets import dictfetchall, dictfetchone
 from .forms import WBPaymentForm, PVZPaymentForm
 from .models import PVZ, Employee, WBPayment, PVZPaiment
-from .queries import month_total_by_pvz_query
-from .assets import dictfetchall
+from .queries import month_total_by_pvz_query, month_total_query
 from .serializers import WBMonitorSerializer
 
 
@@ -51,21 +51,26 @@ class GetWBAnalitic(APIView):
         start_date = query_date + relativedelta(day=1)
         end_date = query_date + relativedelta(day=31)
 
-        prev_month = query_date - relativedelta(month=1)
-        sample_data = {}
-
         with connection.cursor() as cursor:
-            cursor.execute(month_total_by_pvz_query, [start_date, end_date, start_date, end_date, end_date, start_date, end_date,
-                                        start_date, start_date, end_date, start_date, end_date, end_date, start_date,
-                                        end_date, start_date, start_date, end_date, start_date, end_date, end_date,
-                                        start_date, end_date, start_date, start_date, end_date, start_date, end_date,
-                                        end_date, start_date, end_date, start_date, start_date, end_date])
+            cursor.execute(month_total_by_pvz_query,
+                           [start_date, end_date, start_date, end_date, end_date, start_date, end_date,
+                            start_date, start_date, end_date, start_date, end_date, end_date, start_date,
+                            end_date, start_date, start_date, end_date, start_date, end_date, end_date,
+                            start_date, end_date, start_date, start_date, end_date, start_date, end_date,
+                            end_date, start_date, end_date, start_date, start_date, end_date, start_date, end_date,
+                            start_date, end_date, start_date, end_date])
             pvz_total = dictfetchall(cursor)
+
+            cursor.execute(month_total_query,
+                           [start_date, end_date, start_date, end_date, end_date, start_date, end_date, start_date,
+                            start_date, end_date, start_date, end_date, start_date, end_date, start_date, end_date,
+                            end_date, start_date, end_date, start_date, start_date, end_date, start_date, end_date])
+            month_results = dictfetchone(cursor)
 
         serializer = WBMonitorSerializer({
             'pvz_total': pvz_total,
+            'month_results': month_results,
         })
-
 
         return Response(serializer.data)
 
