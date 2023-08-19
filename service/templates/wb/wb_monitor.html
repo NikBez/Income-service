@@ -17,7 +17,15 @@
         </div>
     </div>
 
+
 <div class="container">
+
+    <div class="row mb-3">
+            <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+              <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off">
+              <label class="btn btn-outline-secondary" for="btncheck1">Checkbox 1</label>
+            </div>
+    </div>
     <div class="row mb-5">
         <div class="col">
             <div class="col-md">
@@ -71,7 +79,7 @@
                          <th>Количество коробок</th>
                         <th>Начислено</th>
                         <th>Удержано</th>
-                         <th>Выручка</th>
+                         <th>Партнерская выплата</th>
                     </tr>
                     {% for pvz in static_data.pvz_total %}
                         <tr>

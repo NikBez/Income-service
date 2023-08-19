@@ -64,7 +64,7 @@
                     <div class="col">
                         <div class="card text-center text-white mb-3" id='profit-card-on-monitor'>
                             <div class="card-header">
-                                <p class="card-title">Выплачено</p>
+                                <p class="card-title">Парт. выплата</p>
                             </div>
                             <div class="card-body">
                                 <p class="card-title">{{ static_data.pvz_total.income | default:"0" | floatformat:"g" }} ₽</p>
@@ -170,7 +170,7 @@
             </div>
 
             <div class="card card-body">
-                <table class="table table-sm">
+                <table class="table table table-hover table-sm">
                     <tr>
                         <th></th>
                         <th>ФИО</th>
@@ -181,6 +181,8 @@
                         <th>Удержано</th>
                         <th>Штраф-баланс</th>
                         <th>К выплате</th>
+                        <th></th>
+                        <th></th>
                     </tr>
                      {% for employee in static_data.employees %}
                         <tr>
@@ -193,7 +195,8 @@
                             <td>{{ employee.surcharge_penalty }}₽</td>
                             <td>{{ employee.penalty }}₽</td>
                             <td>{{ employee.total }}₽</td>
-                            <td><a href="" type="button" class="btn btn-dark btn-sm">+ смена</a></td>
+                            <td><a href="" type="button" class="btn btn-dark btn-sm">+ Смена</a></td>
+                            <td><a href="" type="button" class="btn btn-dark btn-sm">Детально</a></td>
                         </tr>
                     {% endfor %}
                 </table>
