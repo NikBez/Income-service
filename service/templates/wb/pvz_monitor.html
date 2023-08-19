@@ -1,58 +1,199 @@
 {% extends 'wb/index.html' %}
-
+{% load static %}
 {% block body %}
 
 
-    <div class="container my-5">
-        <div class="row justify-content-between align-items-end">
-            <div class="col-3">
-                <a class="btn btn-outline-secondary" href="{% url 'wb_monitor' %}?date={{ previous_month }}">Предыдущий месяц</a>
-            </div>
-            <div class="col-6 text-center">
-                <div class="p-2  align-self-start"><h5>{{current_month|date:"F Y"}}</h5></div>
-            </div>
-            <div class="col-3 text-end">
-               <a class="btn btn-outline-secondary" href="{% url 'wb_monitor' %}?date={{ next_month }}">Следующий месяц</a>
-            </div>
+<div class="container my-5">
+    <div class="row">
+        <div class="col">
+            <h3 class="text-center">{{ static_data.pvz_total.title }}</h3>
         </div>
     </div>
 
+    <div class="row justify-content-between align-items-end">
+        <div class="col-3">
+            <a class="btn btn-outline-secondary" href="{% url 'pvz_monitor' pk=pvz_id %}?date={{ previous_week }}">Предыдущая неделя</a>
+        </div>
+        <div class="col-6 text-center">
+            <div class="p-2  align-self-start"><h5>{{start_week}} - {{end_week}}</h5></div>
+        </div>
+        <div class="col-3 text-end">
+            <a class="btn btn-outline-secondary" href="{% url 'pvz_monitor' pk=pvz_id %}?date={{ next_week }}">Следующая неделя</a>
+        </div>
+    </div>
+</div>
+
 <div class="container">
-    <div class="row mb-5">
+    <div class="row">
+        <div class="col">
+            <div class="col-md">
+                <div class="card text-center text-white mb-3" id='salary-card-on-monitor'>
+                    <div class="card-header">
+                        <h5 class="card-title">Прибыль</h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ static_data.pvz_total.profit | default:"0" | floatformat:"g" }} ₽</h3>
+                    </div>
+                </div>
+            </div>
 
-        <div class="col md-5">
-            <div class="card card-body">
+            <div class="col-md">
+                <div class="row mb-5">
+                    <div class="col">
+                        <div class="card text-center text-white mb-3" id='profit-card-on-monitor'>
+                            <div class="card-header">
+                                <p class="card-title">Начисленно</p>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-title">{{ static_data.pvz_total.charged | default:"0" | floatformat:"g" }} ₽</p>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="col">
+                        <div class="card text-center text-white mb-3" id='profit-card-on-monitor'>
+                            <div class="card-header">
+                                <p class="card-title">Удержанно</p>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-title">{{ static_data.pvz_total.holded | default:"0" | floatformat:"g" }} ₽</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card text-center text-white mb-3" id='profit-card-on-monitor'>
+                            <div class="card-header">
+                                <p class="card-title">Выплачено</p>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-title">{{ static_data.pvz_total.income | default:"0" | floatformat:"g" }} ₽</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col md-5">
-            <div class="card card-body">
+
+
+        <div class="col">
+            <div class="col-md">
+                <div class="row mb">
+                    <div class="col">
+                        <div class="card text-center text-white mb-3" id='salary-card-on-monitor'>
+                            <div class="card-header">
+                                <h5 class="card-title">Налог</h5>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="card-title">{{ static_data.pvz_total.taxes | default:"0" | floatformat:"g" }} ₽</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card text-center text-white mb-3" id='salary-card-on-monitor'>
+                            <div class="card-header">
+                                <h5 class="card-title">Зарплата</h5>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="card-title">{{ static_data.pvz_total.salary | default:"0" | floatformat:"g" }} ₽</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card text-center text-white mb-3" id='tax-card-on-monitor'>
+                            <div class="card-header">
+                                <p class="card-title">Коробки</p>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-title">{{ static_data.pvz_total.boxes | default:"0" | floatformat:"g" }} шт.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-md">
+                <div class="row mb-5">
+                    <div class="col">
+                        <div class="card text-center text-white mb-3" id='tax-card-on-monitor'>
+                            <div class="card-header">
+                                <p class="card-title">+ Штраф</p>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-title">{{ static_data.pvz_total.add_penalty | default:"0" | floatformat:"g" }} ₽</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card text-center text-white mb-3" id='tax-card-on-monitor'>
+                            <div class="card-header">
+                                <p class="card-title">- Штраф</p>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-title">{{ static_data.pvz_total.sub_penalty | default:"0" | floatformat:"g" }} ₽</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card text-center text-white mb-3" id='tax-card-on-monitor'>
+                            <div class="card-header">
+                                <p class="card-title">Аренда</p>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-title">{{ static_data.pvz_total.rent_price | default:"0" | floatformat:"g" }} ₽</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
 
     <div class="row ">
-        <h5>Пункты выдачи</h5>
         <div class="col md-5">
+            <div class="row">
+                <div class="col-6">
+                    <h5>СОТРУДНИКИ:</h5>
+                </div>
+                <div class="col-6 text-end mb-3">
+                    <div class="btn-group" role="group" aria-label="Basic outlined example">
+                        <a class="btn btn-outline-dark btn-sm btn-block" href="{% url 'create_wb_payment' static_data.pvz_total.id cr_start_week cr_end_week %}">Добавить выплату WB за текущий период</a>
+                         <a class="btn btn-outline-dark btn-sm btn-block" href="{% url 'list_wb_payment' static_data.pvz_total.id  %}">Список выплат</a>
+                    </div>
+                </div>
+            </div>
+
             <div class="card card-body">
                 <table class="table table-sm">
                     <tr>
                         <th></th>
-                        <th>Название</th>
-                         <th>Количество коробок</th>
-                        <th>Начислено</th>
+                        <th>ФИО</th>
+                        <th>Ставка</th>
+                        <th>Cмен</th>
+                        <th>Количество коробок</th>
+                        <th>Штраф</th>
                         <th>Удержано</th>
-                         <th>Сумма</th>
+                        <th>Штраф-баланс</th>
+                        <th>К выплате</th>
                     </tr>
-                    {% for point in wb_points %}
+                     {% for employee in static_data.employees %}
                         <tr>
-                            <td><a href="" type="button" class="btn btn-dark btn-sm">\>>></a></td>
-                            <td>{{point.title}}</td>
-                            <td>{{point.month_boxes}}</td>
-                            <td>{{point.month_charge}}</td>
-                            <td>{{point.month_hold}}</td>
-                            <td>{{point.month_total}}</td>
+                            <td><a href="{% url 'edit_employee' pk=employee.id %}" type="button" class="btn btn-dark btn-sm">>>></a></td>
+                            <td>{{ employee.name }}</td>
+                            <td>{{ employee.salary }} ₽</td>
+                            <td>{{ employee.days }}</td>
+                            <td>{{ employee.boxes }}шт.</td>
+                            <td>{{ employee.add_penalty }}₽</td>
+                            <td>{{ employee.surcharge_penalty }}₽</td>
+                            <td>{{ employee.penalty }}₽</td>
+                            <td>{{ employee.total }}₽</td>
+                            <td><a href="" type="button" class="btn btn-dark btn-sm">+ смена</a></td>
                         </tr>
                     {% endfor %}
                 </table>

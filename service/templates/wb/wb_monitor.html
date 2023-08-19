@@ -23,10 +23,10 @@
             <div class="col-md">
                 <div class="card text-center text-white mb-3" id='profit-card-on-monitor'>
                     <div class="card-header">
-                        <h5 class="card-title">Выручка</h5>
+                        <h5 class="card-title">Прибыль</h5>
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title">{{ static_data.month_results.profit |default:"0" }} ₽</h3>
+                        <h3 class="card-title">{{ static_data.month_results.profit |default:"0" | floatformat:"g" }} ₽</h3>
                     </div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                         <h5 class="card-title">Налоги к уплате</h5>
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title">{{ static_data.month_results.taxes |default:"0" }} ₽</h3>
+                        <h3 class="card-title">{{ static_data.month_results.taxes |default:"0" | floatformat:"g" }} ₽</h3>
                     </div>
                 </div>
             </div>
@@ -53,7 +53,7 @@
                         <h5 class="card-title">Зарплатный фонд</h5>
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title">{{ static_data.month_results.salaryes |default:"0" }} ₽</h3>
+                        <h3 class="card-title">{{ static_data.month_results.salaryes |default:"0" | floatformat:"g" }} ₽</h3>
                     </div>
                 </div>
             </div>
@@ -71,16 +71,16 @@
                          <th>Количество коробок</th>
                         <th>Начислено</th>
                         <th>Удержано</th>
-                         <th>Сумма</th>
+                         <th>Выручка</th>
                     </tr>
                     {% for pvz in static_data.pvz_total %}
                         <tr>
-                            <td><a href="" type="button" class="btn btn-dark btn-sm">>>></a></td>
+                            <td><a href="{% url 'pvz_monitor' pk=pvz.id %}" type="button" class="btn btn-dark btn-sm">>>></a></td>
                             <td>{{pvz.title}}</td>
                             <td>{{pvz.boxes}} шт.</td>
-                            <td>{{pvz.charged}}₽</td>
-                            <td>{{pvz.holded}}₽</td>
-                            <td>{{pvz.total}}₽</td>
+                            <td>{{pvz.charged | floatformat:"g" }}₽</td>
+                            <td>{{pvz.holded | floatformat:"g" }}₽</td>
+                            <td>{{pvz.total | floatformat:"g" }}₽</td>
                         </tr>
                     {% endfor %}
                 </table>

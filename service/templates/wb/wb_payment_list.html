@@ -5,15 +5,17 @@
 {% block body %}
 
     <div class="container mt-5">
-        <div class="row my-2">
-            <div class="col">
-                <h2 class=" col">Список платежей от WB </h2>
+         <div class="row">
+             <div class="col-5 text-start mb-3">
+                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                    <a class="btn btn-outline-dark btn-sm btn-block" href="{% url 'pvz_monitor' pvz_id %}">Назад</a>
+                </div>
+            </div>
+            <div class="col-7">
+                <h5>Список платежей от WB:</h5>
             </div>
         </div>
 
-        <div>
-            <a class="btn btn-outline-primary btn-sm" href="{% url 'create_wb_payment' %}">  + Добавить новый платеж </a>
-        </div>
         <!--Список записей-->
         <div class="row my-2">
             <table class="table table-hover">
@@ -31,8 +33,8 @@
                         <td>{{ line.total_charge }}</td>
                         <td>{{ line.total_hold }}</td>
                         <td>{{ line.total }}</td>
-                        <td><a href="{% url 'edit_wb_payment' line.id %}" class="btn btn-outline-secondary btn-sm"> Edit </a></td>
-                        <td><a href="{% url 'delete_wb_payment' line.id %}" class="btn btn-outline-secondary btn-sm"> Del </a></td>
+                        <td><a href="{% url 'edit_wb_payment' pvz_id line.id %}" class="btn btn-outline-secondary btn-sm"> Edit </a></td>
+                        <td><a href="{% url 'delete_wb_payment' pvz_id line.id %}" class="btn btn-outline-secondary btn-sm"> Del </a></td>
                     </tr>
                 {% endfor %}
             </table>

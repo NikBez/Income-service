@@ -1,5 +1,5 @@
 from django import forms
-from .models import PVZ, WBPayment, PVZPaiment
+from .models import PVZ, WBPayment, PVZPaiment, Employee
 
 import calculation
 
@@ -43,3 +43,9 @@ class PVZPaymentForm(forms.ModelForm):
     class Meta:
         model = PVZPaiment
         fields = '__all__'
+
+
+class EmployeeUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Employee
+        exclude = ['penalty']
