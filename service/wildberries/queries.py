@@ -7,7 +7,7 @@ month_total_by_pvz_query = '''
         ww.holded,
         COALESCE(pp.boxes, 0) boxes
     FROM
-        wildberries_pvz wp 
+        wildberries_pvz wp
     left join (
         SELECT 
             sub_pp.id,
@@ -59,50 +59,60 @@ month_total_by_pvz_query = '''
             ORDER BY title
 '''
 
-month_total_query = '''
+
+def month_total_constructor(filter):
+    if not filter:
+        where_ww = '''WHERE (ww.from_date >= :start_date and ww.from_date <= :end_date) or (ww.to_date >= :start_date and ww.to_date <= :end_date)),'''
+        where_pp = ''
+    else:
+        filter = '(' + filter + ')'
+        where_ww = f'''WHERE ((ww.from_date >= :start_date and ww.from_date <= :end_date) or (ww.to_date >= :start_date and ww.to_date <= :end_date)) and ww.pvz_id_id IN {filter}),'''
+        where_pp = f''' WHERE pp.pvz_id_id IN {filter}'''
+
+    month_total_query = f'''
     with incomes as (
-    Select 
-    SUM(IIF(ww.from_date >= :start_date and DATE(ww.from_date, 'weekday 0') <= :end_date, ww.total,
-            IIF(ww.from_date >= :start_date and ww.to_date > :end_date,  ROUND(ww.total / 7 * (7 - (JULIANDAY(ww.to_date) - JULIANDAY(:end_date))), 2),
-            IIF(ww.from_date < :start_date and ww.to_date <= :end_date,  ROUND(ww.total / 7 * (7 - (JULIANDAY(:start_date) - JULIANDAY(ww.from_date))), 2),
-            0)))) income
-    from wildberries_wbpayment ww 
-    WHERE (ww.from_date >= :start_date and ww.from_date <= :end_date) or (ww.to_date >= :start_date and ww.to_date <= :end_date)
-    ),
-    outcomes as (
-     SELECT 
-        SUM(IIF(pp.start_of_month = JULIANDAY(:start_date) and pp.end_of_week <= JULIANDAY(:end_date), pp.total,
-                IIF(pp.start_of_week >= JULIANDAY(:start_date) and pp.end_of_week > JULIANDAY(:end_date),  ROUND(pp.total / 7 * (7 - (JULIANDAY(pp.end_of_week) - JULIANDAY(:end_date))), 2),   
-                IIF(pp.start_of_week < JULIANDAY(:start_date) and pp.end_of_week <= JULIANDAY(:end_date),  ROUND(pp.total / 7 * (7 - (JULIANDAY(:start_date) - JULIANDAY(pp.start_of_week))), 2),
-                0)))) outcome
-    FROM (
-        SELECT  
-            pp.total, 
-            pp.date as date,
-            JULIANDAY(date(date(pp.date,'weekday 1'),'start of month')) start_of_month,
-            JULIANDAY(date(pp.date,'weekday 1')) start_of_week,
-            JULIANDAY(date(pp.date,'weekday 0')) end_of_week
-        FROM 
-            wildberries_pvzpaiment pp) pp 
-    WHERE (pp.start_of_week >= JULIANDAY(:start_date) and pp.start_of_week <= JULIANDAY(:end_date)) or (pp.end_of_week >= JULIANDAY(:start_date) and pp.end_of_week <= JULIANDAY(:end_date))
-    )
-    Select 
-    ROUND(o.outcome, 2) salaryes,
-    ROUND(i.income * 0.94 - o.outcome, 2) profit,
-    ROUND(i.income * 0.06, 2) taxes 
-    From 
-    incomes i CROSS JOIN outcomes o;
-'''
+        SELECT 
+        COALESCE(SUM(IIF(ww.from_date >= :start_date and DATE(ww.from_date, 'weekday 0') <= :end_date, ww.total,
+                IIF(ww.from_date >= :start_date and ww.to_date > :end_date,  ROUND(ww.total / 7 * (7 - (JULIANDAY(ww.to_date) - JULIANDAY(:end_date))), 2),
+                IIF(ww.from_date < :start_date and ww.to_date <= :end_date,  ROUND(ww.total / 7 * (7 - (JULIANDAY(:start_date) - JULIANDAY(ww.from_date))), 2),
+                0)))), 0) income
+        FROM wildberries_wbpayment ww ''' + where_ww + ''' outcomes as (
+        SELECT 
+            COALESCE(SUM(IIF(pp.start_of_month = JULIANDAY(:start_date) and pp.end_of_week <= JULIANDAY(:end_date), pp.total,
+                    IIF(pp.start_of_week >= JULIANDAY(:start_date) and pp.end_of_week > JULIANDAY(:end_date),  ROUND(pp.total / 7 * (7 - (JULIANDAY(pp.end_of_week) - JULIANDAY(:end_date))), 2),   
+                    IIF(pp.start_of_week < JULIANDAY(:start_date) and pp.end_of_week <= JULIANDAY(:end_date),  ROUND(pp.total / 7 * (7 - (JULIANDAY(:start_date) - JULIANDAY(pp.start_of_week))), 2),
+                    0)))), 0) outcome
+        FROM (
+            SELECT 
+                pp.pvz_id_id pvz_id_id, 
+                pp.total, 
+                pp.date as date,
+                JULIANDAY(date(date(pp.date,'weekday 1'),'start of month')) start_of_month,
+                JULIANDAY(date(pp.date,'weekday 1')) start_of_week,
+                JULIANDAY(date(pp.date,'weekday 0')) end_of_week
+            FROM 
+                wildberries_pvzpaiment pp ''' + where_pp + ''' 
+            ) pp 
+            WHERE (pp.start_of_week >= JULIANDAY(:start_date) and pp.start_of_week <= JULIANDAY(:end_date)) or (pp.end_of_week >= JULIANDAY(:start_date) and pp.end_of_week <= JULIANDAY(:end_date))
+            ) 
+            SELECT 
+                ROUND(o.outcome, 2) salaryes,
+                ROUND(i.income * 0.94 - o.outcome, 2) profit,
+                ROUND(i.income * 0.06, 2) taxes 
+                From 
+                incomes i CROSS JOIN outcomes o;
+    '''
+    return month_total_query
 
 
 week_total_by_pvz_query = '''      
         WITH pp AS(
         SELECT
                 pvz_id_id id,	
-                SUM(add_penalty) add_penalty,
-                SUM(surcharge_penalty) sub_penalty,
-                SUM(total) salary,
-                SUM(boxes_count) boxes
+                COALESCE(SUM(add_penalty), 0) add_penalty,
+                COALESCE(SUM(surcharge_penalty), 0) sub_penalty,
+                COALESCE(SUM(total), 0) salary,
+                COALESCE(SUM(boxes_count), 0) boxes
         FROM
             wildberries_pvzpaiment pp
         WHERE
@@ -115,9 +125,9 @@ week_total_by_pvz_query = '''
             ww AS (
         SELECT 
              pvz_id_id id,
-             SUM(total) total,
-             SUM(total_charge) charged,
-             SUM(total_hold) holded
+             COALESCE(SUM(total), 0) total,
+             COALESCE(SUM(total_charge), 0) charged,
+             COALESCE(SUM(total_hold), 0) holded
         FROM 
             wildberries_wbpayment ww
         WHERE
@@ -168,7 +178,3 @@ week_employee_report = '''
     GROUP BY we.id
     ORDER BY total DESC 
 '''
-
-
-
-

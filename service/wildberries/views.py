@@ -14,18 +14,22 @@ from rest_framework.views import APIView
 from .assets import dictfetchall, dictfetchone
 from .forms import WBPaymentForm, PVZPaymentForm, EmployeeUpdateForm
 from .models import PVZ, Employee, WBPayment, PVZPaiment
-from .queries import month_total_by_pvz_query, month_total_query, week_total_by_pvz_query, week_employee_report
+from .queries import month_total_by_pvz_query, week_total_by_pvz_query, week_employee_report, month_total_constructor
 from .serializers import WBMonitorSerializer, PVZMonitorSerializer
 
 
 def wb_monitor(request):
     source_date = request.GET.get('date', None)
+    filter = request.GET.get('filter', None)
+
     if source_date:
         request_date = datetime.strptime(source_date, '%Y-%m-%d').date()
     else:
         request_date = timezone.now().date()
+
     params = {
         'date': request_date,
+        'filter': filter
     }
     api_url = reverse('api_wb_monitor')
     response = requests.get(request.build_absolute_uri(api_url), params=params)
@@ -37,6 +41,8 @@ def wb_monitor(request):
         'next_month': dateformat.format(request_date + relativedelta(months=1), 'Y-m-d'),
         'previous_month': dateformat.format(request_date - relativedelta(months=1), 'Y-m-d'),
         'current_month': request_date,
+        'filter_state': filter,
+        'pvz_list':  PVZ.objects.all(),
         'avg_period_length': settings.AVERAGE_PERIOD_LENGTH,
     }
     return render(request, 'wb/wb_monitor.html', context)
@@ -83,10 +89,14 @@ class GetWBAnalitic(APIView):
 
     def get(self, request):
         query_date = request.query_params.get('date')
+        query_filter = request.query_params.get('filter')
+
         query_date = datetime.strptime(query_date, '%Y-%m-%d')
 
         start_date = query_date + relativedelta(day=1)
         end_date = query_date + relativedelta(day=31)
+
+        month_total_query = month_total_constructor(query_filter)
 
         with connection.cursor() as cursor:
             cursor.execute(month_total_by_pvz_query, {'start_date': start_date, 'end_date': end_date})
