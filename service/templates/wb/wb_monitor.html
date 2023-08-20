@@ -68,6 +68,19 @@
                 </div>
             </div>
         </div>
+
+        <div class="col">
+            <div class="col-md">
+                <div class="card text-center text-white mb-3" id="salary-card-on-monitor">
+                    <div class="card-header">
+                        <h5 class="card-title">Арендная плата</h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ rent |default:"0" | floatformat:"g" }} ₽</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row ">

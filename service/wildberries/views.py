@@ -4,7 +4,7 @@ import requests
 from dateutil.relativedelta import relativedelta, MO, SU
 from django.conf import settings
 from django.db import connection
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils import dateformat, timezone
@@ -39,6 +39,7 @@ def wb_monitor(request):
 
     context = {
         'static_data': response,
+        'rent': PVZ.objects.aggregate(rent=Sum('rent_price'))['rent'],
         'next_month': dateformat.format(request_date + relativedelta(months=1), 'Y-m-d'),
         'previous_month': dateformat.format(request_date - relativedelta(months=1), 'Y-m-d'),
         'current_month': request_date,
@@ -177,11 +178,11 @@ class PVZPaimentUpdate(UpdateView):
     form_class = PVZPaymentForm
 
     def get_success_url(self):
-        pvz_id = self.object.pvz_id_id
+        employee_id = self.object.employee_id_id
         start_week = self.kwargs.get('start_week')
         end_week = self.kwargs.get('end_week')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'pk': pvz_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
+                            kwargs={'pk': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
 
     def get_initial(self):
         initial = super().get_initial()
@@ -225,11 +226,11 @@ class PVZPaimentDelete(DeleteView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        pvz_id = self.object.pvz_id_id
+        employee_id = self.object.employee_id_id
         start_week = self.kwargs.get('start_week')
         end_week = self.kwargs.get('end_week')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'pk': pvz_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
+                            kwargs={'pk': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
 
 
 class PVZPaimentCreate(CreateView):
@@ -273,11 +274,11 @@ class PVZPaimentCreate(CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        pvz_id = self.object.pvz_id_id
+        employee_id = self.object.employee_id_id
         start_week = self.kwargs.get('cr_start_week')
         end_week = self.kwargs.get('cr_end_week')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'pk': pvz_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
+                            kwargs={'pk': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
 
 
 class WBPaymentList(ListView):

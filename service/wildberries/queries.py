@@ -94,13 +94,14 @@ def month_total_constructor(filter):
                 wildberries_pvzpaiment pp ''' + where_pp + ''' 
             ) pp 
             WHERE (pp.start_of_week >= JULIANDAY(:start_date) and pp.start_of_week <= JULIANDAY(:end_date)) or (pp.end_of_week >= JULIANDAY(:start_date) and pp.end_of_week <= JULIANDAY(:end_date))
-            ) 
+            ),
+            pvz as (SELECT COALESCE(SUM(rent_price), 0) rent FROM wildberries_pvz)
             SELECT 
                 ROUND(o.outcome, 2) salaryes,
-                ROUND(i.income * 0.94 - o.outcome, 2) profit,
+                ROUND(i.income * 0.94 - o.outcome - p.rent, 2) profit,
                 ROUND(i.income * 0.06, 2) taxes 
                 From 
-                incomes i CROSS JOIN outcomes o;
+                incomes i CROSS JOIN outcomes o CROSS JOIN pvz p;
     '''
     return month_total_query
 
