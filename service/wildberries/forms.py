@@ -38,7 +38,6 @@ class WBPaymentForm(forms.ModelForm):
     total = forms.FloatField(label='Доход', required=False, widget=calculation.FormulaInput('total_charge - total_hold', attrs={'class': 'form-control', 'readonly': True}))
 
 
-
 class PVZPaymentForm(forms.ModelForm):
     class Meta:
         model = PVZPaiment

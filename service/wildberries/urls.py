@@ -28,8 +28,8 @@ urlpatterns = [
     path('wb-payments/<int:pvz_id>/<int:pk>/delete/', WBPaymentDelete.as_view(), name='delete_wb_payment'),
     path('wb-payments/create/<int:pvz_id>/<str:cr_start_week>/<str:cr_end_week>/', WBPaymentCreate.as_view(), name='create_wb_payment'),
 
-    path('pvz-payments/<int:pk>/', PVZPaimentList.as_view(), name='list_pvz_payment'),
-    path('pvz-payments/<int:pk>/edit/', PVZPaimentUpdate.as_view(), name='edit_pvz_payment'),
-    path('pvz-payments/<int:pk>/delete/', PVZPaimentDelete.as_view(), name='delete_pvz_payment'),
+    path('pvz-payments/<int:pk>/<str:cr_start_week>/<str:cr_end_week>/', PVZPaimentList.as_view(), name='list_pvz_payment'),
+    path('pvz-payments/<int:pk>/<int:employee_id>/<str:start_week>/<str:end_week>/edit/', PVZPaimentUpdate.as_view(), name='edit_pvz_payment'),
+    path('pvz-payments/<int:pk>/<int:employee_id>/<str:start_week>/<str:end_week>/delete/', PVZPaimentDelete.as_view(), name='delete_pvz_payment'),
     path('pvz-payments/create/', PVZPaimentCreate.as_view(), name='create_pvz_payment'),
 ]

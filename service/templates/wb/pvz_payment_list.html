@@ -7,40 +7,30 @@
     <div class="container mt-5">
         <div class="row my-2">
             <div class="col">
-                <h2 class=" col">Список зарплатных выплат </h2>
+                <h3 class=" col">Список зарплатных выплат по сотруднику {{ employee.name }} за период {{ start_date }} - {{ end_date }}</h3>
             </div>
-        </div>
-
-        <div>
-            <a class="btn btn-outline-primary btn-sm" href="{% url 'create_wb_payment' %}">  + Добавить новую выплату </a>
         </div>
         <!--Список записей-->
         <div class="row my-2">
             <table class="table table-hover">
                 <thead>
-                <th>Период</th>
-                <th>Сотрудник</th>
                 <th>Cмен</th>
                 <th>Коробки</th>
-                <th>Коробочки</th>
                 <th>Бонус</th>
-                <th>Штраф</th>
-                <th>Нак-ный штраф</th>
-                <th>Итого</th>
+                <th>Штраф + </th>
+                <th>Штраф -</th>
+                <th>К выплате</th>
                 </thead>
                 {% for line in object_list %}
                     <tr>
-                        <td>{{ line.from_date|date:"j M Y" }} - {{ line.to_date|date:"j M Y" }}</td>
-                        <td>{{ line.employee_id }}</td>
                         <td>{{ line.number_days }}</td>
                         <td>{{ line.boxes_count }}</td>
-                        <td>{{ line.extra_boxes }}</td>
                         <td>{{ line.extra_payment }}</td>
                         <td>{{ line.add_penalty }}</td>
                         <td>{{ line.surcharge_penalty }}</td>
                          <td>{{ line.total }}</td>
-                        <td><a href="{% url 'edit_pvz_payment' line.id %}" class="btn btn-outline-secondary btn-sm"> Edit </a></td>
-                        <td><a href="{% url 'delete_pvz_payment' line.id %}" class="btn btn-outline-secondary btn-sm"> Del </a></td>
+                        <td><a href="{% url 'edit_pvz_payment' line.id employee.id start_date end_date %}" class="btn btn-outline-secondary btn-sm">  Редактировать </a></td>
+                        <td><a href="{% url 'delete_pvz_payment' line.id employee.id start_date end_date %}" class="btn btn-outline-secondary btn-sm"> Удалить </a></td>
                     </tr>
                 {% endfor %}
             </table>

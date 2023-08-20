@@ -4,6 +4,7 @@ import requests
 from dateutil.relativedelta import relativedelta, MO, SU
 from django.conf import settings
 from django.db import connection
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils import dateformat, timezone
@@ -42,14 +43,13 @@ def wb_monitor(request):
         'previous_month': dateformat.format(request_date - relativedelta(months=1), 'Y-m-d'),
         'current_month': request_date,
         'filter_state': filter,
-        'pvz_list':  PVZ.objects.all(),
+        'pvz_list': PVZ.objects.all(),
         'avg_period_length': settings.AVERAGE_PERIOD_LENGTH,
     }
     return render(request, 'wb/wb_monitor.html', context)
 
 
 def pvz_monitor(request, pk):
-
     get_object_or_404(PVZ, pk=pk)
 
     source_date = request.GET.get('date', None)
@@ -60,7 +60,7 @@ def pvz_monitor(request, pk):
 
     start_week = dateformat.format(request_date - relativedelta(weekday=MO(-1)), 'Y-m-d')
     end_week = dateformat.format(request_date - relativedelta(weekday=SU(+1)), 'Y-m-d')
-    
+
     params = {
         'start_week': start_week,
         'end_week': end_week,
@@ -96,6 +96,7 @@ class GetWBAnalitic(APIView):
         start_date = query_date + relativedelta(day=1)
         end_date = query_date + relativedelta(day=31)
 
+        # Собираем запрос с фильтром по ПВЗ или без
         month_total_query = month_total_constructor(query_filter)
 
         with connection.cursor() as cursor:
@@ -119,7 +120,7 @@ class GetPVZAnalitic(APIView):
         start_date = request.query_params.get('start_week')
         end_date = request.query_params.get('end_week')
         pvz_id = request.query_params.get('pvz_id')
-        
+
         start_date = datetime.strptime(start_date, '%Y-%m-%d')
         end_date = datetime.strptime(end_date, '%Y-%m-%d')
 
@@ -142,18 +143,55 @@ class PVZPaimentList(ListView):
     template_name = 'wb/pvz_payment_list.html'
     paginate_by = 10
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        employee_id = self.kwargs.get('pk')
+        start_date = self.kwargs.get('cr_start_week')
+        end_date = self.kwargs.get('cr_end_week')
+        context['start_date'] = start_date
+        context['end_date'] = end_date
+
+        context['employee'] = Employee.objects.get(pk=employee_id)
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        employee_id = self.kwargs.get('pk')
+        start_week = self.kwargs.get('cr_start_week')
+        end_week = self.kwargs.get('cr_end_week')
+
+        converted_start_week = datetime.strptime(start_week, "%d-%m-%Y")
+        converted_end_week = datetime.strptime(end_week, "%d-%m-%Y")
+
+        if employee_id is not None:
+            queryset = queryset.filter(Q(date__gte=converted_start_week) & Q(date__lte=converted_end_week),
+                                       employee_id=employee_id).order_by('date')
+        return queryset
+
 
 class PVZPaimentUpdate(UpdateView):
     model = PVZPaiment
     template_name = 'wb/pvz_payment_edit.html'
-    success_url = reverse_lazy('list_pvz_payment')
-    form_class = PVZPaymentForm
+
+    def get_success_url(self):
+        employee_id = self.kwargs.get('employee_id')
+        start_week = self.kwargs.get('start_week')
+        end_week = self.kwargs.get('end_week')
+        return reverse_lazy('list_pvz_payment',
+                            kwargs={'pk': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
 
 
 class PVZPaimentDelete(DeleteView):
     model = PVZPaiment
     template_name = 'wb/pvz_payment_delete.html'
-    success_url = reverse_lazy('list_pvz_payment')
+
+    def get_success_url(self):
+        employee_id = self.kwargs.get('employee_id')
+        start_week = self.kwargs.get('start_week')
+        end_week = self.kwargs.get('end_week')
+        return reverse_lazy('list_pvz_payment',
+                            kwargs={'pk': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
 
 
 class PVZPaimentCreate(CreateView):
@@ -200,6 +238,7 @@ class WBPaymentUpdate(UpdateView):
         initial['to_date'] = end_week
 
         return initial
+
     def get_success_url(self):
         pvz_id = self.kwargs.get('pvz_id')
         return reverse_lazy('list_wb_payment', kwargs={'pvz_id': pvz_id})

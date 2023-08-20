@@ -196,7 +196,7 @@
                             <td>{{ employee.penalty }}₽</td>
                             <td>{{ employee.total }}₽</td>
                             <td><a href="" type="button" class="btn btn-dark btn-sm">+ Смена</a></td>
-                            <td><a href="" type="button" class="btn btn-dark btn-sm">Детально</a></td>
+                            <td><a href="{% url 'list_pvz_payment' employee.id cr_start_week cr_end_week %}" type="button" class="btn btn-dark btn-sm">Детально</a></td>
                         </tr>
                     {% endfor %}
                 </table>
