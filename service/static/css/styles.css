@@ -49,19 +49,23 @@
 }
 
 #profit-card-on-monitor{
-    background-color: #4cb4c7;
+    background-color: #5E4473;
+}
+
+#wb-card-on-monitor{
+    background-color: #767A42;
 }
 
 #tax-card-on-monitor{
-    background-color: #7abecc;
+    background-color: #1A0729;
 }
 
 #salary-card-on-monitor{
-    background-color: #7CD1C0;
+    background-color: #1A0729;
 }
 
 body{
-    background-color: #000000;
+    background-color: #F2F2D0;
 }
 
 .text-center{

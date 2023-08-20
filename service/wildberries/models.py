@@ -83,10 +83,10 @@ class PVZPaiment(models.Model):
         on_delete=models.CASCADE,
         related_name='payments'
     )
-    number_days = models.IntegerField('Отработано смен', null=False, default=0)
-    boxes_count = models.IntegerField('Количество коробок', default=0)
+    number_days = models.IntegerField('Cмены', null=False, default=0)
+    boxes_count = models.IntegerField('Коробки', default=0)
     extra_payment = models.IntegerField('Бонус(руб.)', default=0)
-    add_penalty = models.IntegerField('Штраф к начислеению', default=0)
+    add_penalty = models.IntegerField('Штраф к начислению', default=0)
     surcharge_penalty = models.IntegerField('Штраф к удержанию', default=0)
     total = models.IntegerField('Итого к выплате', null=False, default=0)
 

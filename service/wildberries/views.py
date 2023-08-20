@@ -12,7 +12,7 @@ from django.views.generic import ListView, UpdateView, DeleteView, CreateView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .assets import dictfetchall, dictfetchone
+from .assets import dictfetchall, dictfetchone, update_employee_penalty
 from .forms import WBPaymentForm, PVZPaymentForm, EmployeeUpdateForm
 from .models import PVZ, Employee, WBPayment, PVZPaiment
 from .queries import month_total_by_pvz_query, week_total_by_pvz_query, week_employee_report, month_total_constructor
@@ -151,7 +151,7 @@ class PVZPaimentList(ListView):
         context['start_date'] = start_date
         context['end_date'] = end_date
 
-        context['employee'] = Employee.objects.get(pk=employee_id)
+        context['employee'] = get_object_or_404(Employee, pk=employee_id)
         return context
 
     def get_queryset(self):
@@ -166,39 +166,118 @@ class PVZPaimentList(ListView):
 
         if employee_id is not None:
             queryset = queryset.filter(Q(date__gte=converted_start_week) & Q(date__lte=converted_end_week),
-                                       employee_id=employee_id).order_by('date')
+                                       employee_id=employee_id).order_by('-date')
         return queryset
 
 
 class PVZPaimentUpdate(UpdateView):
     model = PVZPaiment
-    template_name = 'wb/pvz_payment_edit.html'
+    template_name = 'wb/pvz_payment_create.html'
+    success_url = reverse_lazy('wb_monitor')
+    form_class = PVZPaymentForm
 
     def get_success_url(self):
-        employee_id = self.kwargs.get('employee_id')
+        pvz_id = self.object.pvz_id_id
         start_week = self.kwargs.get('start_week')
         end_week = self.kwargs.get('end_week')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'pk': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
+                            kwargs={'pk': pvz_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
+
+    def get_initial(self):
+        initial = super().get_initial()
+        employee_id = self.kwargs.get('employee_id')
+        date_of_operation = dateformat.format(self.object.date, 'd-m-Y')
+        employee = get_object_or_404(Employee, pk=employee_id)
+
+        initial['date'] = date_of_operation
+        initial['pvz_id'] = employee.pvz_id
+        initial['employee_id'] = employee
+        initial['bet'] = employee.salary
+        initial['penalty'] = employee.penalty
+        return initial
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        employee_id = self.kwargs.get('employee_id')
+        employee = get_object_or_404(Employee, pk=employee_id)
+        current_data = get_object_or_404(PVZPaiment, pk=self.object.id)
+        instance.pvz_id = employee.pvz_id
+        instance.employee_id = employee
+
+        update_employee_penalty(employee,
+                                instance.add_penalty - current_data.add_penalty,
+                                instance.surcharge_penalty - current_data.surcharge_penalty,
+                                create=True
+                                )
+        instance.save()
+        return super().form_valid(form)
 
 
 class PVZPaimentDelete(DeleteView):
     model = PVZPaiment
     template_name = 'wb/pvz_payment_delete.html'
 
+    def form_valid(self, form):
+        employee_id = self.object.employee_id
+        add_penalty = self.object.add_penalty
+        surcharge_penalty = self.object.surcharge_penalty
+        update_employee_penalty(employee_id, add_penalty, surcharge_penalty, create=False)
+        return super().form_valid(form)
+
     def get_success_url(self):
-        employee_id = self.kwargs.get('employee_id')
+        pvz_id = self.object.pvz_id_id
         start_week = self.kwargs.get('start_week')
         end_week = self.kwargs.get('end_week')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'pk': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
+                            kwargs={'pk': pvz_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
 
 
 class PVZPaimentCreate(CreateView):
     model = PVZPaiment
     template_name = 'wb/pvz_payment_create.html'
-    success_url = reverse_lazy('list_pvz_payment')
     form_class = PVZPaymentForm
+
+    def get_initial(self):
+        initial = super().get_initial()
+        employee_id = self.kwargs.get('employee_id')
+        current_date = dateformat.format(datetime.utcnow().date(), 'd-m-Y')
+        employee = get_object_or_404(Employee, pk=employee_id)
+
+        initial['pvz_id'] = employee.pvz_id
+        initial['date'] = current_date
+        initial['employee_id'] = employee.pk
+        initial['bet'] = employee.salary
+        initial['penalty'] = employee.penalty
+        return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        employee_id = self.kwargs.get('employee_id')
+        start_date = self.kwargs.get('cr_start_week')
+        end_date = self.kwargs.get('cr_end_week')
+        context['start_date'] = start_date
+        context['end_date'] = end_date
+        context['employee'] = get_object_or_404(Employee, pk=employee_id)
+        return context
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        employee_id = self.kwargs.get('employee_id')
+        employee = get_object_or_404(Employee, pk=employee_id)
+        instance.pvz_id = employee.pvz_id
+        instance.employee_id = employee
+
+        update_employee_penalty(employee, instance.add_penalty, instance.surcharge_penalty)
+
+        instance.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        pvz_id = self.object.pvz_id_id
+        start_week = self.kwargs.get('cr_start_week')
+        end_week = self.kwargs.get('cr_end_week')
+        return reverse_lazy('list_pvz_payment',
+                            kwargs={'pk': pvz_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
 
 
 class WBPaymentList(ListView):

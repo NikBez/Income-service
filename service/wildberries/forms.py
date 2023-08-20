@@ -9,7 +9,7 @@ class WBPaymentForm(forms.ModelForm):
         model = WBPayment
         fields = '__all__'
    
-    from_date = forms.DateField(input_formats=['%d-%m-%Y'], label='от', widget=forms.DateInput(attrs={ 'id': 'from_date'}))
+    from_date = forms.DateField(input_formats=['%d-%m-%Y'], label='от', widget=forms.DateInput(attrs={'id': 'from_date'}))
     to_date = forms.DateField(input_formats=['%d-%m-%Y'], label='до', widget=forms.DateInput(attrs={'id': 'to_date'}))
     pvz_id = forms.ModelChoiceField(queryset=PVZ.objects.all(), label='ПВЗ', empty_label='Выберите...', widget=forms.Select(attrs={'class': 'form-select', 'id': "PVZ_selector"}))
     charged_rate = forms.FloatField(label='Начислено по тарифу', required=False, widget=forms.NumberInput(attrs={'class': 'form-select form-select-lg', 'value': 0}))
@@ -43,8 +43,37 @@ class PVZPaymentForm(forms.ModelForm):
         model = PVZPaiment
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['pvz_id'].required = False
+        self.fields['employee_id'].required = False
+
+    date = forms.DateField(label='Дата', input_formats=['%d-%m-%Y'], widget=forms.DateInput(attrs={'id': 'date'}))
+
+    number_days = forms.IntegerField(label='Смен', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select form-select-lg', 'value': 0}))
+    boxes_count = forms.IntegerField(label='Коробки', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    extra_payment = forms.FloatField(label='Премия', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select form-select-lg', 'value': 0}))
+    add_penalty = forms.FloatField(label='Добавить штраф', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    surcharge_penalty = forms.FloatField(label='Удержать штраф', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    bet = forms.FloatField(label='bet', required=False, widget=forms.HiddenInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    penalty = forms.FloatField(label='Остаток штрафа', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0, 'readonly': True}))
+
+    total = forms.FloatField(label='Итого к выплате', required=False, widget=calculation.FormulaInput('number_days * bet + extra_payment + (boxes_count * 100) - surcharge_penalty',
+                                                                                            attrs={
+                                                                                                'class': 'form-control',
+                                                                                                'readonly': False}))
+
+
+
 
 class EmployeeUpdateForm(forms.ModelForm):
     class Meta:
         model = Employee
-        exclude = ['penalty']
+        exclude = ['penalty',]

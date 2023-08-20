@@ -6,83 +6,70 @@
   <div class="container mt-5">
         <div class="row my-2">
             <div class="col">
-             <h1 class="mb-5">Новый платеж от WB:</h1>
+             <h1 class="mb-5">Новое начисление для {{employee.name}}:</h1>
               <form method="post">
                 {% csrf_token %}
 
-<!--                Выбор ПВЗ-->
-                <div class="input-group input-group-lg mb-3">
-                  <label class="input-group-text" for="PVZ_selector">Пункт выдачи</label>
-                   {{ form.pvz_id }}
-                </div>
-                <hr>
-
-<!--                 Блок с полями from_date и to_date-->
-                <div class="row mb-5 mt-5">
-                      <div class="col">
-                        <div class="input-group">
-                             <span class="input-group-text">Период расчета</span>
-                        <span class="input-group-text"> {{ form.from_date.label_tag }}</span>
-                        {{ form.from_date }}
-                            <span class="input-group-text" >  {{ form.to_date.label_tag }}</span>
-                       {{ form.to_date }}
-                        </div>
-                      </div>
-
-                </div>
-                <hr>
-
-                <!-- Поля начислений -->
+<!--                ШАПКА-->
                    <div class="row">
-                      <div class="col">
-                          <h2 class="mb-5">Начисления:</h2>
+                       <div class="col">
+                        <div class="input-group input-group-lg mb-3">
+                            <span class="input-group-text"> {{ form.date.label_tag }}</span>
+                            {{ form.date }}
+                        </div>
+                      </div>
 
+
+                      <div class="col">
                         <div class="input-group mb-3">
-                        <span class="input-group-text"> {{ form.charged_rate.label_tag }}</span>
-                         {{ form.charged_rate }}
-                         <span class="input-group-text">₽</span>
+                            <span class="input-group-text"> {{ form.penalty.label_tag }}</span>
+                            {{ form.penalty }} <span class="input-group-text ">₽</span>
                         </div>
-
                       </div>
+                   </div>
+                    <hr>
+                <!-- Поля начислений -->
+                    <div class="row">
+                        <div class="col-6">
+
+                            <div class="input-group mb-3">
+                            <span class="input-group-text"> {{ form.number_days.label_tag }}</span>
+                             {{ form.number_days }} <span class="input-group-text">₽</span>
+                            </div>
+                            <div class="input-group mb-3">
+                            <span class="input-group-text"> {{ form.boxes_count.label_tag }}</span>
+                            {{ form.boxes_count }} <span class="input-group-text">₽</span>
+                            </div>
+
+                            <div class="input-group mb-3">
+                            <span class="input-group-text"> {{ form.extra_payment.label_tag }}</span>
+                            {{ form.extra_payment }} <span class="input-group-text">₽</span>
+                            </div>
+
+                        </div>
+                        <div class="col-6">
+
+                            <div class="input-group mb-3">
+                            <span class="input-group-text"> {{ form.add_penalty.label_tag }}</span>
+                            {{ form.add_penalty }} <span class="input-group-text">₽</span>
+                            </div>
+
+                            <div class="input-group mb-3">
+                            <span class="input-group-text"> {{ form.surcharge_penalty.label_tag }}</span>
+                            {{ form.surcharge_penalty }} <span class="input-group-text">₽</span>
+                            </div>
+                        </div>
+                    </div>
+                  <hr>
+                  <div class="row">
                       <div class="col">
-
-                           <h2 class="mb-5">Удержания:</h2>
-
                            <div class="input-group mb-3">
-                        <span class="input-group-text">  {{ form.hold_motivation.label_tag }}</span>
-                         {{ form.hold_motivation }}
-                         <span class="input-group-text">₽</span>
-                        </div>
-
+                            <span class="input-group-text"> {{ form.total.label_tag }}</span>
+                            {{ form.total }} <span class="input-group-text ">₽</span>
+                            </div>
                       </div>
-                    </div>
-
-
-                  <!--                ИТОГОВЫЕ ЗНАЧЕНИЯ-->
-                  <div class="row mb-2">
-                       <h2 class="mb-2">Итоги:</h2>
-                      <div class="col">
-                        <div class="input-group">
-                        <span class="input-group-text">{{ form.total_charge.label_tag }}</span>
-                         {{ form.total_charge }}
-                         <span class="input-group-text">₽</span>
-                        </div>
-                      </div>
-                      <div class="col">
-                        <div class="input-group">
-                        <span class="input-group-text" > {{ form.total_hold.label_tag }}</span>
-                        {{ form.total_hold }}
-                         <span class="input-group-text">₽</span>
-                        </div>
-                      </div>
-                      <div class="col">
-                          <div class="input-group">
-                        <span class="input-group-text" >  {{ form.total.label_tag }}</span>
-                        {{ form.total }}
-                         <span class="input-group-text">₽</span>
-                    </div>
-                      </div>
-                    </div>
+                            {{ form.bet }}
+                  </div>
                 <hr>
                   <div class="row mb-5">
                       <button type="submit" class="btn btn-secondary btn-lg btn-block">Записать</button>
@@ -96,8 +83,7 @@
     <script>
         // Apply input masks to form fields
         $(document).ready(function () {
-            $("#from_date").inputmask("99-99-9999");
-            $("#to_date").inputmask("99-99-9999");
+            $("#date").inputmask("99-99-9999");
         });
     </script>
 {% endblock %}
