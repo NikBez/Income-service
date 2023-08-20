@@ -33,8 +33,13 @@ class WBPaymentForm(forms.ModelForm):
     extra_nds = forms.FloatField(label='Доплата НДС', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
     package_compensation = forms.FloatField(label='Компенсация за пакеты', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
     hold_non_returned = forms.FloatField(label='за невозврат товара', required=False, widget=forms.NumberInput(attrs={'class': 'form-select form-select-lg', 'value': 0}))
-    total_charge = forms.FloatField(label='Всего начислено', required=False, widget=calculation.FormulaInput('charged_rate +charged_courier+surcharge_motivation+surcharge_signage+surcharge_goods+subsidies+extra_motivation+return_incorrect_mark+extra_nds+package_compensation', attrs={'readonly': True}))
-    total_hold = forms.FloatField(label='Всего удержано', required=False, widget=calculation.FormulaInput('hold_motivation+hold_rating+hold_goods+hold_substitution+hold_furniture+hold_for_defects+penalty+hold_non_returned', attrs={'readonly': True}))
+    total_charge = forms.FloatField(label='Всего начислено', required=False, widget=calculation.FormulaInput('charged_rate + charged_courier + surcharge_motivation + '
+                                                                                                             'surcharge_signage + surcharge_goods + subsidies + extra_motivation +'
+                                                                                                             ' return_incorrect_mark + extra_nds + package_compensation + debt +'
+                                                                                                             ' zero_substitution_effect + return_incorrect_mark + penalty +'
+                                                                                                             ' supplier_returns', attrs={'readonly': True}))
+    total_hold = forms.FloatField(label='Всего удержано', required=False, widget=calculation.FormulaInput('hold_motivation + hold_rating + hold_goods + hold_substitution + '
+                                                                                                          'hold_furniture + hold_for_defects + penalty + hold_non_returned', attrs={'readonly': True}))
     total = forms.FloatField(label='Доход', required=False, widget=calculation.FormulaInput('total_charge - total_hold', attrs={'class': 'form-control', 'readonly': True}))
 
 

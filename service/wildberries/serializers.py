@@ -42,6 +42,7 @@ class MonthResultsSerializer(serializers.Serializer):
     salaryes = serializers.FloatField()
     taxes = serializers.FloatField()
     profit = serializers.FloatField()
+    rent = serializers.FloatField()
 
 
 class WBMonitorSerializer(serializers.Serializer):

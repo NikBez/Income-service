@@ -64,10 +64,12 @@ def month_total_constructor(filter):
     if not filter:
         where_ww = '''WHERE (ww.from_date >= :start_date and ww.from_date <= :end_date) or (ww.to_date >= :start_date and ww.to_date <= :end_date)),'''
         where_pp = ''
+        rent = 'SELECT COALESCE(SUM(rent_price), 0) rent FROM wildberries_pvz'
     else:
         filter = '(' + filter + ')'
         where_ww = f'''WHERE ((ww.from_date >= :start_date and ww.from_date <= :end_date) or (ww.to_date >= :start_date and ww.to_date <= :end_date)) and ww.pvz_id_id IN {filter}),'''
         where_pp = f''' WHERE pp.pvz_id_id IN {filter}'''
+        rent = f'SELECT COALESCE(SUM(rent_price), 0) rent FROM wildberries_pvz WHERE id IN {filter}'
 
     month_total_query = f'''
     with incomes as (
@@ -95,11 +97,12 @@ def month_total_constructor(filter):
             ) pp 
             WHERE (pp.start_of_week >= JULIANDAY(:start_date) and pp.start_of_week <= JULIANDAY(:end_date)) or (pp.end_of_week >= JULIANDAY(:start_date) and pp.end_of_week <= JULIANDAY(:end_date))
             ),
-            pvz as (SELECT COALESCE(SUM(rent_price), 0) rent FROM wildberries_pvz)
+            pvz as (''' + rent + ''')
             SELECT 
                 ROUND(o.outcome, 2) salaryes,
                 ROUND(i.income * 0.94 - o.outcome - p.rent, 2) profit,
-                ROUND(i.income * 0.06, 2) taxes 
+                ROUND(i.income * 0.06, 2) taxes,
+                p.rent rent
                 From 
                 incomes i CROSS JOIN outcomes o CROSS JOIN pvz p;
     '''

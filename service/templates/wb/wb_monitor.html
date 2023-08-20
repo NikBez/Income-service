@@ -76,7 +76,7 @@
                         <h5 class="card-title">Арендная плата</h5>
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title">{{ rent |default:"0" | floatformat:"g" }} ₽</h3>
+                        <h3 class="card-title">{{ static_data.month_results.rent |default:"0" | floatformat:"g" }} ₽</h3>
                     </div>
                 </div>
             </div>

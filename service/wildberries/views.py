@@ -39,7 +39,6 @@ def wb_monitor(request):
 
     context = {
         'static_data': response,
-        'rent': PVZ.objects.aggregate(rent=Sum('rent_price'))['rent'],
         'next_month': dateformat.format(request_date + relativedelta(months=1), 'Y-m-d'),
         'previous_month': dateformat.format(request_date - relativedelta(months=1), 'Y-m-d'),
         'current_month': request_date,
