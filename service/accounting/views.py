@@ -313,7 +313,7 @@ class RegularOutcomesView(ListView):
     model = RegularOutcome
     template_name = 'accounting/outcomes_list.html'
     paginate_by = 10
-    ordering = ('start_date', '-sum')
+    ordering = ('end_date', 'start_date')
 
 
 class OutcomeEditView(UpdateView):
