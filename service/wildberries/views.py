@@ -4,7 +4,7 @@ import requests
 from dateutil.relativedelta import relativedelta, MO, SU
 from django.conf import settings
 from django.db import connection
-from django.db.models import Q, Sum
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils import dateformat, timezone
@@ -13,8 +13,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .assets import dictfetchall, dictfetchone, update_employee_penalty
-from .forms import WBPaymentForm, PVZPaymentForm, EmployeeUpdateForm
-from .models import PVZ, Employee, WBPayment, PVZPaiment
+from .forms import WBPaymentForm, PVZPaymentForm, EmployeeUpdateForm, OutcomeForm
+from .models import PVZ, Employee, WBPayment, PVZPaiment, Category, PVZOutcomes
 from .queries import month_total_by_pvz_query, week_total_by_pvz_query, week_employee_report, month_total_constructor
 from .serializers import WBMonitorSerializer, PVZMonitorSerializer
 
@@ -131,9 +131,14 @@ class GetPVZAnalitic(APIView):
             cursor.execute(week_employee_report, {'start_date': start_date, 'end_date': end_date, 'pvz_id': pvz_id})
             employees = dictfetchall(cursor)
 
+        pvz_outcomes = PVZOutcomes.objects.filter(
+            Q(pvz=pvz_id) & Q(date__gte=start_date) & Q(date__lte=end_date)).values('pk', 'date', 'sum', 'category__title',
+                                                                                    'description').order_by('-sum')
+
         serializer = PVZMonitorSerializer({
             'pvz_total': pvz_total,
             'employees': employees,
+            'pvz_outcomes': pvz_outcomes,
         })
         return Response(serializer.data)
 
@@ -386,7 +391,6 @@ class EmployeeCreate(CreateView):
 
 class PVZList(ListView):
     model = PVZ
-
     template_name = 'wb/pvz_list.html'
     paginate_by = 10
 
@@ -409,3 +413,103 @@ class PVZCreate(CreateView):
     template_name = 'wb/pvz_create.html'
     success_url = reverse_lazy('list_pvz')
     fields = '__all__'
+
+
+class OutcomeList(ListView):
+    model = PVZOutcomes
+    template_name = 'wb/outcome_list.html'
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pvz_id = self.kwargs.get('pvz_id')
+        start_date = self.kwargs.get('start_week')
+        end_date = self.kwargs.get('end_week')
+        context['start_date'] = start_date
+        context['end_date'] = end_date
+
+        context['pvz'] = get_object_or_404(PVZ, pk=pvz_id)
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        pvz_id = self.kwargs.get('pvz_id')
+        start_week = self.kwargs.get('start_week')
+        end_week = self.kwargs.get('end_week')
+
+        converted_start_week = datetime.strptime(start_week, "%d-%m-%Y")
+        converted_end_week = datetime.strptime(end_week, "%d-%m-%Y")
+
+        if pvz_id is not None:
+            queryset = queryset.filter(Q(date__gte=converted_start_week) & Q(date__lte=converted_end_week),
+                                       pvz=pvz_id).order_by('-date')
+        return queryset
+
+
+class OutcomeCreate(CreateView):
+    model = PVZOutcomes
+    template_name = 'wb/outcome_create.html'
+    form_class = OutcomeForm
+
+    def get_initial(self):
+        initial = super().get_initial()
+        pvz_id = self.kwargs.get('pvz_id')
+        initial['pvz'] = pvz_id
+        return initial
+
+    def get_success_url(self):
+        pvz_id = self.kwargs.get('pvz_id')
+        return reverse_lazy('pvz_monitor', kwargs={'pk': pvz_id})
+
+
+class OutcomeUpdate(UpdateView):
+    model = PVZOutcomes
+    template_name = 'wb/outcome_edit.html'
+    form_class = OutcomeForm
+
+    def get_success_url(self):
+        pvz_id = self.kwargs.get('pvz_id')
+        return reverse_lazy('pvz_monitor', kwargs={'pk': pvz_id})
+
+
+
+class OutcomeDelete(DeleteView):
+    model = PVZOutcomes
+    template_name = 'wb/outcome_delete.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pvz_id'] = self.kwargs.get('pvz_id')
+        return context
+
+
+    def get_success_url(self):
+        pvz_id = self.kwargs.get('pvz_id')
+        return reverse_lazy('pvz_monitor', kwargs={'pk': pvz_id})
+
+
+class CategoryList(ListView):
+    model = Category
+    template_name = 'wb/category_list.html'
+    paginate_by = 10
+
+
+class CategoryCreate(CreateView):
+    model = Category
+    template_name = 'wb/category_create.html'
+    success_url = reverse_lazy('list_categories')
+    fields = '__all__'
+
+
+class CategoryUpdate(UpdateView):
+    model = Category
+    template_name = 'wb/category_edit.html'
+    success_url = reverse_lazy('list_categories')
+    fields = '__all__'
+
+
+class CategoryDelete(DeleteView):
+    model = Category
+    template_name = 'wb/category_delete.html'
+    success_url = reverse_lazy('list_categories')

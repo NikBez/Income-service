@@ -45,6 +45,14 @@ class MonthResultsSerializer(serializers.Serializer):
     rent = serializers.FloatField()
 
 
+class PVZOutcomesSerializer(serializers.Serializer):
+    pk = serializers.IntegerField()
+    date = serializers.DateField()
+    sum = serializers.DecimalField(max_digits=10, decimal_places=2)
+    category__title = serializers.CharField()
+    description = serializers.CharField()
+
+
 class WBMonitorSerializer(serializers.Serializer):
     pvz_total = PVZTotalSerializer(many=True)
     month_results = MonthResultsSerializer()
@@ -53,3 +61,4 @@ class WBMonitorSerializer(serializers.Serializer):
 class PVZMonitorSerializer(serializers.Serializer):
     pvz_total = PVZDetaledSerializer()
     employees = WeekEmployeeSerializer(many=True)
+    pvz_outcomes = PVZOutcomesSerializer(many=True)

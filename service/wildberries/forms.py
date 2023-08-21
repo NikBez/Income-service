@@ -1,5 +1,5 @@
 from django import forms
-from .models import PVZ, WBPayment, PVZPaiment, Employee
+from .models import PVZ, WBPayment, PVZPaiment, Employee, PVZOutcomes
 
 import calculation
 
@@ -76,9 +76,16 @@ class PVZPaymentForm(forms.ModelForm):
                                                                                                 'readonly': False}))
 
 
-
-
 class EmployeeUpdateForm(forms.ModelForm):
     class Meta:
         model = Employee
         exclude = ['penalty',]
+
+
+class OutcomeForm(forms.ModelForm):
+    class Meta:
+        model = PVZOutcomes
+        fields = '__all__'
+
+    pvz = forms.ModelChoiceField(queryset=PVZ.objects.all(), label='ПВЗ', widget=forms.HiddenInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))

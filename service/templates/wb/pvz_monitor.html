@@ -174,7 +174,7 @@
     <div class="row">
         <div class="col mb-3">
             <div class="d-flex justify-content-between" role="group" aria-label="Basic checkbox toggle button group">
-                <a class="btn btn-outline-secondary btn-sm btn-block flex-fill me-1" href="{% url 'create_wb_payment' static_data.pvz_total.id cr_start_week cr_end_week %}">Добавить выплату WB за эту неделю</a>
+                <a class="btn btn-outline-secondary btn-sm btn-block flex-fill me-1" href="{% url 'create_wb_payment' static_data.pvz_total.id cr_start_week cr_end_week %}">+ Добавить выплату WB за эту неделю</a>
                  <a class="btn btn-outline-secondary btn-sm btn-block flex-fill me-1" href="{% url 'list_wb_payment' static_data.pvz_total.id  %}">Список партнерских выплат ПВЗ</a>
             </div>
         </div>
@@ -231,7 +231,7 @@
                 </div>
                 <div class="col-6 text-end mb-3">
                     <div class="btn-group" role="group" aria-label="Basic outlined example">
-                        <a class="btn btn-outline-secondary btn-sm btn-block" href=""> + Добавить</a>
+                        <a class="btn btn-outline-secondary btn-sm btn-block" href="{% url 'create_outcome' static_data.pvz_total.id %}"> + Добавить расход</a>
                     </div>
                 </div>
             </div>
@@ -240,16 +240,20 @@
                 <table class="table table table-hover table-sm">
                     <tr>
                         <th>Дата</th>
+                        <th>Категория</th>
                         <th>Сумма</th>
                         <th>Описание</th>
                         <th></th>
+                        <th></th>
                     </tr>
-                     {% for employee in static_data.employees %}
+                     {% for outcome in static_data.pvz_outcomes %}
                         <tr>
-                            <td>{{ employee.name }}</td>
-                            <td>{{ employee.salary }} ₽</td>
-                            <td>{{ employee.days }}</td>
-                            <td class="text-end"><a href="" type="button" class="btn btn-secondary btn-sm">Редактировать</a></td>
+                            <td>{{ outcome.date }}</td>
+                            <td>{{ outcome.category__title }} </td>
+                             <td>{{ outcome.sum }}₽</td>
+                            <td>{{ outcome.description }}</td>
+                            <td class="text-end"><a href="{% url 'edit_outcome' outcome.pk static_data.pvz_total.id %}" type="button" class="btn btn-secondary btn-sm">Редактировать</a></td>
+                            <td class="text-end"><a href="{% url 'delete_outcome' outcome.pk static_data.pvz_total.id %}" type="button" class="btn btn-secondary btn-sm">Удалить</a></td>
                         </tr>
                     {% endfor %}
                 </table>

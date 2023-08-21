@@ -182,3 +182,7 @@ week_employee_report = '''
     GROUP BY we.id
     ORDER BY total DESC 
 '''
+
+pvz_outcomes_report = '''
+
+'''

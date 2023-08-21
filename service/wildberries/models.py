@@ -97,15 +97,15 @@ class PVZPaiment(models.Model):
 
 
 class Category(models.Model):
-    title = models.CharField(max_length=50)
+    title = models.CharField('Название', max_length=50)
 
     def __str__(self):
-        return f'Категория: {self.title}'
+        return self.title
 
 
-class PVZOutcome(models.Model):
-    date = models.DateField(default=datetime.datetime.utcnow)
-    sum = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=10)
+class PVZOutcomes(models.Model):
+    date = models.DateField('Дата', default=datetime.datetime.utcnow)
+    sum = models.DecimalField('Сумма', blank=True, default=0, decimal_places=2, max_digits=10)
     pvz = models.ForeignKey(PVZ, verbose_name='ПВЗ',
                             on_delete=models.CASCADE,
                             related_name='outcomes'
@@ -115,7 +115,7 @@ class PVZOutcome(models.Model):
                                  on_delete=models.CASCADE,
                                  related_name='outcomes'
                                  )
-    description = models.CharField(max_length=150, null=True, blank=True)
+    description = models.CharField('Описание', max_length=150, null=True, blank=True)
 
     def __str__(self):
         return f'Расход на: {self.sum}, ПВЗ {self.pvz}'
