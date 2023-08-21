@@ -28,19 +28,19 @@
                 {% endfor %}
             </div>
     </div>
-    <div class="row mb-5">
+
+    <div class="row mb-2">
         <div class="col">
             <div class="col-md">
-                <div class="card text-center text-white mb-3" id='profit-card-on-monitor'>
+                <div class="card text-center text-white mb-3" id="salary-card-on-monitor">
                     <div class="card-header">
-                        <h5 class="card-title">Прибыль</h5>
+                        <h5 class="card-title">Поступление от WB</h5>
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title">{{ static_data.month_results.profit |default:"0" | floatformat:"g" }} ₽</h3>
+                        <h3 class="card-title">{{ static_data.month_results.income |default:"0" | floatformat:"g" }} ₽</h3>
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="col">
@@ -55,6 +55,22 @@
                 </div>
             </div>
         </div>
+
+          <div class="col">
+            <div class="col-md">
+                <div class="card text-center text-white mb-3" id="salary-card-on-monitor">
+                    <div class="card-header">
+                        <h5 class="card-title">Арендная плата</h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ static_data.month_results.rent |default:"0" | floatformat:"g" }} ₽</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+     <div class="row mb-5">
 
          <div class="col">
             <div class="col-md">
@@ -73,14 +89,28 @@
             <div class="col-md">
                 <div class="card text-center text-white mb-3" id="salary-card-on-monitor">
                     <div class="card-header">
-                        <h5 class="card-title">Арендная плата</h5>
+                        <h5 class="card-title">Обслуживание</h5>
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title">{{ static_data.month_results.rent |default:"0" | floatformat:"g" }} ₽</h3>
+                        <h3 class="card-title">{{ static_data.month_results.service |default:"0" | floatformat:"g" }} ₽</h3>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="col">
+            <div class="col-md">
+                <div class="card text-center text-white mb-3" id='profit-card-on-monitor'>
+                    <div class="card-header">
+                        <h5 class="card-title">Прибыль</h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ static_data.month_results.profit |default:"0" | floatformat:"g" }} ₽</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="row ">

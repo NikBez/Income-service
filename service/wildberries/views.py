@@ -15,7 +15,8 @@ from rest_framework.views import APIView
 from .assets import dictfetchall, dictfetchone, update_employee_penalty
 from .forms import WBPaymentForm, PVZPaymentForm, EmployeeUpdateForm, OutcomeForm
 from .models import PVZ, Employee, WBPayment, PVZPaiment, Category, PVZOutcomes
-from .queries import month_total_by_pvz_query, week_total_by_pvz_query, week_employee_report, month_total_constructor
+from .queries import month_total_by_pvz_query, week_total_by_pvz_query, week_employee_report, month_total_constructor, \
+    weekly_pvz_outcomes
 from .serializers import WBMonitorSerializer, PVZMonitorSerializer
 
 
@@ -131,14 +132,17 @@ class GetPVZAnalitic(APIView):
             cursor.execute(week_employee_report, {'start_date': start_date, 'end_date': end_date, 'pvz_id': pvz_id})
             employees = dictfetchall(cursor)
 
+            cursor.execute(weekly_pvz_outcomes, {'start_date': start_date, 'end_date': end_date, 'pvz_id': pvz_id})
+            total_outcomes = dictfetchall(cursor)
+
         pvz_outcomes = PVZOutcomes.objects.filter(
             Q(pvz=pvz_id) & Q(date__gte=start_date) & Q(date__lte=end_date)).values('pk', 'date', 'sum', 'category__title',
                                                                                     'description').order_by('-sum')
-
         serializer = PVZMonitorSerializer({
             'pvz_total': pvz_total,
             'employees': employees,
             'pvz_outcomes': pvz_outcomes,
+            'total_outcomes': total_outcomes,
         })
         return Response(serializer.data)
 

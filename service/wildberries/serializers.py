@@ -23,6 +23,7 @@ class PVZDetaledSerializer(serializers.Serializer):
     salary = serializers.FloatField()
     profit = serializers.FloatField()
     taxes = serializers.FloatField()
+    total_outcome = serializers.DecimalField(max_digits=10, decimal_places=2)
 
 
 class WeekEmployeeSerializer(serializers.Serializer):
@@ -43,7 +44,8 @@ class MonthResultsSerializer(serializers.Serializer):
     taxes = serializers.FloatField()
     profit = serializers.FloatField()
     rent = serializers.FloatField()
-
+    service = serializers.DecimalField(max_digits=10, decimal_places=2)
+    income = serializers.DecimalField(max_digits=10, decimal_places=2)
 
 class PVZOutcomesSerializer(serializers.Serializer):
     pk = serializers.IntegerField()
@@ -51,6 +53,10 @@ class PVZOutcomesSerializer(serializers.Serializer):
     sum = serializers.DecimalField(max_digits=10, decimal_places=2)
     category__title = serializers.CharField()
     description = serializers.CharField()
+
+class TotalOutcomesSerializer(serializers.Serializer):
+    category = serializers.CharField()
+    outcome = serializers.DecimalField(max_digits=10, decimal_places=2)
 
 
 class WBMonitorSerializer(serializers.Serializer):
@@ -62,3 +68,4 @@ class PVZMonitorSerializer(serializers.Serializer):
     pvz_total = PVZDetaledSerializer()
     employees = WeekEmployeeSerializer(many=True)
     pvz_outcomes = PVZOutcomesSerializer(many=True)
+    total_outcomes = TotalOutcomesSerializer(many=True)
