@@ -94,3 +94,28 @@ class PVZPaiment(models.Model):
         formatted_date = self.date.strftime("%d-%m-%Y")
 
         return f'Выплата расчет ЗП сотруднику {self.employee_id.name} от {formatted_date}'
+
+
+class Category(models.Model):
+    title = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f'Категория: {self.title}'
+
+
+class PVZOutcome(models.Model):
+    date = models.DateField(default=datetime.datetime.utcnow)
+    sum = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=10)
+    pvz = models.ForeignKey(PVZ, verbose_name='ПВЗ',
+                            on_delete=models.CASCADE,
+                            related_name='outcomes'
+                            )
+    category = models.ForeignKey(Category,
+                                 verbose_name='Категория',
+                                 on_delete=models.CASCADE,
+                                 related_name='outcomes'
+                                 )
+    description = models.CharField(max_length=150, null=True, blank=True)
+
+    def __str__(self):
+        return f'Расход на: {self.sum}, ПВЗ {self.pvz}'

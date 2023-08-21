@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import PVZ, Employee, WBPayment, PVZPaiment
+from .models import PVZ, Employee, WBPayment, PVZPaiment, PVZOutcomes, Category
 
 
 @admin.register(PVZ)
@@ -18,4 +18,12 @@ class WBPaymentAdmin(admin.ModelAdmin):
 
 @admin.register(PVZPaiment)
 class PVZPaimentAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(PVZOutcomes)
+class PVZAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Category)
+class PVZAdmin(admin.ModelAdmin):
     pass
