@@ -3,6 +3,7 @@ import datetime
 from django.db import models
 
 
+
 class PVZ(models.Model):
     title = models.CharField('Название ПВЗ', max_length=100)
     rent_price = models.FloatField('Стоимость аренды(месяц)', default=0)
@@ -89,6 +90,8 @@ class PVZPaiment(models.Model):
     add_penalty = models.IntegerField('Штраф к начислению', default=0)
     surcharge_penalty = models.IntegerField('Штраф к удержанию', default=0)
     total = models.IntegerField('Итого к выплате', null=False, default=0)
+    is_closed = models.BooleanField('Оплачен', default=False)
+
 
     def __str__(self):
         formatted_date = self.date.strftime("%d-%m-%Y")

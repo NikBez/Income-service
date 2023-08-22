@@ -20,6 +20,7 @@
             <table class="table table-hover">
                 <thead>
                 <th>Дата документа</th>
+                <th>Статус</th>
                 <th>Cмен</th>
                 <th>Коробки</th>
                 <th>Бонус</th>
@@ -30,14 +31,28 @@
                 <th></th>
                 </thead>
                 {% for line in object_list %}
+                    {% if line.is_closed %}
+                    <tr class="table-success">
+                  {% else %}
                     <tr>
+                 {% endif %}
                         <td>{{ line.date | date:'d-m-Y' }}</td>
+                        {% if line.is_closed %}
+                            <td>☑️</td>
+                        {% else %}
+                            <td></td>
+                        {% endif %}
                         <td>{{ line.number_days }}</td>
                         <td>{{ line.boxes_count }}</td>
-                        <td>{{ line.extra_payment }}</td>
-                        <td>{{ line.add_penalty }}</td>
-                        <td>{{ line.surcharge_penalty }}</td>
-                         <td>{{ line.total }}</td>
+                        <td>{{ line.extra_payment }}₽</td>
+                        <td>{{ line.add_penalty }}₽</td>
+                        <td>{{ line.surcharge_penalty }}₽</td>
+                         <td>{{ line.total }}₽</td>
+                        {% if line.is_closed %}
+                             <td class="text-end"><a href="{% url 'list_pvz_payment' employee.id start_date end_date line.id %}" type="button" class="btn btn-secondary btn-sm">Отменить оплату</a></td>
+                        {% else %}
+                             <td class="text-end"><a href="{% url 'list_pvz_payment' employee.id start_date end_date line.id %}" type="button" class="btn btn-secondary btn-sm">Оплатить</a></td>
+                        {% endif %}
                         <td class="text-end"><a href="{% url 'edit_pvz_payment' line.id employee.id start_date end_date %}" class="btn btn-outline-secondary btn-sm">  Редактировать </a></td>
                         <td class="text-end"><a href="{% url 'delete_pvz_payment' line.id employee.id start_date end_date %}" class="btn btn-outline-secondary btn-sm"> Удалить </a></td>
                     </tr>
@@ -58,5 +73,6 @@
                 {% endif %}
             </span>
         </div>
+    </div>
 
 {% endblock %}

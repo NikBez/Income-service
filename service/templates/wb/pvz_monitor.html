@@ -199,7 +199,9 @@
                         <th>Штраф</th>
                         <th>Удержано</th>
                         <th>Остаток штрафа</th>
-                        <th>К выплате</th>
+                        <th>К оплате</th>
+                        <th>Выплачено</th>
+                        <th>Всего</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -209,12 +211,14 @@
                             <td>{{ employee.name }}</td>
                             <td>{{ employee.days }}</td>
                             <td>{{ employee.boxes }}шт.</td>
-                            <td>{{ employee.add_penalty }}₽</td>
-                            <td>{{ employee.surcharge_penalty }}₽</td>
-                            <td>{{ employee.penalty }}₽</td>
-                            <td>{{ employee.total }}₽</td>
+                            <td>{{ employee.add_penalty | floatformat:"g" }}₽</td>
+                            <td>{{ employee.surcharge_penalty | floatformat:"g" }}₽</td>
+                            <td>{{ employee.penalty | floatformat:"g" }}₽</td>
+                            <td class="table-dark">{{ employee.to_pay | floatformat:"g" }}₽</td>
+                            <td>{{ employee.payed | floatformat:"g" }}₽</td>
+                            <td>{{ employee.total | floatformat:"g" }}₽</td>
                             <td class="text-end"><a href="{% url 'create_pvz_payment' employee.id static_data.pvz_total.id cr_start_week cr_end_week %}" type="button" class="btn btn-secondary btn-sm">+ Смена</a></td>
-                            <td class="text-end"><a href="{% url 'list_pvz_payment' employee.id cr_start_week cr_end_week %}" type="button" class="btn btn-secondary btn-sm">Детально</a></td>
+                            <td class="text-end"><a href="{% url 'list_pvz_payment' employee.id cr_start_week cr_end_week 0 %}" type="button" class="btn btn-secondary btn-sm">Детально</a></td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -250,7 +254,7 @@
                         <tr>
                             <td>{{ outcome.date }}</td>
                             <td>{{ outcome.category__title }} </td>
-                             <td>{{ outcome.sum }}₽</td>
+                             <td>{{ outcome.sum | floatformat:"g" }}₽</td>
                             <td>{{ outcome.description }}</td>
                             <td class="text-end"><a href="{% url 'edit_outcome' outcome.pk static_data.pvz_total.id %}" type="button" class="btn btn-secondary btn-sm">Редактировать</a></td>
                             <td class="text-end"><a href="{% url 'delete_outcome' outcome.pk static_data.pvz_total.id %}" type="button" class="btn btn-secondary btn-sm">Удалить</a></td>

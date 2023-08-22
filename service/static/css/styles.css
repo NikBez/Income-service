@@ -65,7 +65,9 @@
 }
 
 body{
-    background-color: #F2F2D0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .text-center{
@@ -75,6 +77,22 @@ body{
 .text-white{
     text-color: white;
 }
+
+.footer{
+    background-color: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+}
+
+.container {
+    flex: 1;
+}
+
+.checkbox-lg .form-check-input{
+     top: 1.2rem;
+     scale: 1.7;
+     margin-right: 0.8rem;
+ }
 
 
 

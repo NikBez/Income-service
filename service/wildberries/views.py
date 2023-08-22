@@ -154,7 +154,7 @@ class PVZPaimentList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        employee_id = self.kwargs.get('pk')
+        employee_id = self.kwargs.get('employee_id')
         start_date = self.kwargs.get('cr_start_week')
         end_date = self.kwargs.get('cr_end_week')
         context['start_date'] = start_date
@@ -166,9 +166,15 @@ class PVZPaimentList(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        employee_id = self.kwargs.get('pk')
+        employee_id = self.kwargs.get('employee_id')
         start_week = self.kwargs.get('cr_start_week')
         end_week = self.kwargs.get('cr_end_week')
+        doc_id = self.kwargs.get('doc_id')
+
+        if doc_id:
+            payment_doc = PVZPaiment.objects.get(pk=doc_id)
+            payment_doc.is_closed = True if payment_doc.is_closed == False else False
+            payment_doc.save()
 
         converted_start_week = datetime.strptime(start_week, "%d-%m-%Y")
         converted_end_week = datetime.strptime(end_week, "%d-%m-%Y")
@@ -181,7 +187,7 @@ class PVZPaimentList(ListView):
 
 class PVZPaimentUpdate(UpdateView):
     model = PVZPaiment
-    template_name = 'wb/pvz_payment_create.html'
+    template_name = 'wb/pvz_payment_edit.html'
     success_url = reverse_lazy('wb_monitor')
     form_class = PVZPaymentForm
 
@@ -190,7 +196,7 @@ class PVZPaimentUpdate(UpdateView):
         start_week = self.kwargs.get('start_week')
         end_week = self.kwargs.get('end_week')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'pk': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
+                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week, 'doc_id': 0})
 
     def get_initial(self):
         initial = super().get_initial()
@@ -218,6 +224,7 @@ class PVZPaimentUpdate(UpdateView):
                                 instance.surcharge_penalty - current_data.surcharge_penalty,
                                 create=True
                                 )
+
         instance.save()
         return super().form_valid(form)
 
@@ -238,7 +245,7 @@ class PVZPaimentDelete(DeleteView):
         start_week = self.kwargs.get('start_week')
         end_week = self.kwargs.get('end_week')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'pk': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
+                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week, 'doc_id': 0})
 
 
 class PVZPaimentCreate(CreateView):
@@ -286,7 +293,7 @@ class PVZPaimentCreate(CreateView):
         start_week = self.kwargs.get('cr_start_week')
         end_week = self.kwargs.get('cr_end_week')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'pk': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week})
+                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week, 'doc_id': 0})
 
 
 class WBPaymentList(ListView):

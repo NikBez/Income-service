@@ -30,7 +30,7 @@ urlpatterns = [
     path('wb-payments/create/<int:pvz_id>/<str:cr_start_week>/<str:cr_end_week>/', WBPaymentCreate.as_view(),
          name='create_wb_payment'),
 
-    path('pvz-payments/<int:pk>/<str:cr_start_week>/<str:cr_end_week>/',
+    path('pvz-payments/<int:employee_id>/<str:cr_start_week>/<str:cr_end_week>/<int:doc_id>/',
          PVZPaimentList.as_view(),
          name='list_pvz_payment'
          ),

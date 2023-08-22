@@ -103,19 +103,31 @@
 
                            <h2 class="mb-5">Удержания:</h2>
 
-                           <div class="input-group mb-3">
-                        <span class="input-group-text">  {{ form.hold_motivation.label_tag }}</span>
-                         {{ form.hold_motivation }}
-                         <span class="input-group-text">₽</span>
-                        </div>
-
                           <div class="input-group mb-3">
                         <span class="input-group-text">  {{ form.hold_rating.label_tag }}</span>
                          {{ form.hold_rating }}
                          <span class="input-group-text">₽</span>
                         </div>
 
-                          <div class="input-group mb-3">
+                           <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.penalty.label_tag }}</span>
+                         {{ form.penalty }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                              <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.hold_motivation.label_tag }}</span>
+                         {{ form.hold_motivation }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                           <div class="input-group mb-3">
+                        <span class="input-group-text">  {{ form.hold_non_returned.label_tag }}</span>
+                         {{ form.hold_non_returned }}
+                         <span class="input-group-text">₽</span>
+                        </div>
+
+                            <div class="input-group mb-3">
                         <span class="input-group-text">  {{ form.hold_goods.label_tag }}</span>
                          {{ form.hold_goods }}
                          <span class="input-group-text">₽</span>
@@ -136,18 +148,6 @@
                           <div class="input-group mb-3">
                         <span class="input-group-text">  {{ form.hold_for_defects.label_tag }}</span>
                          {{ form.hold_for_defects }}
-                         <span class="input-group-text">₽</span>
-                        </div>
-
-                          <div class="input-group mb-3">
-                        <span class="input-group-text">  {{ form.penalty.label_tag }}</span>
-                         {{ form.penalty }}
-                         <span class="input-group-text">₽</span>
-                        </div>
-
-                          <div class="input-group mb-3">
-                        <span class="input-group-text">  {{ form.hold_non_returned.label_tag }}</span>
-                         {{ form.hold_non_returned }}
                          <span class="input-group-text">₽</span>
                         </div>
                       </div>
@@ -221,6 +221,7 @@
             </div>
         </div>
   </div>
+</div>
 
     <script>
         // Apply input masks to form fields

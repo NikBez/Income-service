@@ -9,7 +9,6 @@
              <h1 class="mb-5">Новое начисление для {{employee.name}}:</h1>
               <form method="post">
                 {% csrf_token %}
-
 <!--                ШАПКА-->
                    <div class="row">
                        <div class="col">
@@ -72,7 +71,17 @@
                   </div>
                 <hr>
                   <div class="row mb-5">
-                      <button type="submit" class="btn btn-secondary btn-lg btn-block">Записать</button>
+                      <div class="col-2 align-self-center text-center ">
+                          <div class="form-check form-switch checkbox-lg">
+                              <label class="form-check-label" for="is_closed">Оплачен</label>
+                              <input class="form-check-input" type="checkbox" id="is_closed" name="is_closed" {% if form.is_closed.value %}checked{% endif %}>
+                        </div>
+                      </div>
+                       <div class="col-10">
+                           <div class="d-grid">
+                            <button type="submit" class="btn btn-secondary btn-lg btn-block">Записать</button>
+                               </div>
+                      </div>
                   </div>
               </form>
                 {{ form.media }}

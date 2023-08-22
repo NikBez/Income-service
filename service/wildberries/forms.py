@@ -36,8 +36,7 @@ class WBPaymentForm(forms.ModelForm):
     total_charge = forms.FloatField(label='Всего начислено', required=False, widget=calculation.FormulaInput('charged_rate + charged_courier + surcharge_motivation + '
                                                                                                              'surcharge_signage + surcharge_goods + subsidies + extra_motivation +'
                                                                                                              ' return_incorrect_mark + extra_nds + package_compensation + debt +'
-                                                                                                             ' zero_substitution_effect + return_incorrect_mark + penalty +'
-                                                                                                             ' supplier_returns', attrs={'readonly': True}))
+                                                                                                             ' zero_substitution_effect + penalty + supplier_returns', attrs={'readonly': True}))
     total_hold = forms.FloatField(label='Всего удержано', required=False, widget=calculation.FormulaInput('hold_motivation + hold_rating + hold_goods + hold_substitution + '
                                                                                                           'hold_furniture + hold_for_defects + penalty + hold_non_returned', attrs={'readonly': True}))
     total = forms.FloatField(label='Доход', required=False, widget=calculation.FormulaInput('total_charge - total_hold', attrs={'class': 'form-control', 'readonly': True}))
@@ -69,8 +68,9 @@ class PVZPaymentForm(forms.ModelForm):
         attrs={'class': 'form-select  form-select-lg', 'value': 0}))
     penalty = forms.FloatField(label='Остаток штрафа', required=False, widget=forms.NumberInput(
         attrs={'class': 'form-select  form-select-lg', 'value': 0, 'readonly': True}))
+    is_closed = forms.BooleanField(label='Оплатить', required=False, widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
 
-    total = forms.FloatField(label='Итого к выплате', required=False, widget=calculation.FormulaInput('number_days * bet + extra_payment + (boxes_count * 100) - surcharge_penalty',
+    total = forms.FloatField(label='Итого к выплате', widget=calculation.FormulaInput('number_days * bet + extra_payment + (boxes_count * 100) - surcharge_penalty',
                                                                                             attrs={
                                                                                                 'class': 'form-control',
                                                                                                 'readonly': False}))
