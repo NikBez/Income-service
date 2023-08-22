@@ -181,7 +181,7 @@ week_total_by_pvz_query = '''
 '''
 
 week_employee_report = '''  
-  with sub as (
+   with sub as (
     SELECT 
         pp.employee_id_id employee_id,
         COALESCE(SUM(total), 0) to_pay
@@ -189,23 +189,33 @@ week_employee_report = '''
     WHERE JULIANDAY(pp.date) BETWEEN JULIANDAY(:start_date) and JULIANDAY(:end_date) and pp.pvz_id_id = :pvz_id and is_closed=False
     GROUP BY pp.employee_id_id 
     )
-    SELECT 
+    SELECT
         we.id id,
         we.name name,
         COALESCE(we.salary, 0) salary,
         we.penalty penalty,
-        COALESCE(SUM(pp.number_days), 0) days, 
-        COALESCE(SUM(pp.extra_payment), 0) extra, 
-        COALESCE(SUM(pp.add_penalty), 0) add_penalty, 
-        COALESCE(SUM(pp.surcharge_penalty), 0) surcharge_penalty, 
-        COALESCE(SUM(pp.boxes_count), 0) boxes,
-        COALESCE(SUM(pp.total) - IIF(sub.to_pay is NULL, 0, sub.to_pay), 0) payed, 
+        pp.days days, 
+        pp.extra extra, 
+        pp.add_penalty add_penalty, 
+        pp.surcharge_penalty surcharge_penalty, 
+        pp.boxes boxes,
+        pp.total - IIF(sub.to_pay is NULL, 0, sub.to_pay) payed, 
         COALESCE(sub.to_pay, 0) to_pay,
-        COALESCE(SUM(pp.total), 0) total
-    FROM wildberries_pvzpaiment pp LEFT JOIN wildberries_employee we ON we.id = pp.employee_id_id LEFT JOIN sub ON pp.employee_id_id=sub.employee_id
-    WHERE JULIANDAY(pp.date) BETWEEN JULIANDAY(:start_date) and JULIANDAY(:end_date) and pp.pvz_id_id = :pvz_id
-    GROUP BY pp.employee_id_id 
-    ORDER BY total DESC 
+        pp.total total
+    FROM wildberries_employee we LEFT JOIN (
+        SELECT 
+            pp.employee_id_id,
+            COALESCE(SUM(pp.number_days), 0) days, 
+            COALESCE(SUM(pp.extra_payment), 0) extra, 
+            COALESCE(SUM(pp.add_penalty), 0) add_penalty, 
+            COALESCE(SUM(pp.surcharge_penalty), 0) surcharge_penalty, 
+            COALESCE(SUM(pp.boxes_count), 0) boxes,
+            COALESCE(SUM(pp.total), 0) total
+        FROM wildberries_pvzpaiment pp
+        WHERE JULIANDAY(pp.date) BETWEEN JULIANDAY(:start_date) and JULIANDAY(:end_date) and pp.pvz_id_id = :pvz_id
+        GROUP BY pp.employee_id_id 
+    ) pp ON we.id = pp.employee_id_id LEFT JOIN sub ON we.id=sub.employee_id 
+    WHERE we.pvz_id_id = :pvz_id
 '''
 
 weekly_pvz_outcomes = '''

@@ -209,14 +209,14 @@
                         <tr>
                             <td><a href="{% url 'edit_employee' pk=employee.id %}" type="button" class="btn btn-secondary btn-sm">>>></a></td>
                             <td>{{ employee.name }}</td>
-                            <td>{{ employee.days }}</td>
-                            <td>{{ employee.boxes }}шт.</td>
-                            <td>{{ employee.add_penalty | floatformat:"g" }}₽</td>
-                            <td>{{ employee.surcharge_penalty | floatformat:"g" }}₽</td>
-                            <td>{{ employee.penalty | floatformat:"g" }}₽</td>
-                            <td class="table-dark">{{ employee.to_pay | floatformat:"g" }}₽</td>
-                            <td>{{ employee.payed | floatformat:"g" }}₽</td>
-                            <td>{{ employee.total | floatformat:"g" }}₽</td>
+                            <td>{{ employee.days | default:"0" }}</td>
+                            <td>{{ employee.boxes | default:"0" }}шт.</td>
+                            <td>{{ employee.add_penalty | default:"0"| floatformat:"g" }}₽</td>
+                            <td>{{ employee.surcharge_penalty | default:"0"| floatformat:"g" }}₽</td>
+                            <td>{{ employee.penalty | default:"0"| floatformat:"g" }}₽</td>
+                            <td class="table-secondary">{{ employee.to_pay | floatformat:"g" }}₽</td>
+                            <td>{{ employee.payed | default:"0" | floatformat:"g" }}₽</td>
+                            <td>{{ employee.total | default:"0" | floatformat:"g" }}₽</td>
                             <td class="text-end"><a href="{% url 'create_pvz_payment' employee.id static_data.pvz_total.id cr_start_week cr_end_week %}" type="button" class="btn btn-secondary btn-sm">+ Смена</a></td>
                             <td class="text-end"><a href="{% url 'list_pvz_payment' employee.id cr_start_week cr_end_week 0 %}" type="button" class="btn btn-secondary btn-sm">Детально</a></td>
                         </tr>
