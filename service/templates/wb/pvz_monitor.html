@@ -12,13 +12,13 @@
 
     <div class="row justify-content-between align-items-end">
         <div class="col-3">
-            <a class="btn btn-outline-secondary" href="{% url 'pvz_monitor' pk=pvz_id %}?date={{ previous_week }}">Предыдущая неделя</a>
+            <a class="btn btn-outline-secondary" href="{% url 'pvz_monitor' pk=pvz_id %}?date={{ previous_week }}"><<<</a>
         </div>
         <div class="col-6 text-center">
             <div class="p-2  align-self-start"><h5>{{start_week}} - {{end_week}}</h5></div>
         </div>
         <div class="col-3 text-end">
-            <a class="btn btn-outline-secondary" href="{% url 'pvz_monitor' pk=pvz_id %}?date={{ next_week }}">Следующая неделя</a>
+            <a class="btn btn-outline-secondary" href="{% url 'pvz_monitor' pk=pvz_id %}?date={{ next_week }}">>>></a>
         </div>
     </div>
 </div>
@@ -255,7 +255,7 @@
                             <td>{{ outcome.date }}</td>
                             <td>{{ outcome.category__title }} </td>
                              <td>{{ outcome.sum | floatformat:"g" }}₽</td>
-                            <td>{{ outcome.description }}</td>
+                            <td>{{ outcome.description | default:""}}</td>
                             <td class="text-end"><a href="{% url 'edit_outcome' outcome.pk static_data.pvz_total.id %}" type="button" class="btn btn-secondary btn-sm">Редактировать</a></td>
                             <td class="text-end"><a href="{% url 'delete_outcome' outcome.pk static_data.pvz_total.id %}" type="button" class="btn btn-secondary btn-sm">Удалить</a></td>
                         </tr>

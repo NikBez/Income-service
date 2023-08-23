@@ -105,7 +105,7 @@ def month_total_constructor(filter):
             Select 
                 ROUND(i.income, 2) income,
                 ROUND(o.outcome, 2) salaryes,
-                ROUND(i.income * 0.94 - o.outcome - p.rent, 2) profit,
+                ROUND(i.income * 0.94 - o.outcome - p.rent - po.service, 2) profit,
                 ROUND(i.income * 0.06, 2) taxes,
                 p.rent rent,
                 po.service service
