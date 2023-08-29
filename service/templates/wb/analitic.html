@@ -1,3 +1,4 @@
+
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/series-label.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
@@ -6,178 +7,165 @@
 
 <div class="container analitic">
     <div class="row">
-        <div class="col">
-        <figure class="highcharts-figure">
-        <div class="col" id="container1"></div>
-        </figure>
+        <div class="col-4">
+            <figure class="highcharts-figure">
+            <div class="col" id="profits"></div>
+            </figure>
+        </div>
+        <div class="col-4">
+             <figure class="highcharts-figure">
+            <div class="col" id="income"></div>
+            </figure>
         </div>
 
-        <div class="col">
-        <figure class="highcharts-figure">
-        <div class="col" id="container2"></div>
-        </figure>
+        <div class="col-4">
+             <figure class="highcharts-figure">
+            <div class="col" id="salary"></div>
+            </figure>
         </div>
-
     </div>
 </div>
 
 
+<script type="text/javascript">
 
+document.addEventListener('DOMContentLoaded', function () {
+        var profits = {{ profits | safe }}
+        var income = {{ income | safe }}
+        var salary = {{ salary | safe }}
+        var rent = {{ rent | safe }}
+        var service = {{ service | safe }}
+        var month_names = {{ month_names | safe }}
 
-<script>
-    Highcharts.chart('container1', {
+        Highcharts.chart('profits', {
+            title: {
+            text: 'Динамика прибыли'
+        },
 
-    title: {
-        text: 'U.S Solar Employment Growth',
-        align: 'left'
-    },
+        xAxis: {
+            categories: month_names,
+        },
 
-    subtitle: {
-        text: 'By Job Category. Source: <a href="https://irecusa.org/programs/solar-jobs-census/" target="_blank">IREC</a>.',
-        align: 'left'
-    },
-
-    yAxis: {
-        title: {
-            text: 'Number of Employees'
+        yAxis: {
+            title: {
+                text: 'Сумма (руб.)'
+        },
+        labels: {
+            format: '{value}'
         }
-    },
+        },
 
-    xAxis: {
-        accessibility: {
-            rangeDescription: 'Range: 2010 to 2020'
-        }
-    },
-
-    legend: {
-        layout: 'vertical',
-        align: 'right',
-        verticalAlign: 'middle'
-    },
-
-    plotOptions: {
-        series: {
-            label: {
-                connectorAllowed: false
-            },
-            pointStart: 2010
-        }
-    },
-
-    series: [{
-        name: 'Installation & Developers',
-        data: [43934, 48656, 65165, 81827, 112143, 142383,
-            171533, 165174, 155157, 161454, 154610]
-    }, {
-        name: 'Manufacturing',
-        data: [24916, 37941, 29742, 29851, 32490, 30282,
-            38121, 36885, 33726, 34243, 31050]
-    }, {
-        name: 'Sales & Distribution',
-        data: [11744, 30000, 16005, 19771, 20185, 24377,
-            32147, 30912, 29243, 29213, 25663]
-    }, {
-        name: 'Operations & Maintenance',
-        data: [null, null, null, null, null, null, null,
-            null, 11164, 11218, 10077]
-    }, {
-        name: 'Other',
-        data: [21908, 5548, 8105, 11248, 8989, 11816, 18274,
-            17300, 13053, 11906, 10073]
-    }],
-
-    responsive: {
-        rules: [{
-            condition: {
-                maxWidth: 500
-            },
-            chartOptions: {
-                legend: {
-                    layout: 'horizontal',
-                    align: 'center',
-                    verticalAlign: 'bottom'
-                }
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            crosshairs: true,
+            shared: true
+        },
+        plotOptions: {
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1,
             }
+        }
+        },
+        series: [{
+            name: 'Прибыль',
+            data: profits,
+            lineWidth: 3,
+            color: '#000000',
+            dashStyle: 'longdash'
         }]
-    }
+        })
 
-});
 
- Highcharts.chart('container2', {
+        Highcharts.chart('salary', {
+            title: {
+            text: 'Зарплаты'
+        },
 
-    title: {
-        text: 'U.S Solar Employment Growth',
-        align: 'left'
-    },
+        xAxis: {
+            categories: month_names,
+        },
 
-    subtitle: {
-        text: 'By Job Category. Source: <a href="https://irecusa.org/programs/solar-jobs-census/" target="_blank">IREC</a>.',
-        align: 'left'
-    },
-
-    yAxis: {
-        title: {
-            text: 'Number of Employees'
+        yAxis: {
+            title: {
+                text: 'Сумма (руб.)'
+        },
+        labels: {
+            format: '{value}'
         }
-    },
+        },
 
-    xAxis: {
-        accessibility: {
-            rangeDescription: 'Range: 2010 to 2020'
-        }
-    },
-
-    legend: {
-        layout: 'vertical',
-        align: 'right',
-        verticalAlign: 'middle'
-    },
-
-    plotOptions: {
-        series: {
-            label: {
-                connectorAllowed: false
-            },
-            pointStart: 2010
-        }
-    },
-
-    series: [{
-        name: 'Installation & Developers',
-        data: [43934, 48656, 65165, 81827, 112143, 142383,
-            171533, 165174, 155157, 161454, 154610]
-    }, {
-        name: 'Manufacturing',
-        data: [24916, 37941, 29742, 29851, 32490, 30282,
-            38121, 36885, 33726, 34243, 31050]
-    }, {
-        name: 'Sales & Distribution',
-        data: [11744, 30000, 16005, 19771, 20185, 24377,
-            32147, 30912, 29243, 29213, 25663]
-    }, {
-        name: 'Operations & Maintenance',
-        data: [null, null, null, null, null, null, null,
-            null, 11164, 11218, 10077]
-    }, {
-        name: 'Other',
-        data: [21908, 5548, 8105, 11248, 8989, 11816, 18274,
-            17300, 13053, 11906, 10073]
-    }],
-
-    responsive: {
-        rules: [{
-            condition: {
-                maxWidth: 500
-            },
-            chartOptions: {
-                legend: {
-                    layout: 'horizontal',
-                    align: 'center',
-                    verticalAlign: 'bottom'
-                }
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            crosshairs: true,
+            shared: true
+        },
+        plotOptions: {
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1,
             }
+        }
+        },
+        series: [{
+            name: 'ЗП',
+            data: salary,
+            lineWidth: 3,
+            color: '#000000',
+            dashStyle: 'longdash'
         }]
-    }
+        })
 
+
+        Highcharts.chart('income', {
+            title: {
+            text: 'Динамика от WB'
+        },
+
+        xAxis: {
+            categories: month_names,
+        },
+
+        yAxis: {
+            title: {
+                text: 'Сумма (руб.)'
+        },
+        labels: {
+            format: '{value}'
+        }
+        },
+
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            crosshairs: true,
+            shared: true
+        },
+        plotOptions: {
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1,
+            }
+        }
+        },
+        series: [{
+            name: 'Доход',
+            data: income,
+            lineWidth: 3,
+            color: '#000000',
+            dashStyle: 'longdash'
+        }]
+        })
 });
 </script>

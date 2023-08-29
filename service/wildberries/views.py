@@ -16,7 +16,7 @@ from .assets import dictfetchall, dictfetchone, update_employee_penalty
 from .forms import WBPaymentForm, PVZPaymentForm, EmployeeUpdateForm, OutcomeForm
 from .models import PVZ, Employee, WBPayment, PVZPaiment, Category, PVZOutcomes
 from .queries import month_total_by_pvz_query, week_total_by_pvz_query, week_employee_report, month_total_constructor, \
-    weekly_pvz_outcomes
+    weekly_pvz_outcomes, year_analitic_constructor
 from .serializers import WBMonitorSerializer, PVZMonitorSerializer
 
 
@@ -46,6 +46,12 @@ def wb_monitor(request):
         'filter_state': filter,
         'pvz_list': PVZ.objects.all(),
         'avg_period_length': settings.AVERAGE_PERIOD_LENGTH,
+        'profits': [float(value) for value in response['profits']],
+        'income': [float(value) for value in response['income']],
+        'salary': [float(value) for value in response['salary']],
+        'rent': [float(value) for value in response['rent']],
+        'service': [float(value) for value in response['service']],
+        'month_names': response['month_names'],
     }
     return render(request, 'wb/wb_monitor.html', context)
 
@@ -99,6 +105,7 @@ class GetWBAnalitic(APIView):
 
         # Собираем запрос с фильтром по ПВЗ или без
         month_total_query = month_total_constructor(query_filter)
+        year_analitic_query = year_analitic_constructor(query_filter)
 
         with connection.cursor() as cursor:
             cursor.execute(month_total_by_pvz_query, {'start_date': start_date, 'end_date': end_date})
@@ -107,9 +114,35 @@ class GetWBAnalitic(APIView):
             cursor.execute(month_total_query, {'start_date': start_date, 'end_date': end_date})
             month_results = dictfetchone(cursor)
 
+            cursor.execute(year_analitic_query)
+            year_results = dictfetchall(cursor)
+
+        month_names = []
+        profits = []
+        income = []
+        salary = []
+        rent = []
+        service = []
+
+        for month in year_results:
+            month_name = datetime.strptime(month.get('month'), '%Y-%m-%d').strftime('%B')
+            month_names.append(month_name)
+            profits.append(month.get('profit', 0))
+            income.append(month.get('income', 0))
+            salary.append(month.get('salary', 0))
+            rent.append(month.get('rent', 0))
+            service.append(month.get('service', 0))
+
+
         serializer = WBMonitorSerializer({
             'pvz_total': pvz_total,
             'month_results': month_results,
+            'month_names': month_names,
+            'profits': profits,
+            'income': income,
+            'salary': salary,
+            'rent': rent,
+            'service': service,
         })
 
         return Response(serializer.data)

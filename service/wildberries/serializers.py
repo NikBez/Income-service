@@ -49,6 +49,7 @@ class MonthResultsSerializer(serializers.Serializer):
     service = serializers.DecimalField(max_digits=10, decimal_places=2)
     income = serializers.DecimalField(max_digits=10, decimal_places=2)
 
+
 class PVZOutcomesSerializer(serializers.Serializer):
     pk = serializers.IntegerField()
     date = serializers.DateField()
@@ -56,14 +57,25 @@ class PVZOutcomesSerializer(serializers.Serializer):
     category__title = serializers.CharField()
     description = serializers.CharField()
 
+
 class TotalOutcomesSerializer(serializers.Serializer):
     category = serializers.CharField()
     outcome = serializers.DecimalField(max_digits=10, decimal_places=2)
 
 
+class MonthNamesSerializer(serializers.Serializer):
+    names = serializers.ListSerializer
+
+
 class WBMonitorSerializer(serializers.Serializer):
     pvz_total = PVZTotalSerializer(many=True)
     month_results = MonthResultsSerializer()
+    month_names = serializers.ListSerializer(child=serializers.CharField())
+    profits = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
+    income = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
+    salary = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
+    rent = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
+    service = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
 
 
 class PVZMonitorSerializer(serializers.Serializer):
