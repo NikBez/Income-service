@@ -48,22 +48,6 @@
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-#profit-card-on-monitor{
-    background-color: #5E4473;
-}
-
-#wb-card-on-monitor{
-    background-color: #767A42;
-}
-
-#tax-card-on-monitor{
-    background-color: #1A0729;
-}
-
-#salary-card-on-monitor{
-    background-color: #1A0729;
-}
-
 body{
     min-height: 100vh;
     display: flex;
@@ -93,6 +77,47 @@ body{
      scale: 1.7;
      margin-right: 0.8rem;
  }
+
+ #analitic-background{
+    background-color: #f3f3f3;
+    padding: 1.5em .5em .5em;
+    border-radius: 1em;
+    text-align: center;
+    box-shadow: 0 5px 10px rgba(0,0,0,.1);
+    border-width: 0px;
+}
+
+#wb-card0{
+    background-color: #d0cad6;
+    padding: 1.5em .5em .5em;
+    border-radius: 1em;
+    box-shadow: 0 5px 10px rgba(0,0,0,.1);
+    border-width: 0px;
+}
+
+#wb-card2{
+    background-color: #cbd9d9;
+    border-radius: 1em;
+    padding: 1.5em .5em .5em;
+    box-shadow: 0 5px 10px rgba(0,0,0,.1);
+    border-width: 0px;
+}
+
+#wb-card1{
+    background-color: #cbd9d9;
+    border-radius: 1em;
+    padding: 0.5em .5em .5em;
+    box-shadow: 0 5px 10px rgba(0,0,0,.1);
+    border-width: 0px;
+}
+
+#wb-card3{
+    background-color: #2b3034;
+    border-radius: 1em;
+    padding: 0.5em .5em .5em;
+    box-shadow: 0 5px 10px rgba(0,0,0,.1);
+    border-width: 0px;
+}
 
 
 

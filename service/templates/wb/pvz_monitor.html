@@ -24,120 +24,103 @@
 </div>
 
 <div class="container">
-    <div class="row p-3 mb-3" id='profit-card-on-monitor'>
-        <div class="col">
-            <div class="col-md">
-                <div class="card text-center text-white mb-3" id='profit-card-on-monitor'>
-                    <div class="card-header">
-                        <h5 class="card-title">Прибыль</h5>
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title display-1">{{ static_data.pvz_total.profit | default:"0" | floatformat:"g" }} ₽</h3>
-                    </div>
+    <div class="row py-4 mb-4" id='analitic-background'>
+        <div class="col-5">
+
+            <div class="text-center mb-3">
+                <div class="card-header">
+                    <h5 class="card-title">Прибыль</h5>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title display-1">{{ static_data.pvz_total.profit | default:"0" | floatformat:"g" }} ₽</h3>
                 </div>
             </div>
 
-            <div class="col-md">
-                <div class="row">
-                    <div class="col">
-                        <div class="card text-center text-white mb-3" id='wb-card-on-monitor'>
-                            <div class="card-header">
-                                <p class="card-title">Начисленно</p>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-title">{{ static_data.pvz_total.charged | default:"0" | floatformat:"g" }} ₽</p>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="col">
-                        <div class="card text-center text-white mb-3" id='wb-card-on-monitor'>
-                            <div class="card-header">
-                                <p class="card-title">Удержанно</p>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-title">{{ static_data.pvz_total.holded | default:"0" | floatformat:"g" }} ₽</p>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="col">
-                        <div class="card text-center text-white mb-3" id='wb-card-on-monitor'>
-                            <div class="card-header">
-                                <p class="card-title">Парт. выплата</p>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-title">{{ static_data.pvz_total.income | default:"0" | floatformat:"g" }} ₽</p>
-                            </div>
+            <div class="row">
+
+                <div class="col">
+                    <div class="card text-center mb-3" id='wb-card0'>
+                        <p class="card-title">Начисленно</p>
+                        <div class="card-body">
+                            <p class="card-title">{{ static_data.pvz_total.charged | default:"0" | floatformat:"g" }} ₽</p>
                         </div>
                     </div>
                 </div>
+
+                <div class="col">
+                    <div class="card text-center mb-3" id='wb-card0'>
+                        <p class="card-title">Удержанно</p>
+                        <div class="card-body">
+                            <p class="card-title">{{ static_data.pvz_total.holded | default:"0" | floatformat:"g" }} ₽</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card text-center mb-3" id='wb-card0'>
+                        <p class="card-title">Парт. выплата</p>
+                        <div class="card-body">
+                            <p class="card-title">{{ static_data.pvz_total.income | default:"0" | floatformat:"g" }} ₽</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-
-        <div class="col">
+        <div class="col-7">
             <div class="col-md">
                 <div class="row">
                     <div class="col">
 
-                        <div class="card text-center text-white mb-3" id='tax-card-on-monitor'>
-                            <div class="card-header">
-                                <h5 class="card-title">Налог</h5>
-                            </div>
-                            <div class="card-body py-5">
-                                <h3 class="card-title">{{ static_data.pvz_total.taxes | default:"0" | floatformat:"g" }} ₽</h3>
+                        <div class="card text-center mb-3" id='wb-card1'>
+                            <h5 class="card-title">Налог</h5>
+                            <div class="card-body">
+                                <h4 class="card-title">{{ static_data.pvz_total.taxes | default:"0" | floatformat:"g" }} ₽</h4>
                             </div>
                         </div>
                     </div>
 
 
                     <div class="col">
-                        <div class="card text-center text-white mb-3" id='tax-card-on-monitor'>
-                            <div class="card-header">
-                                <h5 class="card-title">Аренда</h5>
-                            </div>
-                            <div class="card-body py-5">
-                                <h3 class="card-title">{{ static_data.pvz_total.rent_price | default:"0" | floatformat:"g" }} ₽</h3>
+                        <div class="card text-center mb-3" id='wb-card1'>
+                            <h5 class="card-title">Аренда</h5>
+                            <div class="card-body">
+                                <h4 class="card-title">{{ static_data.pvz_total.rent_price | default:"0" | floatformat:"g" }} ₽</h4>
                             </div>
                         </div>
                     </div>
 
                     <div class="col">
-                        <div class="card text-center text-white mb-3" id='tax-card-on-monitor'>
-                            <div class="card-header">
-                                <h5 class="card-title">Содержание</h5>
-                            </div>
-                            <div class="card-body py-5">
-                                <h3 class="card-title"> {{ static_data.pvz_total.total_outcome | floatformat:"g" }} ₽</h3>
+                        <div class="card text-center mb-3" id='wb-card1'>
+                            <h5 class="card-title">Содержание</h5>
+                            <div class="card-body">
+                                <h4 class="card-title"> {{ static_data.pvz_total.total_outcome | floatformat:"g" }} ₽</h4>
                             </div>
                         </div>
                     </div>
 
-
-                </div>
-            </div>
-
-            <div class="col-md">
-                <div class="row">
-
-
-                    <div class="col">
-                        <div class="card text-center text-white mb-3" id='tax-card-on-monitor'>
-                            <div class="card-header">
-                                <h5 class="card-title">Зарплаты</h5>
-                            </div>
+                     <div class="col">
+                        <div class="card text-center mb-3" id='wb-card1'>
+                            <h5 class="card-title">Зарплаты</h5>
                             <div class="card-body">
                                 <h4 class="card-title">{{ static_data.pvz_total.salary | default:"0" | floatformat:"g" }} ₽</h4>
                             </div>
                         </div>
                     </div>
 
+
+                </div>
+            </div>
+
+            <div class="col-md">
+                <div class="row">
+
                     <div class="col">
-                        <div class="card text-center text-white mb-3" id='salary-card-on-monitor'>
-                            <div class="card-header">
-                                <p class="card-title">+ Штраф</p>
-                            </div>
+                        <div class="card text-center mb-3" id='wb-card2'>
+                            <p class="card-title">+ Штраф</p>
                             <div class="card-body">
                                 <p class="card-title">{{ static_data.pvz_total.add_penalty | default:"0" | floatformat:"g" }} ₽</p>
                             </div>
@@ -145,10 +128,8 @@
                     </div>
 
                     <div class="col">
-                        <div class="card text-center text-white mb-3" id='salary-card-on-monitor'>
-                            <div class="card-header">
-                                <p class="card-title">- Штраф</p>
-                            </div>
+                        <div class="card text-center mb-3" id='wb-card2'>
+                            <p class="card-title">- Штраф</p>
                             <div class="card-body">
                                 <p class="card-title">{{ static_data.pvz_total.sub_penalty | default:"0" | floatformat:"g" }} ₽</p>
                             </div>
@@ -156,10 +137,8 @@
                     </div>
 
                     <div class="col">
-                        <div class="card text-center text-white mb-3" id='salary-card-on-monitor'>
-                            <div class="card-header">
-                                <p class="card-title">Коробки</p>
-                            </div>
+                        <div class="card text-center mb-3" id='wb-card2'>
+                            <p class="card-title">Коробки</p>
                             <div class="card-body">
                                 <p class="card-title">{{ static_data.pvz_total.boxes | default:"0" | floatformat:"g" }} шт.</p>
                             </div>
@@ -181,7 +160,7 @@
     </div>
 
 
-    <div class="row mb-5 ">
+    <div class="row mb-4 ">
         <div class="col md-5">
             <div class="row">
                 <div class="col-6">

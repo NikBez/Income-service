@@ -28,56 +28,47 @@
                 {% endfor %}
             </div>
     </div>
-
-    <div class="row mb-2">
-        <div class="col">
-            <div class="col-md">
-                <div class="card text-center text-white mb-3" id="salary-card-on-monitor">
-                    <div class="card-header">
+    <div class="row mb-3" id='analitic-background'>
+        <div class="row mb-2" >
+            <div class="col">
+                <div class="col-md">
+                    <div class="card text-center mb-3" id="wb-card0">
                         <h5 class="card-title">Поступление от WB</h5>
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">{{ static_data.month_results.income |default:"0" | floatformat:"g" }} ₽</h3>
+                        <div class="card-body">
+                            <h3 class="card-title">{{ static_data.month_results.income |default:"0" | floatformat:"g" }} ₽</h3>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col">
-            <div class="col-md">
-                <div class="card text-center text-white mb-3" id="tax-card-on-monitor">
-                    <div class="card-header">
+            <div class="col">
+                <div class="col-md">
+                    <div class="card text-center mb-3" id="wb-card0">
                         <h5 class="card-title">Налоги к уплате</h5>
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">{{ static_data.month_results.taxes |default:"0" | floatformat:"g" }} ₽</h3>
+                        <div class="card-body">
+                            <h3 class="card-title">{{ static_data.month_results.taxes |default:"0" | floatformat:"g" }} ₽</h3>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-          <div class="col">
-            <div class="col-md">
-                <div class="card text-center text-white mb-3" id="salary-card-on-monitor">
-                    <div class="card-header">
+              <div class="col">
+                <div class="col-md">
+                    <div class="card text-center mb-3" id="wb-card0">
                         <h5 class="card-title">Арендная плата</h5>
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">{{ static_data.month_results.rent |default:"0" | floatformat:"g" }} ₽</h3>
+                        <div class="card-body">
+                            <h3 class="card-title">{{ static_data.month_results.rent |default:"0" | floatformat:"g" }} ₽</h3>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
-
-    </div>
-     <div class="row mb-5">
-
+        <div class="row mb-4">
          <div class="col">
             <div class="col-md">
-                <div class="card text-center text-white mb-3" id="salary-card-on-monitor">
-                    <div class="card-header">
-                        <h5 class="card-title">Зарплатный фонд</h5>
-                    </div>
+                <div class="card text-center mb-3" id="wb-card0">
+                    <h5 class="card-title">Зарплатный фонд</h5>
                     <div class="card-body">
                         <h3 class="card-title">{{ static_data.month_results.salaryes |default:"0" | floatformat:"g" }} ₽</h3>
                     </div>
@@ -87,10 +78,8 @@
 
         <div class="col">
             <div class="col-md">
-                <div class="card text-center text-white mb-3" id="salary-card-on-monitor">
-                    <div class="card-header">
-                        <h5 class="card-title">Обслуживание</h5>
-                    </div>
+                <div class="card text-center mb-3" id="wb-card0">
+                    <h5 class="card-title">Обслуживание</h5>
                     <div class="card-body">
                         <h3 class="card-title">{{ static_data.month_results.service |default:"0" | floatformat:"g" }} ₽</h3>
                     </div>
@@ -100,10 +89,8 @@
 
         <div class="col">
             <div class="col-md">
-                <div class="card text-center text-white mb-3" id='profit-card-on-monitor'>
-                    <div class="card-header">
-                        <h5 class="card-title">Прибыль</h5>
-                    </div>
+                <div class="card text-center mb-3" id='wb-card2'>
+                    <h5 class="card-title">Прибыль</h5>
                     <div class="card-body">
                         <h3 class="card-title">{{ static_data.month_results.profit |default:"0" | floatformat:"g" }} ₽</h3>
                     </div>
@@ -112,6 +99,7 @@
         </div>
 
     </div>
+     </div>
 
     <div class="row ">
         <h5>Пункты выдачи</h5>
@@ -128,7 +116,7 @@
                     </tr>
                     {% for pvz in static_data.pvz_total %}
                         <tr>
-                            <td><a href="{% url 'pvz_monitor' pk=pvz.id %}" type="button" class="btn btn-dark btn-sm">>>></a></td>
+                            <td><a href="{% url 'pvz_monitor' pk=pvz.id %}" type="button" class="btn btn-outline-secondary btn-sm">>>></a></td>
                             <td>{{pvz.title}}</td>
                             <td>{{pvz.boxes}} шт.</td>
                             <td>{{pvz.charged | floatformat:"g" }}₽</td>
@@ -142,6 +130,8 @@
         </div>
     </div>
 </div>
+
+{% include 'wb/analitic.html' %}
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -175,6 +165,5 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 </script>
-
 {% endblock %}
 
