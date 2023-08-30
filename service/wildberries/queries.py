@@ -235,243 +235,297 @@ weekly_pvz_outcomes = '''
 def year_analitic_constructor(filter):
     if not filter:
         query = f'''
-            WITH incomes AS (
-            WITH A AS(	
-            SELECT
-                date(from_date, 'start of month') month,
-                SUM(IIF(to_date < date(from_date, '+1 month', 'start of month'), total, 0))	total
-            FROM 
-                wildberries_wbpayment ww
-            WHERE 
-                (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                (ww.from_date <= date('now', '+1 month', 'start of month', '-1 day') or ww.to_date <= date('now', '+1 month', 'start of month', '-1 day'))
-            GROUP BY month
-            ), B AS(
-            SELECT
-                date(ww.from_date, 'start of month') month,
-                SUM(IIF(ww.to_date >= date(ww.from_date, '+1 month', 'start of month'),  ROUND(ww.total / 7 * (7 - (JULIANDAY(ww.to_date) - JULIANDAY(date(ww.from_date, '+1 month', 'start of month', '-1 day')))), 2), 0)) total
-            FROM 
-                wildberries_wbpayment ww
-            WHERE 
-                (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                (ww.from_date < date('now', '+1 month', 'start of month') or ww.to_date < date('now', '+1 month', 'start of month'))
-            GROUP BY month
-            ), C AS (
-            SELECT
-                date(ww.to_date, 'start of month') month,
-                SUM(IIF(ww.to_date >= date(ww.from_date, '+1 month', 'start of month'),  ROUND(ww.total / 7 * (JULIANDAY(ww.to_date) - JULIANDAY(date(ww.from_date, '+1 month', 'start of month', '-1 day'))), 2), 0)) total
-            FROM 
-                wildberries_wbpayment ww
-            WHERE 
-                (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                (ww.from_date < date('now', '+1 month', 'start of month') or ww.to_date < date('now', '+1 month', 'start of month'))
-            GROUP BY month
-            )
-            SELECT
-                COALESCE(A.month, B.month, C.month) month,
-                COALESCE(A.total, 0) + COALESCE(B.total, 0) + COALESCE(C.total, 0) AS income
-            FROM A FULL JOIN B ON A.month=B.month FULL JOIN C on A.month=C.month
+        WITH incomes AS (
+		WITH A AS (
+	        SELECT
+	            date(from_date, 'start of month') month,
+	            SUM(IIF(to_date < date(from_date, '+1 month', 'start of month'), total, 0))	total
+	        FROM 
+	            wildberries_wbpayment ww
+	        WHERE 
+	            (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
+	            (ww.from_date <= date('now', '+1 month', 'start of month', '-1 day') or ww.to_date <= date('now', '+1 month', 'start of month', '-1 day'))
+	        GROUP BY month
+	       	UNION 
+	        SELECT
+	            date(ww.from_date, 'start of month') month,
+	            SUM(IIF(ww.to_date >= date(ww.from_date, '+1 month', 'start of month'),  ROUND(ww.total / 7 * (7 - (JULIANDAY(ww.to_date) - JULIANDAY(date(ww.from_date, '+1 month', 'start of month', '-1 day')))), 2), 0)) total
+	        FROM 
+	            wildberries_wbpayment ww
+	        WHERE 
+	            (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
+	            (ww.from_date < date('now', '+1 month', 'start of month') or ww.to_date < date('now', '+1 month', 'start of month'))
+	        GROUP BY month
+	        UNION
+	        SELECT
+	            date(ww.to_date, 'start of month') month,
+	            SUM(IIF(ww.to_date >= date(ww.from_date, '+1 month', 'start of month'),  ROUND(ww.total / 7 * (JULIANDAY(ww.to_date) - JULIANDAY(date(ww.from_date, '+1 month', 'start of month', '-1 day'))), 2), 0)) total
+	        FROM 
+	            wildberries_wbpayment ww
+	        WHERE 
+	            (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
+	            (ww.from_date < date('now', '+1 month', 'start of month') or ww.to_date < date('now', '+1 month', 'start of month'))
+	        GROUP BY month
+	    	)
+        SELECT
+	        A.month month,
+	        SUM(A.total) AS income
+        FROM A
+        GROUP BY A.month
         ), salaries AS (
-            WITH A AS(
-            SELECT 
-                pp.start_of_month month,
-                COALESCE(SUM(IIF(pp.end_of_week < date(start_of_week, '+1 month', 'start of month'), pp.total,  0)), 0) total
-            FROM (
-                SELECT
+		WITH A AS(
+			SELECT 
+					pp.start_of_month month,
+					COALESCE(SUM(IIF(pp.end_of_week < date(start_of_week, '+1 month', 'start of month'), pp.total, 0)),0) total
+			FROM
+				(
+				SELECT
                     pp.pvz_id_id pvz_id_id,
                     pp.total, 
                     pp.date as date,
-                    date(date(pp.date,'weekday 0', '-6 days'),'start of month') start_of_month,
-                    date(pp.date,'weekday 0', '-6 days') start_of_week,
-                    date(pp.date,'weekday 0') end_of_week
-                FROM 
-                    wildberries_pvzpaiment pp
-                ) pp
-            WHERE 
-                (pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year') or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                (pp.start_of_week < date('now', '+1 month', 'start of month') or pp.end_of_week < date('now', '+1 month', 'start of month'))
-            GROUP BY month
-            ), B AS(
-            SELECT 
-                pp.start_of_month month,	
-                SUM(IIF(pp.end_of_week >= date(pp.start_of_week, '+1 month', 'start of month'),  ROUND(pp.total / 7 * (7 - (JULIANDAY(pp.end_of_week) - JULIANDAY(date(pp.start_of_week, '+1 month', 'start of month', '-1 day')))), 2), 0)) total
-            FROM (
-                SELECT
+                    date(date(pp.date, 'weekday 0', '-6 days'), 'start of month') start_of_month,
+                    date(pp.date, 'weekday 0', '-6 days') start_of_week,
+                    date(pp.date, 'weekday 0') end_of_week
+				FROM 
+						wildberries_pvzpaiment pp
+				) pp
+			WHERE 
+					(pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year')
+					or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year'))
+					and 
+					(pp.start_of_week < date('now', '+1 month', 'start of month')
+						or pp.end_of_week < date('now', '+1 month', 'start of month'))
+				GROUP BY
+					month
+			UNION 
+			SELECT 
+					pp.start_of_month month,	
+					SUM(IIF(pp.end_of_week >= date(pp.start_of_week, '+1 month', 'start of month'), ROUND(pp.total / 7 * (7 - (JULIANDAY(pp.end_of_week) - JULIANDAY(date(pp.start_of_week, '+1 month', 'start of month', '-1 day')))), 2), 0)) total
+			FROM
+				(
+				SELECT
                     pp.pvz_id_id pvz_id_id,
                     pp.total, 
                     pp.date as date,
-                    date(date(pp.date,'weekday 0', '-6 days'),'start of month') start_of_month,
-                    date(pp.date,'weekday 0', '-6 days') start_of_week,
-                    date(pp.date,'weekday 0') end_of_week
-                FROM 
-                    wildberries_pvzpaiment pp
-                ) pp
-            WHERE 
-                (pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year') or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                (pp.start_of_week < date('now', '+1 month', 'start of month') or pp.end_of_week < date('now', '+1 month', 'start of month'))
-            GROUP BY month
-            ), C AS (
-            SELECT 
-                date(pp.end_of_week, 'start of month') month,	
-                SUM(IIF(pp.end_of_week >= date(pp.start_of_week, '+1 month', 'start of month'),  ROUND(pp.total / 7 * (JULIANDAY(pp.end_of_week) - JULIANDAY(date(pp.start_of_week, '+1 month', 'start of month', '-1 day'))), 2), 0)) total
-            FROM (
-                SELECT
+                    date(date(pp.date, 'weekday 0', '-6 days'), 'start of month') start_of_month,
+                    date(pp.date, 'weekday 0', '-6 days') start_of_week,
+                    date(pp.date, 'weekday 0') end_of_week
+				FROM 
+						wildberries_pvzpaiment pp
+				) pp
+			WHERE 
+					(pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year')
+					or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year'))
+					and 
+					(pp.start_of_week < date('now', '+1 month', 'start of month')
+						or pp.end_of_week < date('now', '+1 month', 'start of month'))
+				GROUP BY
+					month
+			UNION
+			SELECT 
+					date(pp.end_of_week, 'start of month') month,	
+					SUM(IIF(pp.end_of_week >= date(pp.start_of_week, '+1 month', 'start of month'), ROUND(pp.total / 7 * (JULIANDAY(pp.end_of_week) - JULIANDAY(date(pp.start_of_week, '+1 month', 'start of month', '-1 day'))), 2), 0)) total
+			FROM
+				(
+				SELECT
                     pp.pvz_id_id pvz_id_id,
                     pp.total, 
                     pp.date as date,
-                    date(date(pp.date,'weekday 0', '-6 days'),'start of month') start_of_month,
-                    date(pp.date,'weekday 0', '-6 days') start_of_week,
-                    date(pp.date,'weekday 0') end_of_week
-                FROM 
-                    wildberries_pvzpaiment pp
-                ) pp
-            WHERE 
-                (pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year') or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                (pp.start_of_week < date('now', '+1 month', 'start of month') or pp.end_of_week < date('now', '+1 month', 'start of month'))
-            GROUP BY month
-            )
+                    date(date(pp.date, 'weekday 0', '-6 days'), 'start of month') start_of_month,
+                    date(pp.date, 'weekday 0', '-6 days') start_of_week,
+                    date(pp.date, 'weekday 0') end_of_week
+				FROM 
+						wildberries_pvzpaiment pp
+				) pp
+				WHERE 
+					(pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year')
+					or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year'))
+					and 
+					(pp.start_of_week < date('now', '+1 month', 'start of month')
+						or pp.end_of_week < date('now', '+1 month', 'start of month'))
+				GROUP BY
+					month
+				)
+		SELECT
+			COALESCE(A.month, 0) month,
+			SUM(A.total) AS salary
+		FROM A
+		GROUP BY month
+        ),pvz AS (
+            select
+            COALESCE(SUM(rent_price),
+            0) rent
+            from
+            wildberries_pvz
+        ),
+        service AS (
             SELECT
-                COALESCE(A.month, B.month, C.month) month,
-                COALESCE(A.total, 0) + COALESCE(B.total, 0) + COALESCE(C.total, 0) AS salary
-            FROM A FULL JOIN B ON A.month=B.month FULL JOIN C on A.month=C.month
-            ), pvz AS (
-            select COALESCE(SUM(rent_price), 0) rent from wildberries_pvz
-            ), service AS (
-                SELECT
                 date(date, 'start of month') month,
-                COALESCE(SUM(sum), 0) service 
-                FROM wildberries_pvzoutcomes wp 
-                WHERE wp.date BETWEEN date('now', '+1 month', 'start of month', '-1 year') AND date('now', '+1 month', 'start of month', '-1 days')
-                GROUP BY month
-            )
-            SELECT
-                COALESCE(i.month, s.month) month,
-                i.income,
-                s.salary,
-                pvz.rent,
-                se.service,
-                ROUND(i.income * 0.94 - s.salary - pvz.rent - se.service, 2) profit	
-            FROM incomes i FULL JOIN salaries s ON s.month = i.month FULL JOIN pvz LEFT JOIN service se ON se.month = i.month 
-        '''
+                COALESCE(SUM(sum), 0) service
+            FROM
+                wildberries_pvzoutcomes wp
+            WHERE
+                wp.date BETWEEN date('now', '+1 month', 'start of month', '-1 year') AND date('now', '+1 month', 'start of month', '-1 days')
+            GROUP BY month
+        )
+        SELECT
+            COALESCE(i.month, s.month) month,
+            i.income,
+            s.salary,
+            pvz.rent,
+            COALESCE(se.service, 0) service,
+            COALESCE(ROUND(i.income * 0.94 - IIF(s.salary IS NOT NULL, s.salary, 0) - pvz.rent - IIF(se.service IS NOT NULL, se.service, 0), 2), 0) profit
+        FROM
+            incomes i LEFT JOIN salaries s ON s.month = i.month LEFT JOIN pvz LEFT JOIN service se ON se.month = i.month 
+'''
     else:
         filter = '(' + filter + ')'
         query = f'''
-                WITH incomes AS (
-                WITH A AS(	
-                SELECT
-                    date(from_date, 'start of month') month,
-                    SUM(IIF(to_date < date(from_date, '+1 month', 'start of month'), total, 0))	total
-                FROM 
-                    wildberries_wbpayment ww
-                WHERE 
-                    (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                    (ww.from_date <= date('now', '+1 month', 'start of month', '-1 day') or ww.to_date <= date('now', '+1 month', 'start of month', '-1 day')) AND ww.pvz_id_id IN {filter}
-                GROUP BY month
-                ), B AS(
-                SELECT
-                    date(ww.from_date, 'start of month') month,
-                    SUM(IIF(ww.to_date >= date(ww.from_date, '+1 month', 'start of month'),  ROUND(ww.total / 7 * (7 - (JULIANDAY(ww.to_date) - JULIANDAY(date(ww.from_date, '+1 month', 'start of month', '-1 day')))), 2), 0)) total
-                FROM 
-                    wildberries_wbpayment ww
-                WHERE 
-                    (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                    (ww.from_date < date('now', '+1 month', 'start of month') or ww.to_date < date('now', '+1 month', 'start of month')) AND ww.pvz_id_id IN {filter}
-                GROUP BY month
-                ), C AS (
-                SELECT
-                    date(ww.to_date, 'start of month') month,
-                    SUM(IIF(ww.to_date >= date(ww.from_date, '+1 month', 'start of month'),  ROUND(ww.total / 7 * (JULIANDAY(ww.to_date) - JULIANDAY(date(ww.from_date, '+1 month', 'start of month', '-1 day'))), 2), 0)) total
-                FROM 
-                    wildberries_wbpayment ww
-                WHERE 
-                    (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                    (ww.from_date < date('now', '+1 month', 'start of month') or ww.to_date < date('now', '+1 month', 'start of month'))  AND ww.pvz_id_id IN {filter}
-                GROUP BY month
-                )
-                SELECT
-                    COALESCE(A.month, B.month, C.month) month,
-                    COALESCE(A.total, 0) + COALESCE(B.total, 0) + COALESCE(C.total, 0) AS income
-                FROM A FULL JOIN B ON A.month=B.month FULL JOIN C on A.month=C.month
-            ), salaries AS (
-                WITH A AS(
-                SELECT 
-                    pp.start_of_month month,
-                    COALESCE(SUM(IIF(pp.end_of_week < date(start_of_week, '+1 month', 'start of month'), pp.total,  0)), 0) total
-                FROM (
-                    SELECT
-                        pp.pvz_id_id pvz_id_id,
-                        pp.total, 
-                        pp.date as date,
-                        date(date(pp.date,'weekday 0', '-6 days'),'start of month') start_of_month,
-                        date(pp.date,'weekday 0', '-6 days') start_of_week,
-                        date(pp.date,'weekday 0') end_of_week
-                    FROM 
-                        wildberries_pvzpaiment pp
-                    WHERE pp.pvz_id_id IN {filter}) pp
-                WHERE 
-                    (pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year') or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                    (pp.start_of_week < date('now', '+1 month', 'start of month') or pp.end_of_week < date('now', '+1 month', 'start of month'))
-                GROUP BY month
-                ), B AS(
-                SELECT 
-                    pp.start_of_month month,	
-                    SUM(IIF(pp.end_of_week >= date(pp.start_of_week, '+1 month', 'start of month'),  ROUND(pp.total / 7 * (7 - (JULIANDAY(pp.end_of_week) - JULIANDAY(date(pp.start_of_week, '+1 month', 'start of month', '-1 day')))), 2), 0)) total
-                FROM (
-                    SELECT
-                        pp.pvz_id_id pvz_id_id,
-                        pp.total, 
-                        pp.date as date,
-                        date(date(pp.date,'weekday 0', '-6 days'),'start of month') start_of_month,
-                        date(pp.date,'weekday 0', '-6 days') start_of_week,
-                        date(pp.date,'weekday 0') end_of_week
-                    FROM 
-                        wildberries_pvzpaiment pp
-                    WHERE pp.pvz_id_id IN {filter}) pp
-                WHERE 
-                    (pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year') or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                    (pp.start_of_week < date('now', '+1 month', 'start of month') or pp.end_of_week < date('now', '+1 month', 'start of month'))
-                GROUP BY month
-                ), C AS (
-                SELECT 
-                    date(pp.end_of_week, 'start of month') month,	
-                    SUM(IIF(pp.end_of_week >= date(pp.start_of_week, '+1 month', 'start of month'),  ROUND(pp.total / 7 * (JULIANDAY(pp.end_of_week) - JULIANDAY(date(pp.start_of_week, '+1 month', 'start of month', '-1 day'))), 2), 0)) total
-                FROM (
-                    SELECT
-                        pp.pvz_id_id pvz_id_id,
-                        pp.total, 
-                        pp.date as date,
-                        date(date(pp.date,'weekday 0', '-6 days'),'start of month') start_of_month,
-                        date(pp.date,'weekday 0', '-6 days') start_of_week,
-                        date(pp.date,'weekday 0') end_of_week
-                    FROM 
-                        wildberries_pvzpaiment pp
-                    WHERE pp.pvz_id_id IN {filter}) pp
-                WHERE 
-                    (pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year') or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year')) and 
-                    (pp.start_of_week < date('now', '+1 month', 'start of month') or pp.end_of_week < date('now', '+1 month', 'start of month'))
-                GROUP BY month
-                )
-                SELECT
-                    COALESCE(A.month, B.month, C.month) month,
-                    COALESCE(A.total, 0) + COALESCE(B.total, 0) + COALESCE(C.total, 0) AS salary
-                FROM A FULL JOIN B ON A.month=B.month FULL JOIN C on A.month=C.month
-                ), pvz AS (
-                select COALESCE(SUM(rent_price), 0) rent from wildberries_pvz where id IN {filter}
-                ), service AS (
-                    SELECT
-                    date(date, 'start of month') month,
-                    COALESCE(SUM(sum), 0) service 
-                    FROM wildberries_pvzoutcomes wp 
-                    WHERE wp.pvz_id IN {filter} and wp.date BETWEEN date('now', '+1 month', 'start of month', '-1 year') AND date('now', '+1 month', 'start of month', '-1 days')
-                    GROUP BY month
-                )
-                SELECT
-                    COALESCE(i.month, s.month) month,
-                    i.income,
-                    s.salary,
-                    pvz.rent,
-                    se.service,
-                    ROUND(i.income * 0.94 - s.salary - pvz.rent - se.service, 2) profit	
-                FROM incomes i FULL JOIN salaries s ON s.month = i.month FULL JOIN pvz LEFT JOIN service se ON se.month = i.month 
-            '''
+    WITH incomes AS (
+		WITH A AS (
+	        SELECT
+	            date(from_date, 'start of month') month,
+	            SUM(IIF(to_date < date(from_date, '+1 month', 'start of month'), total, 0))	total
+	        FROM 
+	            wildberries_wbpayment ww
+	        WHERE 
+	            (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
+	            (ww.from_date <= date('now', '+1 month', 'start of month', '-1 day') or ww.to_date <= date('now', '+1 month', 'start of month', '-1 day')) AND ww.pvz_id_id IN {filter}
+	        GROUP BY month
+	       	UNION 
+	        SELECT
+	            date(ww.from_date, 'start of month') month,
+	            SUM(IIF(ww.to_date >= date(ww.from_date, '+1 month', 'start of month'),  ROUND(ww.total / 7 * (7 - (JULIANDAY(ww.to_date) - JULIANDAY(date(ww.from_date, '+1 month', 'start of month', '-1 day')))), 2), 0)) total
+	        FROM 
+	            wildberries_wbpayment ww
+	        WHERE 
+	            (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
+	            (ww.from_date < date('now', '+1 month', 'start of month') or ww.to_date < date('now', '+1 month', 'start of month')) AND ww.pvz_id_id IN {filter}
+	        GROUP BY month
+	        UNION
+	        SELECT
+	            date(ww.to_date, 'start of month') month,
+	            SUM(IIF(ww.to_date >= date(ww.from_date, '+1 month', 'start of month'),  ROUND(ww.total / 7 * (JULIANDAY(ww.to_date) - JULIANDAY(date(ww.from_date, '+1 month', 'start of month', '-1 day'))), 2), 0)) total
+	        FROM 
+	            wildberries_wbpayment ww
+	        WHERE 
+	            (ww.from_date >= date('now', '+1 month', 'start of month', '-1 year') or ww.to_date >= date('now', '+1 month', 'start of month', '-1 year')) and 
+	            (ww.from_date < date('now', '+1 month', 'start of month') or ww.to_date < date('now', '+1 month', 'start of month')) AND ww.pvz_id_id IN {filter}
+	        GROUP BY month
+	    	)
+        SELECT
+	        A.month month,
+	        SUM(A.total) AS income
+        FROM A
+        GROUP BY A.month
+        ), salaries AS (
+		WITH A AS(
+			SELECT 
+					pp.start_of_month month,
+					COALESCE(SUM(IIF(pp.end_of_week < date(start_of_week, '+1 month', 'start of month'), pp.total, 0)),
+				0) total
+			FROM
+				(
+				SELECT
+                    pp.pvz_id_id pvz_id_id,
+                    pp.total, 
+                    pp.date as date,
+                    date(date(pp.date, 'weekday 0', '-6 days'), 'start of month') start_of_month,
+                    date(pp.date, 'weekday 0', '-6 days') start_of_week,
+                    date(pp.date, 'weekday 0') end_of_week
+				FROM 
+						wildberries_pvzpaiment pp
+				WHERE pp.pvz_id_id IN {filter}) pp
+			WHERE 
+					(pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year')
+					or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year'))
+					and 
+					(pp.start_of_week < date('now', '+1 month', 'start of month')
+						or pp.end_of_week < date('now', '+1 month', 'start of month'))
+				GROUP BY
+					month
+			UNION 
+			SELECT 
+					pp.start_of_month month,	
+					SUM(IIF(pp.end_of_week >= date(pp.start_of_week, '+1 month', 'start of month'), ROUND(pp.total / 7 * (7 - (JULIANDAY(pp.end_of_week) - JULIANDAY(date(pp.start_of_week, '+1 month', 'start of month', '-1 day')))), 2), 0)) total
+			FROM
+				(
+				SELECT
+                    pp.pvz_id_id pvz_id_id,
+                    pp.total, 
+                    pp.date as date,
+                    date(date(pp.date, 'weekday 0', '-6 days'), 'start of month') start_of_month,
+                    date(pp.date, 'weekday 0', '-6 days') start_of_week,
+                    date(pp.date, 'weekday 0') end_of_week
+				FROM 
+						wildberries_pvzpaiment pp
+				WHERE pp.pvz_id_id IN {filter}) pp
+			WHERE 
+					(pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year')
+					or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year'))
+					and 
+					(pp.start_of_week < date('now', '+1 month', 'start of month')
+						or pp.end_of_week < date('now', '+1 month', 'start of month'))
+				GROUP BY
+					month
+			UNION
+			SELECT 
+					date(pp.end_of_week, 'start of month') month,	
+					SUM(IIF(pp.end_of_week >= date(pp.start_of_week, '+1 month', 'start of month'), ROUND(pp.total / 7 * (JULIANDAY(pp.end_of_week) - JULIANDAY(date(pp.start_of_week, '+1 month', 'start of month', '-1 day'))), 2), 0)) total
+			FROM
+				(
+				SELECT
+                    pp.pvz_id_id pvz_id_id,
+                    pp.total, 
+                    pp.date as date,
+                    date(date(pp.date, 'weekday 0', '-6 days'), 'start of month') start_of_month,
+                    date(pp.date, 'weekday 0', '-6 days') start_of_week,
+                    date(pp.date, 'weekday 0') end_of_week
+				FROM 
+						wildberries_pvzpaiment pp
+				WHERE pp.pvz_id_id IN {filter}) pp
+				WHERE 
+					(pp.start_of_week >= date('now', '+1 month', 'start of month', '-1 year')
+					or pp.end_of_week >= date('now', '+1 month', 'start of month', '-1 year'))
+					and 
+					(pp.start_of_week < date('now', '+1 month', 'start of month')
+						or pp.end_of_week < date('now', '+1 month', 'start of month'))
+				GROUP BY
+					month
+				)
+		SELECT
+			COALESCE(A.month, 0) month,
+			SUM(A.total) AS salary
+		FROM
+			A
+		GROUP BY month
+),pvz AS (
+select
+	COALESCE(SUM(rent_price),
+	0) rent
+from
+	wildberries_pvz where id IN {filter}
+),
+service AS (
+SELECT
+	date(date, 'start of month') month,
+	COALESCE(SUM(sum),
+	0) service
+FROM
+	wildberries_pvzoutcomes wp
+WHERE
+	wp.pvz_id IN {filter} and wp.date BETWEEN date('now', '+1 month', 'start of month', '-1 year') AND date('now', '+1 month', 'start of month', '-1 days')
+GROUP BY
+	month
+)
+SELECT
+	COALESCE(i.month, s.month) month,
+	i.income,
+	s.salary,
+	pvz.rent,
+	COALESCE(se.service, 0) service,
+	COALESCE(ROUND(i.income * 0.94 - IIF(s.salary IS NOT NULL, s.salary, 0) - pvz.rent - IIF(se.service IS NOT NULL, se.service, 0), 2), 0) profit
+FROM
+	incomes i LEFT JOIN salaries s ON s.month = i.month LEFT JOIN pvz LEFT JOIN service se ON se.month = i.month 
+'''
     return query

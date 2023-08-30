@@ -46,12 +46,12 @@ def wb_monitor(request):
         'filter_state': filter,
         'pvz_list': PVZ.objects.all(),
         'avg_period_length': settings.AVERAGE_PERIOD_LENGTH,
-        'profits': [float(value) for value in response['profits']],
-        'income': [float(value) for value in response['income']],
-        'salary': [float(value) for value in response['salary']],
-        'rent': [float(value) for value in response['rent']],
-        'service': [float(value) for value in response['service']],
-        'month_names': response['month_names'],
+        'profits': [float(value) for value in response.get('profits') if response.get('profits')],
+        'income': [float(value) for value in response.get('income') if response.get('income')],
+        'salary': [float(value) for value in response.get('salary') if response.get('salary')],
+        'rent': [float(value) for value in response.get('rent') if response.get('rent')],
+        'service': [float(value) for value in response.get('service') if response.get('service')],
+        'month_names': response.get('month_names'),
     }
     return render(request, 'wb/wb_monitor.html', context)
 

@@ -62,14 +62,14 @@ class TotalOutcomesSerializer(serializers.Serializer):
     category = serializers.CharField()
     outcome = serializers.DecimalField(max_digits=10, decimal_places=2)
 
-
-class MonthNamesSerializer(serializers.Serializer):
-    names = serializers.ListSerializer
-
+class TestSerializer(serializers.Serializer):
+    month = serializers.CharField()
+    total = serializers.IntegerField()
 
 class WBMonitorSerializer(serializers.Serializer):
     pvz_total = PVZTotalSerializer(many=True)
     month_results = MonthResultsSerializer()
+    # test = TestSerializer(many=True)
     month_names = serializers.ListSerializer(child=serializers.CharField())
     profits = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
     income = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
