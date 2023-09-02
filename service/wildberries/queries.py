@@ -997,7 +997,7 @@ def year_analitic_by_weeks(pvz_id):
             GROUP BY week
         )
         SELECT
-        	strftime('%d.%m', COALESCE(i.week, s.week), '-7 days') || ' - ' || strftime('%d.%m', COALESCE(i.week, s.week)) AS week,
+        	strftime('%d.%m', COALESCE(i.week, s.week)) || ' - ' || strftime('%d.%m', COALESCE(i.week, s.week), 'weekday 0') AS week,
             i.income,
             i.holded,
             s.salary,
