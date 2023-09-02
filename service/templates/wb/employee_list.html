@@ -23,6 +23,7 @@
                 <th>Ставка за смену</th>
                  <th>Сумма к удержанию</th>
                 <th>Дата трудоустройства</th>
+                <th>Статус</th>
                 </thead>
                 {% for line in object_list %}
                     <tr>
@@ -31,6 +32,11 @@
                         <td>{{ line.salary }}</td>
                         <td>{{ line.penalty }}</td>
                         <td>{{ line.date_of_start }}</td>
+                        {% if line.is_archived %}
+                             <td> ❌</td>
+                        {% else %}
+                             <td>✅</td>
+                        {% endif %}
                         <td><a href="{% url 'edit_employee' line.id %}" class="btn btn-outline-secondary btn-sm"> Edit </a></td>
                         <td><a href="{% url 'delete_employee' line.id %}" class="btn btn-outline-secondary btn-sm"> Del </a></td>
                     </tr>

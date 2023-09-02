@@ -25,6 +25,7 @@ class Employee(models.Model):
     date_of_start = models.DateField('Дата трудоустройства', null=True, blank=True)
     salary = models.FloatField('Ставка за смену', default=0)
     penalty = models.FloatField('Накопленный штраф', default=0)
+    is_archived = models.BooleanField('В архиве', default=False)
 
     def __str__(self):
         return self.name

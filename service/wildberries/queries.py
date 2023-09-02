@@ -215,7 +215,7 @@ week_employee_report = '''
         WHERE JULIANDAY(pp.date) BETWEEN JULIANDAY(:start_date) and JULIANDAY(:end_date) and pp.pvz_id_id = :pvz_id
         GROUP BY pp.employee_id_id 
     ) pp ON we.id = pp.employee_id_id LEFT JOIN sub ON we.id=sub.employee_id 
-    WHERE we.pvz_id_id = :pvz_id
+    WHERE we.pvz_id_id = :pvz_id AND (pp.total <> 0 or we.is_archived=False)
 '''
 
 weekly_pvz_outcomes = '''
