@@ -53,6 +53,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         Highcharts.chart('profits', {
+            chart: {
+            type: 'area',
+            inverted: false
+        },
             title: {
             text: 'Прибыль'
         },
@@ -78,25 +82,30 @@ document.addEventListener('DOMContentLoaded', function () {
             shared: true
         },
         plotOptions: {
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1,
+            marker: {
+                radius: 5,
+                lineColor: '#666666',
+                lineWidth: 1,
+                },
+            area: {
+                fillOpacity: 0.2,
             }
-        }
         },
         series: [{
             name: 'Прибыль',
             data: profits,
-            lineWidth: 3,
-            color: '#000000',
+            lineWidth: 1,
+            color: '#555555',
             dashStyle: 'longdash'
         }]
         })
 
 
         Highcharts.chart('salary', {
+            chart: {
+            type: 'area',
+            inverted: false
+        },
             title: {
             text: 'Зарплаты'
         },
@@ -122,18 +131,19 @@ document.addEventListener('DOMContentLoaded', function () {
             shared: true
         },
         plotOptions: {
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1,
+            marker: {
+                radius: 5,
+                lineColor: '#666666',
+                lineWidth: 1,
+            },
+            area: {
+                fillOpacity: 0.2
             }
-        }
         },
         series: [{
             name: 'ЗП',
             data: salary,
-            lineWidth: 3,
+            lineWidth: 1,
             color: '#000000',
             dashStyle: 'longdash'
         }]
@@ -141,6 +151,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         Highcharts.chart('income', {
+            chart: {
+            type: 'area',
+            inverted: false
+        },
             title: {
             text: 'Выплаты WB'
         },
@@ -166,18 +180,19 @@ document.addEventListener('DOMContentLoaded', function () {
             shared: true
         },
         plotOptions: {
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1,
+            marker: {
+                radius: 5,
+                lineColor: '#666666',
+                lineWidth: 1
+            },
+            area: {
+                fillOpacity: 0.2,
             }
-        }
         },
         series: [{
             name: 'Доход',
             data: income,
-            lineWidth: 3,
+            lineWidth: 1,
             color: '#000000',
             dashStyle: 'longdash'
         }]
@@ -185,6 +200,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         Highcharts.chart('holded', {
+            chart: {
+            type: 'area',
+            inverted: false
+        },
             title: {
             text: 'Удержания WB'
         },
@@ -210,18 +229,19 @@ document.addEventListener('DOMContentLoaded', function () {
             shared: true
         },
         plotOptions: {
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1,
+            marker: {
+                radius: 5,
+                lineColor: '#666666',
+                lineWidth: 1
+            },
+            area: {
+                fillOpacity: 0.2,
             }
-        }
         },
         series: [{
             name: 'Удержано',
             data: holded,
-            lineWidth: 3,
+            lineWidth: 1,
             color: '#000000',
             dashStyle: 'longdash'
         }]
