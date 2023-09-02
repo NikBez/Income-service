@@ -16,7 +16,7 @@ from .assets import dictfetchall, dictfetchone, update_employee_penalty
 from .forms import WBPaymentForm, PVZPaymentForm, EmployeeUpdateForm, OutcomeForm
 from .models import PVZ, Employee, WBPayment, PVZPaiment, Category, PVZOutcomes
 from .queries import month_total_by_pvz_query, week_total_by_pvz_query, week_employee_report, month_total_constructor, \
-    weekly_pvz_outcomes, year_analitic_constructor
+    weekly_pvz_outcomes, year_analitic_constructor, year_analitic_by_weeks
 from .serializers import WBMonitorSerializer, PVZMonitorSerializer
 
 
@@ -48,6 +48,7 @@ def wb_monitor(request):
         'avg_period_length': settings.AVERAGE_PERIOD_LENGTH,
         'profits': [float(value) for value in response.get('profits') if response.get('profits')],
         'income': [float(value) for value in response.get('income') if response.get('income')],
+        'holded': [float(value) for value in response.get('holded') if response.get('holded')],
         'salary': [float(value) for value in response.get('salary') if response.get('salary')],
         'rent': [float(value) for value in response.get('rent') if response.get('rent')],
         'service': [float(value) for value in response.get('service') if response.get('service')],
@@ -87,7 +88,15 @@ def pvz_monitor(request, pk):
         'cr_start_week': dateformat.format(datetime.strptime(start_week, '%Y-%m-%d').date(), 'd-m-Y'),
         'cr_end_week': dateformat.format(datetime.strptime(end_week, '%Y-%m-%d').date(), 'd-m-Y'),
         'avg_period_length': settings.AVERAGE_PERIOD_LENGTH,
-        'pvz_id': pk
+        'pvz_id': pk,
+
+        'profits': [float(value) for value in response.get('profits') if response.get('profits')],
+        'income': [float(value) for value in response.get('income') if response.get('income')],
+        'holded': [float(value) for value in response.get('holded') if response.get('holded')],
+        'salary': [float(value) for value in response.get('salary') if response.get('salary')],
+        'rent': [float(value) for value in response.get('rent') if response.get('rent')],
+        'service': [float(value) for value in response.get('service') if response.get('service')],
+        'week_titles': response.get('week_titles'),
     }
     return render(request, 'wb/pvz_monitor.html', context)
 
@@ -120,6 +129,7 @@ class GetWBAnalitic(APIView):
         month_names = []
         profits = []
         income = []
+        holded = []
         salary = []
         rent = []
         service = []
@@ -129,6 +139,7 @@ class GetWBAnalitic(APIView):
             month_names.append(month_name)
             profits.append(month.get('profit', 0))
             income.append(month.get('income', 0))
+            holded.append(month.get('holded', 0))
             salary.append(month.get('salary', 0))
             rent.append(month.get('rent', 0))
             service.append(month.get('service', 0))
@@ -140,6 +151,7 @@ class GetWBAnalitic(APIView):
             'month_names': month_names,
             'profits': profits,
             'income': income,
+            'holded': holded,
             'salary': salary,
             'rent': rent,
             'service': service,
@@ -158,6 +170,8 @@ class GetPVZAnalitic(APIView):
         start_date = datetime.strptime(start_date, '%Y-%m-%d')
         end_date = datetime.strptime(end_date, '%Y-%m-%d')
 
+        year_analitic_query = year_analitic_by_weeks(pvz_id)
+
         with connection.cursor() as cursor:
             cursor.execute(week_total_by_pvz_query, {'start_date': start_date, 'end_date': end_date, 'pvz_id': pvz_id})
             pvz_total = dictfetchone(cursor)
@@ -168,6 +182,26 @@ class GetPVZAnalitic(APIView):
             cursor.execute(weekly_pvz_outcomes, {'start_date': start_date, 'end_date': end_date, 'pvz_id': pvz_id})
             total_outcomes = dictfetchall(cursor)
 
+            cursor.execute(year_analitic_query)
+            year_results = dictfetchall(cursor)
+
+        week_titles = []
+        profits = []
+        income = []
+        holded = []
+        salary = []
+        rent = []
+        service = []
+
+        for week in year_results:
+            week_titles.append(week.get('week'))
+            profits.append(week.get('profit', 0))
+            income.append(week.get('income', 0))
+            holded.append(week.get('holded', 0))
+            salary.append(week.get('salary', 0))
+            rent.append(week.get('rent', 0))
+            service.append(week.get('service', 0))
+
         pvz_outcomes = PVZOutcomes.objects.filter(
             Q(pvz=pvz_id) & Q(date__gte=start_date) & Q(date__lte=end_date)).values('pk', 'date', 'sum', 'category__title',
                                                                                     'description').order_by('-sum')
@@ -176,6 +210,14 @@ class GetPVZAnalitic(APIView):
             'employees': employees,
             'pvz_outcomes': pvz_outcomes,
             'total_outcomes': total_outcomes,
+
+            'week_titles': week_titles,
+            'profits': profits,
+            'income': income,
+            'holded': holded,
+            'salary': salary,
+            'rent': rent,
+            'service': service,
         })
         return Response(serializer.data)
 

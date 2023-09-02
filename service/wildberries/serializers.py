@@ -62,17 +62,19 @@ class TotalOutcomesSerializer(serializers.Serializer):
     category = serializers.CharField()
     outcome = serializers.DecimalField(max_digits=10, decimal_places=2)
 
+
 class TestSerializer(serializers.Serializer):
     month = serializers.CharField()
     total = serializers.IntegerField()
 
+
 class WBMonitorSerializer(serializers.Serializer):
     pvz_total = PVZTotalSerializer(many=True)
     month_results = MonthResultsSerializer()
-    # test = TestSerializer(many=True)
     month_names = serializers.ListSerializer(child=serializers.CharField())
     profits = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
     income = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
+    holded = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
     salary = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
     rent = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
     service = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
@@ -83,3 +85,10 @@ class PVZMonitorSerializer(serializers.Serializer):
     employees = WeekEmployeeSerializer(many=True)
     pvz_outcomes = PVZOutcomesSerializer(many=True)
     total_outcomes = TotalOutcomesSerializer(many=True)
+    week_titles = serializers.ListSerializer(child=serializers.CharField())
+    profits = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
+    income = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
+    holded = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
+    salary = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
+    rent = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))
+    service = serializers.ListSerializer(child=serializers.DecimalField(max_digits=10, decimal_places=2))

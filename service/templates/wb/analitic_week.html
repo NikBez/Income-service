@@ -6,7 +6,7 @@
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
 <div class="container analitic">
-    <div class="row mt-5">
+    <div class="row">
         <h5>Динамика доходов</h5>
 
         <div class="col-6">
@@ -49,7 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var holded = {{ holded | safe }}
         var rent = {{ rent | safe }}
         var service = {{ service | safe }}
-        var month_names = {{ month_names | safe }}
+        var week_titles = {{ week_titles | safe }}
+
 
         Highcharts.chart('profits', {
             title: {
@@ -57,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
 
         xAxis: {
-            categories: month_names,
+            categories: week_titles,
         },
 
         yAxis: {
@@ -101,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
 
         xAxis: {
-            categories: month_names,
+            categories: week_titles,
         },
 
         yAxis: {
@@ -145,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
 
         xAxis: {
-            categories: month_names,
+            categories: week_titles,
         },
 
         yAxis: {
@@ -189,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
 
         xAxis: {
-            categories: month_names,
+            categories: week_titles,
         },
 
         yAxis: {
