@@ -12,9 +12,9 @@ from django.views.generic import ListView, UpdateView, DeleteView, CreateView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .assets import dictfetchall, dictfetchone, update_employee_penalty
-from .forms import WBPaymentForm, PVZPaymentForm, EmployeeUpdateForm, OutcomeForm
-from .models import PVZ, Employee, WBPayment, PVZPaiment, Category, PVZOutcomes
+from .assets import dictfetchall, dictfetchone, update_employee_penalty, translate_month_titles
+from .forms import WBPaymentForm, PVZPaymentForm, EmployeeUpdateForm, OutcomeForm, WalletCreateForm, WalletUpdateForm
+from .models import PVZ, Employee, WBPayment, PVZPaiment, Category, PVZOutcomes, Wallet, WalletTransaction
 from .queries import month_total_by_pvz_query, week_total_by_pvz_query, week_employee_report, month_total_constructor, \
     weekly_pvz_outcomes, year_analitic_constructor, year_analitic_by_weeks
 from .serializers import WBMonitorSerializer, PVZMonitorSerializer
@@ -38,6 +38,8 @@ def wb_monitor(request):
     response.raise_for_status()
     response = response.json()
 
+    translated_month_titles = translate_month_titles(response.get('month_names'))
+
     context = {
         'static_data': response,
         'next_month': dateformat.format(request_date + relativedelta(months=1), 'Y-m-d'),
@@ -45,6 +47,7 @@ def wb_monitor(request):
         'current_month': request_date,
         'filter_state': filter,
         'pvz_list': PVZ.objects.all(),
+        'wallets': Wallet.objects.filter(user=request.user.id),
         'avg_period_length': settings.AVERAGE_PERIOD_LENGTH,
         'profits': [float(value) for value in response.get('profits') if response.get('profits')],
         'income': [float(value) for value in response.get('income') if response.get('income')],
@@ -52,7 +55,7 @@ def wb_monitor(request):
         'salary': [float(value) for value in response.get('salary') if response.get('salary')],
         'rent': [float(value) for value in response.get('rent') if response.get('rent')],
         'service': [float(value) for value in response.get('service') if response.get('service')],
-        'month_names': response.get('month_names'),
+        'month_names': translated_month_titles,
     }
     return render(request, 'wb/wb_monitor.html', context)
 
@@ -144,7 +147,6 @@ class GetWBAnalitic(APIView):
             rent.append(month.get('rent', 0))
             service.append(month.get('service', 0))
 
-
         serializer = WBMonitorSerializer({
             'pvz_total': pvz_total,
             'month_results': month_results,
@@ -203,7 +205,8 @@ class GetPVZAnalitic(APIView):
             service.append(week.get('service', 0))
 
         pvz_outcomes = PVZOutcomes.objects.filter(
-            Q(pvz=pvz_id) & Q(date__gte=start_date) & Q(date__lte=end_date)).values('pk', 'date', 'sum', 'category__title',
+            Q(pvz=pvz_id) & Q(date__gte=start_date) & Q(date__lte=end_date)).values('pk', 'date', 'sum',
+                                                                                    'category__title',
                                                                                     'description').order_by('-sum')
         serializer = PVZMonitorSerializer({
             'pvz_total': pvz_total,
@@ -271,7 +274,8 @@ class PVZPaimentUpdate(UpdateView):
         start_week = self.kwargs.get('start_week')
         end_week = self.kwargs.get('end_week')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week, 'doc_id': 0})
+                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week,
+                                    'doc_id': 0})
 
     def get_initial(self):
         initial = super().get_initial()
@@ -320,7 +324,8 @@ class PVZPaimentDelete(DeleteView):
         start_week = self.kwargs.get('start_week')
         end_week = self.kwargs.get('end_week')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week, 'doc_id': 0})
+                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week,
+                                    'doc_id': 0})
 
 
 class PVZPaimentCreate(CreateView):
@@ -368,7 +373,8 @@ class PVZPaimentCreate(CreateView):
         start_week = self.kwargs.get('cr_start_week')
         end_week = self.kwargs.get('cr_end_week')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week, 'doc_id': 0})
+                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week,
+                                    'doc_id': 0})
 
 
 class WBPaymentList(ListView):
@@ -559,7 +565,6 @@ class OutcomeUpdate(UpdateView):
         return reverse_lazy('pvz_monitor', kwargs={'pk': pvz_id})
 
 
-
 class OutcomeDelete(DeleteView):
     model = PVZOutcomes
     template_name = 'wb/outcome_delete.html'
@@ -568,7 +573,6 @@ class OutcomeDelete(DeleteView):
         context = super().get_context_data(**kwargs)
         context['pvz_id'] = self.kwargs.get('pvz_id')
         return context
-
 
     def get_success_url(self):
         pvz_id = self.kwargs.get('pvz_id')
@@ -597,5 +601,81 @@ class CategoryUpdate(UpdateView):
 
 class CategoryDelete(DeleteView):
     model = Category
+    template_name = 'wb/category_delete.html'
+    success_url = reverse_lazy('list_categories')
+
+
+class WalletList(ListView):
+    model = Wallet
+    template_name = 'wb/wallet_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user_id = int(self.kwargs.get('user_id'))
+        queryset = queryset.filter(user=user_id)
+        return queryset
+
+
+class WalletCreate(CreateView):
+    model = Wallet
+    template_name = 'wb/wallet_create.html'
+    form_class = WalletCreateForm
+
+    def get_success_url(self):
+        return reverse_lazy('list_wallets', kwargs={'user_id': self.request.user.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        has_salary_wallet = Wallet.objects.filter(user=self.request.user, for_salary=True)
+        context['has_salary_wallet'] = has_salary_wallet.exists()
+        return context
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        instance.user = self.request.user
+        instance.save()
+        return super().form_valid(form)
+
+
+class WalletUpdate(UpdateView):
+    model = Wallet
+    template_name = 'wb/wallet_edit.html'
+    form_class = WalletUpdateForm
+
+    def get_success_url(self):
+        return reverse_lazy('list_wallets', kwargs={'user_id': self.request.user.id})
+
+
+class WalletDelete(DeleteView):
+    model = Wallet
+    template_name = 'wb/wallet_delete.html'
+
+    def get_success_url(self):
+        return reverse_lazy('list_wallets', kwargs={'user_id': self.request.user.id})
+
+
+class WalletTransactionsList(ListView):
+    model = WalletTransaction
+    template_name = 'wb/category_list.html'
+    paginate_by = 10
+
+
+class WalletTransactionCreate(CreateView):
+    model = WalletTransaction
+    template_name = 'wb/category_create.html'
+    success_url = reverse_lazy('list_categories')
+    fields = '__all__'
+
+
+class WalletTransactionUpdate(UpdateView):
+    model = WalletTransaction
+    template_name = 'wb/category_edit.html'
+    success_url = reverse_lazy('list_categories')
+    fields = '__all__'
+
+
+class WalletTransactionDelete(DeleteView):
+    model = WalletTransaction
     template_name = 'wb/category_delete.html'
     success_url = reverse_lazy('list_categories')

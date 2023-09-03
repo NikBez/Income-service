@@ -1,7 +1,9 @@
 import datetime
 
+from django.contrib.auth.models import User
 from django.db import models
-
+from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 
 
 class PVZ(models.Model):
@@ -93,7 +95,6 @@ class PVZPaiment(models.Model):
     total = models.IntegerField('Итого к выплате', null=False, default=0)
     is_closed = models.BooleanField('Оплачен', default=False)
 
-
     def __str__(self):
         formatted_date = self.date.strftime("%d-%m-%Y")
 
@@ -123,3 +124,39 @@ class PVZOutcomes(models.Model):
 
     def __str__(self):
         return f'Расход на: {self.sum}, ПВЗ {self.pvz}'
+
+
+class Wallet(models.Model):
+    title = models.CharField('Название счета', max_length=100)
+    balance = models.DecimalField('Текущий баланс', max_digits=10, decimal_places=2, default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wallets', verbose_name='Пользователь')
+    is_archived = models.BooleanField('В архиве', default=False)
+    for_salary = models.BooleanField('Зарплатный', default=False)
+    created_at = models.DateTimeField('Дата создания', auto_now_add=datetime.datetime.utcnow)
+
+    def save(self, *args, **kwargs):
+        if self.for_salary:
+            current_user = self.user_id
+            existing_salary_wallets = Wallet.objects.filter(user=current_user, for_salary=True).exclude(pk=self.pk)
+            if existing_salary_wallets.exists():
+                raise ValueError('У вас уже есть зарплатные счета.')
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.title} Баланс: {self.balance}'
+
+
+class WalletTransaction(models.Model):
+    class TransactionType(models.TextChoices):
+        INCOME = 'IN', _('Поступление')
+        OUTCOME = 'OUT', _('Списание')
+
+    operation_date = models.DateTimeField('Дата операции', default=datetime.datetime.utcnow)
+    wallet_id = models.ForeignKey(Wallet, on_delete=models.CASCADE, verbose_name='Счет', related_name='transactions')
+    transaction_type = models.CharField('Тип операции', max_length=20, choices=TransactionType.choices)
+    transaction_sum = models.DecimalField('Сумма', max_digits=10, decimal_places=2)
+    description = models.TextField('Описание', null=True)
+    last_modified = models.DateTimeField('Дата создания', auto_now=datetime.datetime.utcnow)
+
+    def __str__(self):
+        return f'Операция от {self.operation_date} по счету {self.wallet_id} на сумму {self.transaction_sum}'

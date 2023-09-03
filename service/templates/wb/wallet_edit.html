@@ -1,0 +1,52 @@
+{% extends 'wb/index.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block body %}
+   <div class="container mt-5">
+        <div class="row my-2">
+            <div class="col">
+             <h3>Редактирование счета:</h3>
+              <form method="post">
+                {% csrf_token %}
+                  <div class="row mt-5">
+                      <div class="col">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text"> {{ form.title.label_tag }}</span>
+                                {{ form.title }}
+                            </div>
+                      </div>
+                       <div class="col">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text"> {{ form.balance.label_tag }}</span>
+                                {{ form.balance }} <span class="input-group-text">₽</span>
+                            </div>
+                      </div>
+                  </div>
+
+                <div class="row mb-5">
+                  <div class="col-2 align-self-center text-center ">
+                      <div class="form-check form-switch checkbox-lg">
+                          <label class="form-check-label" for="for_salary">Зарплатный</label>
+                          <input class="form-check-input" type="checkbox" id="for_salary" name="for_salary" {% if form.for_salary.value %}checked{% endif %}>
+                    </div>
+                  </div>
+
+                  <div class="col-2 align-self-center text-center ">
+                      <div class="form-check form-switch checkbox-lg">
+                          <label class="form-check-label" for="is_archived">В архиве</label>
+                          <input class="form-check-input" type="checkbox" id="is_archived" name="is_archived" {% if form.is_archived.value %}checked{% endif %}>
+                      </div>
+                  </div>
+
+                   <div class="col-8">
+                       <div class="d-grid">
+                        <button type="submit" class="btn btn-secondary btn-lg btn-block">Записать</button>
+                           </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+        </div>
+  </div>
+{% endblock %}

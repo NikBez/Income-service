@@ -32,7 +32,7 @@
             <div class="col">
                 <div class="col-md">
                     <div class="card text-center mb-3" id="wb-card0">
-                        <h5 class="card-title">Поступление от WB</h5>
+                        <h5 class="card-title">Поступило от WB</h5>
                         <div class="card-body">
                             <h3 class="card-title">{{ static_data.month_results.income |default:"0" | floatformat:"g" }} ₽</h3>
                         </div>
@@ -89,20 +89,21 @@
         <div class="col">
             <div class="col-md">
                 <div class="card text-center mb-3" id='wb-card2'>
-                    <h5 class="card-title">Прибыль</h5>
+                    <h5 class="card-title">Чистая прибыль</h5>
                     <div class="card-body">
                         <h3 class="card-title">{{ static_data.month_results.profit |default:"0" | floatformat:"g" }} ₽</h3>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
      </div>
 
-    <div class="row ">
-        <h5>Пункты выдачи</h5>
-        <div class="col md-5">
+    <div class="row mt-5">
+        <div class="col-6">
+            <div class="row mb-5">
+                <div class="col md-5">
+            <h5>Пункты выдачи</h5>
             <div class="card card-body">
                 <table class="table table-sm">
                     <tr>
@@ -111,7 +112,7 @@
                          <th>Коробки</th>
                         <th>Начислено</th>
                         <th>Удержано</th>
-                         <th>Партнерская выплата</th>
+                         <th>Выплата</th>
                     </tr>
                     {% for pvz in static_data.pvz_total %}
                         <tr>
@@ -127,10 +128,42 @@
 
             </div>
         </div>
+            </div>
+            <div class="row mb-5">
+                <div class="col md-5">
+            <h5>Счета</h5>
+            <div class="card card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <th>Название</th>
+                        <th>Баланс</th>
+                         <th></th>
+                    </tr>
+                    {% for wallet in wallets %}
+                        <tr>
+                            <td>{{wallet.title}}</td>
+                            <td>{{wallet.balance | floatformat:"g" }}₽</td>
+                            <td class="text-end">
+                                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                                    <a href="" type="button" class="btn btn-outline-secondary btn-sm"> + </a>
+                                    <a href="" type="button" class="btn btn-outline-secondary btn-sm"> - </a>
+                                    <a href="" type="button" class="btn btn-outline-secondary btn-sm">История операций</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+            </div>
+        </div>
+            </div>
+        </div>
+        <div class="col-6">
+            {% include 'wb/analitic_test.html' %}
+        </div>
     </div>
 </div>
 
-{% include 'wb/analitic.html' %}
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {

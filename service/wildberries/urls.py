@@ -4,8 +4,10 @@ from .views import (wb_monitor, GetWBAnalitic, PVZCreate, PVZList, PVZDelete, PV
                     EmployeeCreate, EmployeeDelete, EmployeeUpdate, EmployeeList,
                     WBPaymentCreate, WBPaymentDelete, WBPaymentUpdate, WBPaymentList,
                     PVZPaimentCreate, PVZPaimentDelete, PVZPaimentUpdate, PVZPaimentList, GetPVZAnalitic, pvz_monitor,
-                    OutcomeList, OutcomeUpdate, OutcomeDelete, OutcomeCreate, CategoryList, CategoryUpdate, CategoryDelete,
-                    CategoryCreate
+                    OutcomeList, OutcomeUpdate, OutcomeDelete, OutcomeCreate, CategoryList, CategoryUpdate,
+                    CategoryDelete,
+                    CategoryCreate, WalletList, WalletUpdate, WalletDelete, WalletCreate, WalletTransactionsList,
+                    WalletTransactionUpdate, WalletTransactionDelete, WalletTransactionCreate
                     )
 
 urlpatterns = [
@@ -50,4 +52,14 @@ urlpatterns = [
     path('categorie/<int:pk>/edit/', CategoryUpdate.as_view(), name='edit_category'),
     path('categorie/<int:pk>/delete/', CategoryDelete.as_view(), name='delete_category'),
     path('categorie/create/', CategoryCreate.as_view(), name='create_category'),
+
+    path('<int:user_id>/wallets/', WalletList.as_view(), name='list_wallets'),
+    path('wallet/<int:pk>/edit/', WalletUpdate.as_view(), name='edit_wallet'),
+    path('wallet/<int:pk>/delete/', WalletDelete.as_view(), name='delete_wallet'),
+    path('wallet/create/', WalletCreate.as_view(), name='create_wallet'),
+
+    path('<int:user_id>/wallet-transactions/', WalletTransactionsList.as_view(), name='list_wallet_transactions'),
+    path('wallet-transaction/<int:pk>/edit/', WalletTransactionUpdate.as_view(), name='edit_wallet_transaction'),
+    path('wallet-transaction/<int:pk>/delete/', WalletTransactionDelete.as_view(), name='delete_wallet_transaction'),
+    path('wallet-transaction/create/', WalletTransactionCreate.as_view(), name='create_wallet_transaction'),
 ]

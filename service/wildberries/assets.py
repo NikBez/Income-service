@@ -29,3 +29,26 @@ def update_employee_penalty(employee, to_add, to_surcharge, create=True):
         employee.penalty -= float(to_add) + float(to_surcharge)
     employee.save()
 
+def translate_month_titles(month_list):
+
+    if not month_list:
+        return month_list
+
+    russin_titles = {
+        'January': 'Январь',
+        'February': 'Февраль',
+        'March': 'Март',
+        'January': 'Апрель',
+        'May': 'Май',
+        'June': 'Июнь',
+        'July': 'Июль',
+        'August': 'Август',
+        'September': 'Сентябрь',
+        'October': 'Октябрь',
+        'November': 'Ноябрь',
+        'December': 'Декабрь',
+    }
+
+    return [russin_titles[month] for month in month_list]
+
+

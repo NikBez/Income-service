@@ -1,0 +1,96 @@
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/series-label.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<div class="container analitic">
+    <div class="row">
+        <h5>Динамика</h5>
+        <div class="col">
+             <figure class="highcharts-figure">
+            <div class="col" id="merged-report"></div>
+            </figure>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+document.addEventListener('DOMContentLoaded', function () {
+        var profits = {{ profits | safe }}
+        var income = {{ income | safe }}
+        var salary = {{ salary | safe }}
+        var holded = {{ holded | safe }}
+        var rent = {{ rent | safe }}
+        var service = {{ service | safe }}
+        var month_names = {{ month_names | safe }}
+
+        Highcharts.chart('merged-report', {
+
+            title: {
+            text: ''
+        },
+
+        xAxis: {
+            categories: month_names,
+        },
+
+        yAxis: {
+            title: {
+                text: 'Сумма (руб.)'
+        },
+        labels: {
+            format: '{value}'
+        }
+        },
+
+        legend: {
+
+            borderWidth: 0,
+            backgroundColor:
+                Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
+        },
+        tooltip: {
+            shared: false,
+            pointFormat: '&#8226; {series.name}: <b>{point.y} р.</b>'
+        },
+
+        plotOptions: {
+            area: {
+                fillOpacity: 0.1
+            }
+        },
+        series: [{
+            name: 'Поступления от WB',
+            data: income,
+            lineWidth: 3,
+            color: '#a8c4dc',
+            fillColor: '#a8c4dc',
+        },
+        {
+            name: 'Прибыль',
+            data: profits,
+            lineWidth: 3,
+            color: '#ced9d9',
+            fillColor: '#ced9d9'
+        },
+        {
+            name: 'ЗП',
+            data: salary,
+            lineWidth: 3,
+             color: '#cfcad5',
+            fillColor: '#cfcad5',
+        },
+        {
+            name: 'Удержано',
+            data: holded,
+            lineWidth: 3,
+             color: '#dca8a8',
+            fillColor: '#dca8a8'
+        }]
+        })
+});
+</script>

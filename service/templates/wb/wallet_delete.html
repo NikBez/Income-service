@@ -1,0 +1,19 @@
+{% extends 'wb/index.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block body %}
+  <div class="container mt-5">
+        <div class="row my-2">
+            <div class="col">
+              <h5>Удаляем счет "{{ object }}"</h5>
+              <p>Уверены что хотите удалить этот счет?</p>
+              <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="mt-4 btn btn-outline-secondary btn-lg">Да, удалить</button>
+                <a class="mt-4 btn btn-outline-secondary btn-lg" href="{% url 'list_wallets' object.user.pk %}">Отменить</a>
+              </form>
+            </div>
+        </div>
+  </div>
+{% endblock %}

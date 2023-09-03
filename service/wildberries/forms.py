@@ -1,5 +1,5 @@
 from django import forms
-from .models import PVZ, WBPayment, PVZPaiment, Employee, PVZOutcomes
+from .models import PVZ, WBPayment, PVZPaiment, Employee, PVZOutcomes, Wallet
 
 import calculation
 
@@ -89,3 +89,25 @@ class OutcomeForm(forms.ModelForm):
 
     pvz = forms.ModelChoiceField(queryset=PVZ.objects.all(), label='ПВЗ', widget=forms.HiddenInput(
         attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+
+class WalletCreateForm(forms.ModelForm):
+    class Meta:
+        model = Wallet
+        fields = ('title', 'balance', 'for_salary')
+
+    title = forms.CharField(label='Название', widget=forms.TextInput(attrs={'type': 'text', 'class': 'form-control form-control-lg', 'placeholder': 'Название', 'aria-label': 'Название'}))
+    balance = forms.DecimalField(label='Начальный остаток', max_digits=10, decimal_places=2, required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0, 'aria-label': '100000'}))
+    for_salary = forms.BooleanField(label='Зарплатный', disabled=True,  required=False, widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
+
+
+class WalletUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Wallet
+        fields = ('title', 'balance', 'for_salary', 'is_archived')
+
+    title = forms.CharField(label='Название', widget=forms.TextInput(attrs={'type': 'text', 'class': 'form-control form-control-lg', 'placeholder': 'Название', 'aria-label': 'Название'}))
+    balance = forms.DecimalField(label='Текущий баланс', max_digits=10, decimal_places=2, disabled=True, required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0, 'aria-label': '100000'}))
+    for_salary = forms.BooleanField(label='Зарплатный',  required=False, widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
+    is_archived = forms.BooleanField(label='В архиве', required=False, widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))

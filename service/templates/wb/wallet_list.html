@@ -1,0 +1,68 @@
+{% extends 'wb/index.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block body %}
+
+    <div class="container mt-5">
+         <div class="row">
+             <div class="col-5 text-start mb-3">
+                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                    <a class="btn btn-outline-dark btn-sm btn-block" href="{% url 'wb_monitor' %}">Назад</a>
+                </div>
+                 <a class="btn btn-outline-dark btn-sm btn-block" href="{% url 'create_wallet' %}">Добавить новый счет</a>
+            </div>
+            <div class="col-7">
+                <h5>Список счетов:</h5>
+            </div>
+        </div>
+
+        <!--Список записей-->
+        <div class="row my-2">
+            <table class="table table-hover">
+                <thead>
+                <th>Название</th>
+                <th>Баланс</th>
+                <th>Зарплатный</th>
+                <th>В архиве</th>
+                <th></th>
+                <th></th>
+                </thead>
+                {% for line in object_list %}
+                    <tr>
+                        <td>{{ line.title }}</td>
+                        <td>{{ line.balance }}</td>
+                        {% if line.for_salary %}
+                             <td> ✅</td>
+                        {% else %}
+                             <td>-</td>
+                        {% endif %}
+
+                        {% if line.is_archived %}
+                             <td> ✅</td>
+                        {% else %}
+                             <td>-</td>
+                        {% endif %}
+                        <td class="text-end"><a href="{% url 'edit_wallet' line.id %}" class="btn btn-outline-secondary btn-sm"> Редактировать </a></td>
+                        <td class="text-end"><a href="{% url 'delete_wallet' line.id %}" class="btn btn-outline-secondary btn-sm"> Удалить </a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+    <!--Пагинация-->
+        <div class="pagination mb-4 justify-content-md-center">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="btn btn-light btn-sm">&laquo; Первая</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-light btn-sm">&lsaquo; Предыдущая</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-light btn-sm">Следующая &rsaquo;</a>
+                    <a href="?page={{ paginator.num_pages }}" class="btn btn-light btn-sm">Последняя &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+{% endblock %}
