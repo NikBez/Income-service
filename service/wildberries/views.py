@@ -627,7 +627,7 @@ class WalletCreate(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        has_salary_wallet = Wallet.objects.filter(user=self.request.user, for_salary=True)
+        has_salary_wallet = Wallet.objects.filter(user=self.request.user, is_archived=False, for_salary=True)
         context['has_salary_wallet'] = has_salary_wallet.exists()
         return context
 
@@ -642,6 +642,12 @@ class WalletUpdate(UpdateView):
     model = Wallet
     template_name = 'wb/wallet_edit.html'
     form_class = WalletUpdateForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        has_salary_wallet = Wallet.objects.filter(user=self.request.user, is_archived=False, for_salary=True).exclude(pk=self.object.pk)
+        context['has_salary_wallet'] = has_salary_wallet.exists()
+        return context
 
     def get_success_url(self):
         return reverse_lazy('list_wallets', kwargs={'user_id': self.request.user.id})

@@ -28,7 +28,7 @@
                   <div class="col-2 align-self-center text-center ">
                       <div class="form-check form-switch checkbox-lg">
                           <label class="form-check-label" for="for_salary">Зарплатный</label>
-                          <input class="form-check-input" type="checkbox" id="for_salary" name="for_salary" {% if form.for_salary.value %}checked{% endif %}>
+                          <input class="form-check-input" type="checkbox" id="for_salary" name="for_salary" {% if form.for_salary.value %}checked{% endif %} {% if has_salary_wallet %}disabled{% endif %}>
                     </div>
                   </div>
 

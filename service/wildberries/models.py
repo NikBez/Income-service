@@ -137,7 +137,7 @@ class Wallet(models.Model):
     def save(self, *args, **kwargs):
         if self.for_salary:
             current_user = self.user_id
-            existing_salary_wallets = Wallet.objects.filter(user=current_user, for_salary=True).exclude(pk=self.pk)
+            existing_salary_wallets = Wallet.objects.filter(user=current_user, is_archived=False, for_salary=True).exclude(pk=self.pk)
             if existing_salary_wallets.exists():
                 raise ValueError('У вас уже есть зарплатные счета.')
         super().save(*args, **kwargs)

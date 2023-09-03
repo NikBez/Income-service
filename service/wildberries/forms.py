@@ -98,8 +98,7 @@ class WalletCreateForm(forms.ModelForm):
     title = forms.CharField(label='Название', widget=forms.TextInput(attrs={'type': 'text', 'class': 'form-control form-control-lg', 'placeholder': 'Название', 'aria-label': 'Название'}))
     balance = forms.DecimalField(label='Начальный остаток', max_digits=10, decimal_places=2, required=False, widget=forms.NumberInput(
         attrs={'class': 'form-select  form-select-lg', 'value': 0, 'aria-label': '100000'}))
-    for_salary = forms.BooleanField(label='Зарплатный', disabled=True,  required=False, widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
-
+    for_salary = forms.BooleanField(label='Зарплатный', required=False, widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox', 'id': 'for_salary'}))
 
 class WalletUpdateForm(forms.ModelForm):
     class Meta:

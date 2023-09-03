@@ -30,7 +30,11 @@
                 </thead>
                 {% for line in object_list %}
                     <tr>
+                        {% if line.is_archived %}
+                        <td  class="text-muted"><del>{{ line.title }}</del></td>
+                        {% else %}
                         <td>{{ line.title }}</td>
+                        {% endif %}
                         <td>{{ line.balance }}</td>
                         {% if line.for_salary %}
                              <td> ✅</td>
