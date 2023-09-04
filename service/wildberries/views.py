@@ -612,8 +612,7 @@ class WalletList(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        user_id = int(self.kwargs.get('user_id'))
-        queryset = queryset.filter(user=user_id)
+        queryset = queryset.filter(user=self.request.user.id)
         return queryset
 
 
@@ -623,7 +622,7 @@ class WalletCreate(CreateView):
     form_class = WalletCreateForm
 
     def get_success_url(self):
-        return reverse_lazy('list_wallets', kwargs={'user_id': self.request.user.id})
+        return reverse_lazy('list_wallets')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -650,7 +649,7 @@ class WalletUpdate(UpdateView):
         return context
 
     def get_success_url(self):
-        return reverse_lazy('list_wallets', kwargs={'user_id': self.request.user.id})
+        return reverse_lazy('list_wallets')
 
 
 class WalletDelete(DeleteView):
@@ -658,30 +657,39 @@ class WalletDelete(DeleteView):
     template_name = 'wb/wallet_delete.html'
 
     def get_success_url(self):
-        return reverse_lazy('list_wallets', kwargs={'user_id': self.request.user.id})
+        return reverse_lazy('list_wallets')
 
 
 class WalletTransactionsList(ListView):
     model = WalletTransaction
-    template_name = 'wb/category_list.html'
+    template_name = 'wb/wallet_transaction_list.html'
     paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        wallet_id = self.kwargs.get('wallet_id')
+        if wallet_id:
+            queryset = queryset.filter(wallet_id=int(wallet_id))
+        else:
+            queryset = queryset.filter(wallet_id__user=self.request.user.id)
+        return queryset
 
 
 class WalletTransactionCreate(CreateView):
     model = WalletTransaction
-    template_name = 'wb/category_create.html'
+    template_name = 'wb/wallet_transaction_create.html'
     success_url = reverse_lazy('list_categories')
     fields = '__all__'
 
 
 class WalletTransactionUpdate(UpdateView):
     model = WalletTransaction
-    template_name = 'wb/category_edit.html'
+    template_name = 'wb/wallet_transaction_edit.html'
     success_url = reverse_lazy('list_categories')
     fields = '__all__'
 
 
 class WalletTransactionDelete(DeleteView):
     model = WalletTransaction
-    template_name = 'wb/category_delete.html'
+    template_name = 'wb/wallet_transaction_delete.html'
     success_url = reverse_lazy('list_categories')

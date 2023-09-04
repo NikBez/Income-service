@@ -157,6 +157,7 @@ class WalletTransaction(models.Model):
     transaction_sum = models.DecimalField('Сумма', max_digits=10, decimal_places=2)
     description = models.TextField('Описание', null=True)
     last_modified = models.DateTimeField('Дата создания', auto_now=datetime.datetime.utcnow)
+    source = models.ForeignKey(PVZPaiment, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Основание', related_name='transactions')
 
     def __str__(self):
         return f'Операция от {self.operation_date} по счету {self.wallet_id} на сумму {self.transaction_sum}'

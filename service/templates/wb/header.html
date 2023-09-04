@@ -19,8 +19,8 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Дополнительно</a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><a class="dropdown-item" href="{% url 'list_wallets' user.pk %}">Счета</a></li>
-                    <li><a class="dropdown-item" href="#">Операции по счетам</a></li>
+                    <li><a class="dropdown-item" href="{% url 'list_wallets' %}">Счета</a></li>
+                    <li><a class="dropdown-item" href="{% url 'list_wallet_transactions' %}">Операции по счетам</a></li>
                     <li><a class="dropdown-item" href="#">Категории расходов</a></li>
                   </ul>
             </li>
