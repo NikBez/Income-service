@@ -26,17 +26,33 @@
                 <th>Сумма</th>
                 <th>Расшифровка</th>
                 <th>Основание</th>
+                <th></th>
+                 <th></th>
                 </thead>
                 {% for line in object_list %}
                     <tr>
                         <td>{{ line.operation_date }}</td>
-                        <td>{{ line.transaction_type }}</td>
-                         <td>{{ line.wallet_id }}</td>
+                        {% if line.transaction_type == 'IN' %}
+                            <td>👆</td>
+                        {% elif line.transaction_type == 'OUT' %}
+                              <td>👇</td>
+                        {% endif %}
+                         <td>{{ line.wallet_id.title }}</td>
                          <td>{{ line.transaction_sum }}</td>
-                         <td>{{ line.description }}</td>
-                         <td>{{ line.source }}</td>
-                        <td class="text-end"><a href="{% url 'edit_wallet_transaction' line.id %}" class="btn btn-outline-secondary btn-sm"> Редактировать </a></td>
-                        <td class="text-end"><a href="{% url 'delete_wallet_transaction' line.id %}" class="btn btn-outline-secondary btn-sm"> Удалить </a></td>
+                         <td>{{ line.description | default:"-" }}</td>
+                        {% if line.object_id %}
+                             <td><a href="{% url 'edit_pvz_payment' line.object_id 1 start_of_week end_of_week %}">
+                                 Документ № {{ line.object_id | default:"-"  }}</a>
+                             </td>
+                        {% else %}
+                            <td>-</td>
+                        {% endif %}
+                        <td class="text-end">
+                            <a href="{% url 'edit_wallet_transaction' line.id %}?wallet={{ line.wallet_id.id }}" class="btn btn-outline-secondary btn-sm {% if line.object_id %}disabled{% endif %}"> Редактировать </a>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'delete_wallet_transaction' line.id %}" class="btn btn-outline-secondary btn-sm {% if line.object_id %}disabled{% endif %}"> Удалить </a>
+                        </td>
                     </tr>
                 {% endfor %}
             </table>

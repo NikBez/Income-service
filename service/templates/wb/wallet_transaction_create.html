@@ -3,42 +3,50 @@
 
 
 {% block body %}
-   <div class="container mt-5">
-        <div class="row my-2">
-            <div class="col">
-             <h3>Новый счет:</h3>
-              <form method="post">
+
+<div class="container mt-5">
+    <div class="row my-2">
+        <div class="col">
+            <h3>Новая транзакция по счету {{ wallet_title }}:</h3>
+            <form method="post">
                 {% csrf_token %}
-                  <div class="row mt-5">
-                      <div class="col">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text"> {{ form.title.label_tag }}</span>
-                                {{ form.title }}
-                            </div>
-                      </div>
-                       <div class="col">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text"> {{ form.balance.label_tag }}</span>
-                                {{ form.balance }} <span class="input-group-text">₽</span>
-                            </div>
-                      </div>
-                  </div>
+                <!--ШАПКА-->
+                <div class="row mt-5">
+                    <div class="col">
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"> {{ form.operation_date.label_tag }}</span>
+                            {{ form.operation_date }}
+                        </div>
+                    </div>
+                     <div class="col">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"> {{ form.transaction_sum.label_tag }}</span>
+                            {{ form.transaction_sum }} <span class="input-group-text">₽</span>
+                        </div>
+
+                    </div>
+                </div>
+                <hr>
+
+                <div class="input-group mb-5">
+                    {{ form.description }}
+                    {{ form.wallet_id }}
+                    {{ form.transaction_type }}
+                    {{ form.content_type }}
+                    {{ form.object_id }}
+                    {{ form.source }}
+                </div>
 
                 <div class="row mb-5">
-                  <div class="col-2 align-self-center text-center ">
-                      <div class="form-check form-switch checkbox-lg">
-                          <label class="form-check-label" for="for_salary">Зарплатный</label>
-                          <input class="form-check-input" type="checkbox" id="for_salary" name="for_salary" {% if has_salary_wallet %}disabled{% endif %}>
+                    <div class="col">
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-secondary btn-lg btn-block">Записать</button>
+                        </div>
                     </div>
-                  </div>
-                   <div class="col-10">
-                       <div class="d-grid">
-                        <button type="submit" class="btn btn-secondary btn-lg btn-block">Записать</button>
-                           </div>
-                  </div>
                 </div>
-              </form>
-            </div>
+            </form>
         </div>
-  </div>
+    </div>
+</div>
 {% endblock %}

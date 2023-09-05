@@ -1,10 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 from dateutil.relativedelta import relativedelta, MO, SU
 from django.conf import settings
 from django.db import connection
 from django.db.models import Q
+from django.http import HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils import dateformat, timezone
@@ -12,8 +13,10 @@ from django.views.generic import ListView, UpdateView, DeleteView, CreateView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .assets import dictfetchall, dictfetchone, update_employee_penalty, translate_month_titles
-from .forms import WBPaymentForm, PVZPaymentForm, EmployeeUpdateForm, OutcomeForm, WalletCreateForm, WalletUpdateForm
+from .assets import dictfetchall, dictfetchone, update_employee_penalty, translate_month_titles, create_wallet_outcome, \
+    update_wallet_total, delete_wallet_transaction
+from .forms import WBPaymentForm, PVZPaymentForm, EmployeeUpdateForm, OutcomeForm, WalletCreateForm, WalletUpdateForm, \
+    WalletTransactionCreateForm
 from .models import PVZ, Employee, WBPayment, PVZPaiment, Category, PVZOutcomes, Wallet, WalletTransaction
 from .queries import month_total_by_pvz_query, week_total_by_pvz_query, week_employee_report, month_total_constructor, \
     weekly_pvz_outcomes, year_analitic_constructor, year_analitic_by_weeks
@@ -251,7 +254,13 @@ class PVZPaimentList(ListView):
 
         if doc_id:
             payment_doc = PVZPaiment.objects.get(pk=doc_id)
-            payment_doc.is_closed = True if payment_doc.is_closed == False else False
+            if payment_doc.is_closed:
+                payment_doc.is_closed = False
+                delete_wallet_transaction(doc_id)
+            else:
+                payment_doc.is_closed = True
+                current_user = self.request.user
+                create_wallet_outcome(current_user, payment_doc.total, payment_doc.employee_id.name, doc_id)
             payment_doc.save()
 
         converted_start_week = datetime.strptime(start_week, "%d-%m-%Y")
@@ -271,6 +280,7 @@ class PVZPaimentUpdate(UpdateView):
 
     def get_success_url(self):
         employee_id = self.object.employee_id_id
+
         start_week = self.kwargs.get('start_week')
         end_week = self.kwargs.get('end_week')
         return reverse_lazy('list_pvz_payment',
@@ -279,9 +289,8 @@ class PVZPaimentUpdate(UpdateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        employee_id = self.kwargs.get('employee_id')
+        employee = self.object.employee_id
         date_of_operation = dateformat.format(self.object.date, 'd-m-Y')
-        employee = get_object_or_404(Employee, pk=employee_id)
 
         initial['date'] = date_of_operation
         initial['pvz_id'] = employee.pvz_id
@@ -292,17 +301,21 @@ class PVZPaimentUpdate(UpdateView):
 
     def form_valid(self, form):
         instance = form.save(commit=False)
-        employee_id = self.kwargs.get('employee_id')
-        employee = get_object_or_404(Employee, pk=employee_id)
+        employee = instance.employee_id
         current_data = get_object_or_404(PVZPaiment, pk=self.object.id)
         instance.pvz_id = employee.pvz_id
-        instance.employee_id = employee
 
         update_employee_penalty(employee,
                                 instance.add_penalty - current_data.add_penalty,
                                 instance.surcharge_penalty - current_data.surcharge_penalty,
                                 create=True
                                 )
+        if form.instance.is_closed:
+            update = True
+            current_user = self.request.user
+            create_wallet_outcome(current_user, form.instance.total, form.instance.employee_id.name, form.instance.id, update)
+        else:
+            delete_wallet_transaction(form.instance.id)
 
         instance.save()
         return super().form_valid(form)
@@ -317,6 +330,8 @@ class PVZPaimentDelete(DeleteView):
         add_penalty = self.object.add_penalty
         surcharge_penalty = self.object.surcharge_penalty
         update_employee_penalty(employee_id, add_penalty, surcharge_penalty, create=False)
+        if self.object.is_closed:
+            delete_wallet_transaction(self.object.id)
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -362,10 +377,11 @@ class PVZPaimentCreate(CreateView):
         employee = get_object_or_404(Employee, pk=employee_id)
         instance.pvz_id = employee.pvz_id
         instance.employee_id = employee
-
         update_employee_penalty(employee, instance.add_penalty, instance.surcharge_penalty)
-
         instance.save()
+        if form.instance.is_closed:
+            current_user = self.request.user
+            create_wallet_outcome(current_user, instance.total, instance.employee_id.name, instance.id)
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -612,7 +628,7 @@ class WalletList(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(user=self.request.user.id)
+        queryset = queryset.filter(user=self.request.user.id).order_by('is_archived')
         return queryset
 
 
@@ -644,7 +660,8 @@ class WalletUpdate(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        has_salary_wallet = Wallet.objects.filter(user=self.request.user, is_archived=False, for_salary=True).exclude(pk=self.object.pk)
+        has_salary_wallet = Wallet.objects.filter(user=self.request.user, is_archived=False, for_salary=True).exclude(
+            pk=self.object.pk)
         context['has_salary_wallet'] = has_salary_wallet.exists()
         return context
 
@@ -664,32 +681,123 @@ class WalletTransactionsList(ListView):
     model = WalletTransaction
     template_name = 'wb/wallet_transaction_list.html'
     paginate_by = 10
+    ordering = ('-operation_date',)
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        wallet_id = self.kwargs.get('wallet_id')
+        wallet_id = self.request.GET.get('wallet_id')
         if wallet_id:
             queryset = queryset.filter(wallet_id=int(wallet_id))
+            print(queryset)
         else:
             queryset = queryset.filter(wallet_id__user=self.request.user.id)
         return queryset
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_date = datetime.now()
+        day_of_week = current_date.weekday()
+        days_until_start_of_week = (day_of_week + 1) % 7
+        days_until_end_of_week = 6 - day_of_week
+
+        start_of_week = current_date - timedelta(days=days_until_start_of_week)
+        end_of_week = current_date + timedelta(days=days_until_end_of_week)
+
+        context['start_of_week'] = start_of_week.strftime('%d-%m-%Y')
+        context['end_of_week'] = end_of_week.strftime('%d-%m-%Y')
+
+        return context
 
 
 class WalletTransactionCreate(CreateView):
     model = WalletTransaction
     template_name = 'wb/wallet_transaction_create.html'
-    success_url = reverse_lazy('list_categories')
-    fields = '__all__'
+    form_class = WalletTransactionCreateForm
+
+    def get_success_url(self):
+        wallet_id = self.request.GET.get('wallet_id')
+        reverse_url = reverse_lazy('list_wallet_transactions')
+        return reverse_url + f'?wallet_id={wallet_id}'
+
+    def get_initial(self):
+        initial = super().get_initial()
+        wallet_id = self.request.GET.get('wallet_id')
+        transaction_type = self.request.GET.get('type')
+
+        if transaction_type == 'in':
+            transaction_type_choice = WalletTransaction.TransactionType.INCOME
+        elif transaction_type == 'out':
+            transaction_type_choice = WalletTransaction.TransactionType.OUTCOME
+        else:
+            return HttpResponseBadRequest("Invalid transaction_type parameter")
+
+        initial['wallet_id'] = Wallet.objects.get(pk=wallet_id)
+        initial['transaction_type'] = transaction_type_choice
+        initial['operation_date'] = datetime.utcnow()
+        return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        wallet_id = self.request.GET.get('wallet_id')
+        wallet = Wallet.objects.get(pk=wallet_id)
+        context['wallet_title'] = wallet.title
+        return context
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        update_wallet_total(instance.wallet_id.id, instance.transaction_type, instance.transaction_sum)
+        instance.save()
+        return super().form_valid(form)
 
 
 class WalletTransactionUpdate(UpdateView):
     model = WalletTransaction
-    template_name = 'wb/wallet_transaction_edit.html'
-    success_url = reverse_lazy('list_categories')
-    fields = '__all__'
+    template_name = 'wb/wallet_transaction_create.html'
+    form_class = WalletTransactionCreateForm
+
+    def get_success_url(self):
+        wallet_id = self.request.GET.get('wallet')
+        reverse_url = reverse_lazy('list_wallet_transactions')
+        return reverse_url + f'?wallet_id={wallet_id}'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        wallet_id = self.request.GET.get('wallet')
+        wallet = Wallet.objects.get(pk=wallet_id)
+        context['wallet_title'] = wallet.title
+        return context
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        current_wallet_id = self.object.wallet_id.id
+        wallet = Wallet.objects.get(pk=current_wallet_id)
+        transaction_sum = form.initial.get('transaction_sum')
+        if instance.transaction_type == 'IN':
+            new_balance = wallet.balance - transaction_sum + instance.transaction_sum
+        elif instance.transaction_type == 'OUT':
+            new_balance = wallet.balance + transaction_sum - instance.transaction_sum
+        wallet.balance = new_balance
+        wallet.save()
+        instance.save()
+        return super().form_valid(form)
 
 
 class WalletTransactionDelete(DeleteView):
     model = WalletTransaction
     template_name = 'wb/wallet_transaction_delete.html'
-    success_url = reverse_lazy('list_categories')
+
+    def get_success_url(self):
+        return reverse_lazy('list_wallet_transactions')
+
+    def form_valid(self, form):
+        current_wallet_id = self.object.wallet_id.id
+        wallet = Wallet.objects.get(pk=current_wallet_id)
+        transaction_sum = self.object.transaction_sum
+        if self.object.transaction_type == 'IN':
+            new_balance = wallet.balance - transaction_sum
+        elif self.object.transaction_type == 'OUT':
+            new_balance = wallet.balance + transaction_sum
+        wallet.balance = new_balance
+        wallet.save()
+
+        return super().form_valid(form)

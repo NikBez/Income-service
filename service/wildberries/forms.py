@@ -1,45 +1,77 @@
-from django import forms
-from .models import PVZ, WBPayment, PVZPaiment, Employee, PVZOutcomes, Wallet
-
 import calculation
+from django import forms
+from django.contrib.contenttypes.models import ContentType
+
+from .models import PVZ, WBPayment, PVZPaiment, Employee, PVZOutcomes, Wallet, WalletTransaction
 
 
 class WBPaymentForm(forms.ModelForm):
     class Meta:
         model = WBPayment
         fields = '__all__'
-   
-    from_date = forms.DateField(input_formats=['%d-%m-%Y'], label='от', widget=forms.DateInput(attrs={'id': 'from_date'}))
+
+    from_date = forms.DateField(input_formats=['%d-%m-%Y'], label='от',
+                                widget=forms.DateInput(attrs={'id': 'from_date'}))
     to_date = forms.DateField(input_formats=['%d-%m-%Y'], label='до', widget=forms.DateInput(attrs={'id': 'to_date'}))
-    pvz_id = forms.ModelChoiceField(queryset=PVZ.objects.all(), label='ПВЗ', empty_label='Выберите...', widget=forms.Select(attrs={'class': 'form-select', 'id': "PVZ_selector"}))
-    charged_rate = forms.FloatField(label='Начислено по тарифу', required=False, widget=forms.NumberInput(attrs={'class': 'form-select form-select-lg', 'value': 0}))
-    charged_courier = forms.FloatField(label='Доплата за выданное через курьера', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    surcharge_motivation = forms.FloatField(label='Доплата за мотивацию', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    hold_motivation = forms.FloatField(label='за мотивацию', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    hold_rating = forms.FloatField(label='за рейтинг', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    surcharge_signage = forms.FloatField(label='Доплата за вывеску', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    surcharge_goods = forms.FloatField(label='Доплата за товары', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    hold_goods = forms.FloatField(label='за товары', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    hold_substitution = forms.FloatField(label='за подмену товара', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    hold_furniture = forms.FloatField(label='за мебель', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    hold_for_defects = forms.FloatField(label='за брак', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    subsidies = forms.FloatField(label='Субсидии', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    debt = forms.FloatField(label='Долг', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    penalty = forms.FloatField(label='Штраф', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    supplier_returns = forms.FloatField(label='Возвраты поставщику', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    extra_motivation = forms.FloatField(label='Дополнительная мотивация', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    zero_substitution_effect = forms.FloatField(label='Нулевой эффект подмены', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    return_incorrect_mark = forms.FloatField(label='Возврат удержаний за некорректную отметку о браке', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    extra_nds = forms.FloatField(label='Доплата НДС', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    package_compensation = forms.FloatField(label='Компенсация за пакеты', required=False, widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
-    hold_non_returned = forms.FloatField(label='за невозврат товара', required=False, widget=forms.NumberInput(attrs={'class': 'form-select form-select-lg', 'value': 0}))
-    total_charge = forms.FloatField(label='Всего начислено', required=False, widget=calculation.FormulaInput('charged_rate + charged_courier + surcharge_motivation + '
-                                                                                                             'surcharge_signage + surcharge_goods + subsidies + extra_motivation +'
-                                                                                                             ' return_incorrect_mark + extra_nds + package_compensation + debt +'
-                                                                                                             ' zero_substitution_effect + penalty + supplier_returns', attrs={'readonly': True}))
-    total_hold = forms.FloatField(label='Всего удержано', required=False, widget=calculation.FormulaInput('hold_motivation + hold_rating + hold_goods + hold_substitution + '
-                                                                                                          'hold_furniture + hold_for_defects + penalty + hold_non_returned', attrs={'readonly': True}))
-    total = forms.FloatField(label='Доход', required=False, widget=calculation.FormulaInput('total_charge - total_hold', attrs={'class': 'form-control', 'readonly': True}))
+    pvz_id = forms.ModelChoiceField(queryset=PVZ.objects.all(), label='ПВЗ', empty_label='Выберите...',
+                                    widget=forms.Select(attrs={'class': 'form-select', 'id': "PVZ_selector"}))
+    charged_rate = forms.FloatField(label='Начислено по тарифу', required=False,
+                                    widget=forms.NumberInput(attrs={'class': 'form-select form-select-lg', 'value': 0}))
+    charged_courier = forms.FloatField(label='Доплата за выданное через курьера', required=False,
+                                       widget=forms.NumberInput(
+                                           attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    surcharge_motivation = forms.FloatField(label='Доплата за мотивацию', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    hold_motivation = forms.FloatField(label='за мотивацию', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    hold_rating = forms.FloatField(label='за рейтинг', required=False,
+                                   widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    surcharge_signage = forms.FloatField(label='Доплата за вывеску', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    surcharge_goods = forms.FloatField(label='Доплата за товары', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    hold_goods = forms.FloatField(label='за товары', required=False,
+                                  widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    hold_substitution = forms.FloatField(label='за подмену товара', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    hold_furniture = forms.FloatField(label='за мебель', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    hold_for_defects = forms.FloatField(label='за брак', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    subsidies = forms.FloatField(label='Субсидии', required=False,
+                                 widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    debt = forms.FloatField(label='Долг', required=False,
+                            widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    penalty = forms.FloatField(label='Штраф', required=False,
+                               widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    supplier_returns = forms.FloatField(label='Возвраты поставщику', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    extra_motivation = forms.FloatField(label='Дополнительная мотивация', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    zero_substitution_effect = forms.FloatField(label='Нулевой эффект подмены', required=False,
+                                                widget=forms.NumberInput(
+                                                    attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    return_incorrect_mark = forms.FloatField(label='Возврат удержаний за некорректную отметку о браке', required=False,
+                                             widget=forms.NumberInput(
+                                                 attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    extra_nds = forms.FloatField(label='Доплата НДС', required=False,
+                                 widget=forms.NumberInput(attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    package_compensation = forms.FloatField(label='Компенсация за пакеты', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select  form-select-lg', 'value': 0}))
+    hold_non_returned = forms.FloatField(label='за невозврат товара', required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-select form-select-lg', 'value': 0}))
+    total_charge = forms.FloatField(label='Всего начислено', required=False, widget=calculation.FormulaInput(
+        'charged_rate + charged_courier + surcharge_motivation + '
+        'surcharge_signage + surcharge_goods + subsidies + extra_motivation +'
+        ' return_incorrect_mark + extra_nds + package_compensation + debt +'
+        ' zero_substitution_effect + penalty + supplier_returns', attrs={'readonly': True}))
+    total_hold = forms.FloatField(label='Всего удержано', required=False, widget=calculation.FormulaInput(
+        'hold_motivation + hold_rating + hold_goods + hold_substitution + '
+        'hold_furniture + hold_for_defects + penalty + hold_non_returned', attrs={'readonly': True}))
+    total = forms.FloatField(label='Доход', required=False, widget=calculation.FormulaInput('total_charge - total_hold',
+                                                                                            attrs={
+                                                                                                'class': 'form-control',
+                                                                                                'readonly': True}))
 
 
 class PVZPaymentForm(forms.ModelForm):
@@ -68,18 +100,24 @@ class PVZPaymentForm(forms.ModelForm):
         attrs={'class': 'form-select  form-select-lg', 'value': 0}))
     penalty = forms.FloatField(label='Остаток штрафа', required=False, widget=forms.NumberInput(
         attrs={'class': 'form-select  form-select-lg', 'value': 0, 'readonly': True}))
-    is_closed = forms.BooleanField(label='Оплатить', required=False, widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
-
-    total = forms.FloatField(label='Итого к выплате', widget=calculation.FormulaInput('number_days * bet + extra_payment + (boxes_count * 100) - surcharge_penalty',
-                                                                                            attrs={
-                                                                                                'class': 'form-control',
-                                                                                                'readonly': False}))
+    is_closed = forms.BooleanField(label='Оплатить', required=False,
+                                   widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
+    total = forms.FloatField(label='Итого к выплате', widget=calculation.FormulaInput(
+        'number_days * bet + extra_payment + (boxes_count * 100) - surcharge_penalty',
+        attrs={
+            'class': 'form-control',
+            'readonly': False}))
+    employee_id = forms.ModelChoiceField(
+        label='Тип операции',
+        queryset=Employee.objects.all(),
+        widget=forms.HiddenInput()
+    )
 
 
 class EmployeeUpdateForm(forms.ModelForm):
     class Meta:
         model = Employee
-        exclude = ['penalty',]
+        exclude = ['penalty', ]
 
 
 class OutcomeForm(forms.ModelForm):
@@ -90,23 +128,111 @@ class OutcomeForm(forms.ModelForm):
     pvz = forms.ModelChoiceField(queryset=PVZ.objects.all(), label='ПВЗ', widget=forms.HiddenInput(
         attrs={'class': 'form-select  form-select-lg', 'value': 0}))
 
+
 class WalletCreateForm(forms.ModelForm):
     class Meta:
         model = Wallet
         fields = ('title', 'balance', 'for_salary')
 
-    title = forms.CharField(label='Название', widget=forms.TextInput(attrs={'type': 'text', 'class': 'form-control form-control-lg', 'placeholder': 'Название', 'aria-label': 'Название'}))
-    balance = forms.DecimalField(label='Начальный остаток', max_digits=10, decimal_places=2, required=False, widget=forms.NumberInput(
-        attrs={'class': 'form-select  form-select-lg', 'value': 0, 'aria-label': '100000'}))
-    for_salary = forms.BooleanField(label='Зарплатный', required=False, widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox', 'id': 'for_salary'}))
+    title = forms.CharField(label='Название', widget=forms.TextInput(
+        attrs={'type': 'text', 'class': 'form-control form-control-lg', 'placeholder': 'Название',
+               'aria-label': 'Название'}))
+    balance = forms.DecimalField(label='Начальный остаток', max_digits=10, decimal_places=2, required=False,
+                                 widget=forms.NumberInput(
+                                     attrs={'class': 'form-select  form-select-lg', 'value': 0,
+                                            'aria-label': '100000'}))
+    for_salary = forms.BooleanField(label='Зарплатный', required=False,
+                                    widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox', 'id': 'for_salary'}))
+
 
 class WalletUpdateForm(forms.ModelForm):
     class Meta:
         model = Wallet
         fields = ('title', 'balance', 'for_salary', 'is_archived')
 
-    title = forms.CharField(label='Название', widget=forms.TextInput(attrs={'type': 'text', 'class': 'form-control form-control-lg', 'placeholder': 'Название', 'aria-label': 'Название'}))
-    balance = forms.DecimalField(label='Текущий баланс', max_digits=10, decimal_places=2, disabled=True, required=False, widget=forms.NumberInput(
-        attrs={'class': 'form-select  form-select-lg', 'value': 0, 'aria-label': '100000'}))
-    for_salary = forms.BooleanField(label='Зарплатный',  required=False, widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
-    is_archived = forms.BooleanField(label='В архиве', required=False, widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
+    title = forms.CharField(label='Название', widget=forms.TextInput(
+        attrs={'type': 'text', 'class': 'form-control form-control-lg', 'placeholder': 'Название',
+               'aria-label': 'Название'}))
+    balance = forms.DecimalField(label='Текущий баланс', max_digits=10, decimal_places=2, disabled=True, required=False,
+                                 widget=forms.NumberInput(
+                                     attrs={'class': 'form-select  form-select-lg', 'value': 0,
+                                            'aria-label': '100000'}))
+    for_salary = forms.BooleanField(label='Зарплатный', required=False,
+                                    widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
+    is_archived = forms.BooleanField(label='В архиве', required=False,
+                                     widget=forms.CheckboxInput(attrs={'class': 'custom-checkbox'}))
+
+
+class WalletTransactionCreateForm(forms.ModelForm):
+    class Meta:
+        model = WalletTransaction
+        fields = ('operation_date',
+                  'transaction_sum',
+                  'description',
+                  'wallet_id',
+                  'transaction_type',
+                  'content_type',
+                  'object_id',
+                  )
+
+    operation_date = forms.DateTimeField(
+        label='Дата операции',
+        widget=forms.DateTimeInput(
+            attrs={
+                'class': 'form-control'
+            }
+        )
+    )
+
+    transaction_sum = forms.DecimalField(
+        label='Сумма',
+        max_digits=10,
+        decimal_places=2,
+        min_value=0,
+        widget=forms.NumberInput(
+            attrs={
+                'class': 'form-select',
+                'value': 0,
+                'aria-label': '100000'
+            }
+        )
+    )
+
+    description = forms.CharField(
+        label='Описание',
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                'type': 'text',
+                'class': 'form-control',
+                'placeholder': 'Описание',
+                'aria-label': 'Описание',
+                'aria-describedby': 'addon-wrapping'
+            }
+        )
+    )
+
+    wallet_id = forms.ModelChoiceField(
+        label='Счет',
+        queryset=Wallet.objects.all(),
+        widget=forms.HiddenInput()
+    )
+
+    transaction_type = forms.ChoiceField(
+        label='Тип операции',
+        choices=WalletTransaction.TransactionType.choices,
+        widget=forms.HiddenInput()
+    )
+
+    content_type = forms.ModelChoiceField(
+        label='Основание',
+        queryset=ContentType.objects.all(),
+        required=False,
+        widget=forms.HiddenInput()
+    )
+
+    object_id = forms.IntegerField(
+        label='ID объекта',
+        required=False,
+        widget=forms.HiddenInput()
+    )

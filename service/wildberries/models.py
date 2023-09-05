@@ -1,6 +1,8 @@
 import datetime
 
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
@@ -155,9 +157,11 @@ class WalletTransaction(models.Model):
     wallet_id = models.ForeignKey(Wallet, on_delete=models.CASCADE, verbose_name='Счет', related_name='transactions')
     transaction_type = models.CharField('Тип операции', max_length=20, choices=TransactionType.choices)
     transaction_sum = models.DecimalField('Сумма', max_digits=10, decimal_places=2)
-    description = models.TextField('Описание', null=True)
+    description = models.CharField('Описание', max_length=200, null=True, blank=True)
     last_modified = models.DateTimeField('Дата создания', auto_now=datetime.datetime.utcnow)
-    source = models.ForeignKey(PVZPaiment, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Основание', related_name='transactions')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Основание', related_name='transactions')
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    source = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
         return f'Операция от {self.operation_date} по счету {self.wallet_id} на сумму {self.transaction_sum}'

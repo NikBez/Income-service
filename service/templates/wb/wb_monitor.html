@@ -145,9 +145,9 @@
                             <td>{{wallet.balance | floatformat:"g" }}₽</td>
                             <td class="text-end">
                                 <div class="btn-group" role="group" aria-label="Basic outlined example">
-                                    <a href="" type="button" class="btn btn-outline-secondary btn-sm"> + </a>
-                                    <a href="" type="button" class="btn btn-outline-secondary btn-sm"> - </a>
-                                    <a href="" type="button" class="btn btn-outline-secondary btn-sm">История операций</a>
+                                    <a href="{% url 'create_wallet_transaction' %}?wallet_id={{ wallet.pk }}&type=in" type="button" class="btn btn-outline-secondary btn-sm"> + </a>
+                                    <a href="{% url 'create_wallet_transaction' %}?wallet_id={{ wallet.pk }}&type=out" type="button" class="btn btn-outline-secondary btn-sm"> - </a>
+                                    <a href="{% url 'list_wallet_transactions' %}?wallet_id={{ wallet.pk }}" type="button" class="btn btn-outline-secondary btn-sm">История операций</a>
                                 </div>
                             </td>
                         </tr>
