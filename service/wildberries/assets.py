@@ -32,7 +32,7 @@ def update_employee_penalty(employee, to_add, to_surcharge, create=True):
 
 
 def create_wallet_outcome(user, sum, employee_name, object_id, update=False):
-    salary_wallet, created = Wallet.objects.get_or_create(user=user, for_salary=True)
+    salary_wallet, created = Wallet.objects.get_or_create(user=user, for_salary=True, is_archived=False)
 
     content_type = ContentType.objects.get_for_model(PVZPaiment)
     transaction_type = 'OUT'

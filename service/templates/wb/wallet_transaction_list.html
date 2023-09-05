@@ -33,9 +33,9 @@
                     <tr>
                         <td>{{ line.operation_date }}</td>
                         {% if line.transaction_type == 'IN' %}
-                            <td>👆</td>
+                            <td>📗</td>
                         {% elif line.transaction_type == 'OUT' %}
-                              <td>👇</td>
+                              <td>📕</td>
                         {% endif %}
                          <td>{{ line.wallet_id.title }}</td>
                          <td>{{ line.transaction_sum }}</td>
