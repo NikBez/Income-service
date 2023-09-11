@@ -374,10 +374,10 @@ def year_analitic_constructor_(filter):
         )
         SELECT
             COALESCE(i.month, s.month) month,
-            i.income,
-            i.holded,
-            s.salary,
-            pvz.rent,
+            COALESCE(i.income, 0) income,
+            COALESCE(i.holded, 0) holded,
+            COALESCE(s.salary, 0)salary,
+            COALESCE(pvz.rent, 0) rent,
             COALESCE(se.service, 0) service,
             COALESCE(ROUND(i.income * 0.94 - IIF(s.salary IS NOT NULL, s.salary, 0) - pvz.rent - IIF(se.service IS NOT NULL, se.service, 0), 2), 0) profit
         FROM
@@ -529,10 +529,10 @@ GROUP BY
 )
 SELECT
 	COALESCE(i.month, s.month) month,
-	i.income,
-	i.holded,
-	s.salary,
-	pvz.rent,
+	COALESCE(i.income, 0) income,
+    COALESCE(i.holded, 0) holded,
+    COALESCE(s.salary, 0)salary,
+    COALESCE(pvz.rent, 0) rent,
 	COALESCE(se.service, 0) service,
 	COALESCE(ROUND(i.income * 0.94 - IIF(s.salary IS NOT NULL, s.salary, 0) - pvz.rent - IIF(se.service IS NOT NULL, se.service, 0), 2), 0) profit
 FROM
@@ -684,10 +684,10 @@ def year_analitic_constructor(filter):
         )
         SELECT
             COALESCE(i.month, s.month) month,
-            i.income,
-            i.holded,
-            s.salary,
-            pvz.rent,
+            COALESCE(i.income, 0) income,
+            COALESCE(i.holded, 0) holded,
+            COALESCE(s.salary, 0)salary,
+            COALESCE(pvz.rent, 0) rent,
             COALESCE(se.service, 0) service,
             COALESCE(ROUND(i.income * 0.94 - IIF(s.salary IS NOT NULL, s.salary, 0) - pvz.rent - IIF(se.service IS NOT NULL, se.service, 0), 2), 0) profit
         FROM
@@ -839,10 +839,10 @@ GROUP BY
 )
 SELECT
 	COALESCE(i.month, s.month) month,
-	i.income,
-	i.holded,
-	s.salary,
-	pvz.rent,
+	COALESCE(i.income, 0) income,
+    COALESCE(i.holded, 0) holded,
+    COALESCE(s.salary, 0)salary,
+    COALESCE(pvz.rent, 0) rent,
 	COALESCE(se.service, 0) service,
 	COALESCE(ROUND(i.income * 0.94 - IIF(s.salary IS NOT NULL, s.salary, 0) - pvz.rent - IIF(se.service IS NOT NULL, se.service, 0), 2), 0) profit
 FROM
@@ -919,10 +919,10 @@ def year_analitic_by_weeks(pvz_id):
             )
             SELECT
                 strftime('%d.%m', COALESCE(i.week, s.week), '-7 days') || ' - ' || strftime('%d.%m', COALESCE(i.week, s.week)) AS week,
-                i.income,
-                i.holded,
-                s.salary,
-                pvz.rent,
+                COALESCE(i.income, 0) income,
+                COALESCE(i.holded, 0) holded,
+                COALESCE(s.salary, 0)salary,
+                COALESCE(pvz.rent, 0) rent,
                 COALESCE(se.service, 0) service,
                 COALESCE(ROUND(i.income * 0.94 - IIF(s.salary IS NOT NULL, s.salary, 0) - pvz.rent - IIF(se.service IS NOT NULL, se.service, 0), 2), 0) profit
             FROM
@@ -998,10 +998,10 @@ def year_analitic_by_weeks(pvz_id):
         )
         SELECT
         	strftime('%d.%m', COALESCE(i.week, s.week)) || ' - ' || strftime('%d.%m', COALESCE(i.week, s.week), 'weekday 0') AS week,
-            i.income,
-            i.holded,
-            s.salary,
-            pvz.rent,
+            COALESCE(i.income, 0) income,
+            COALESCE(i.holded, 0) holded,
+            COALESCE(s.salary, 0)salary,
+            COALESCE(pvz.rent, 0) rent,
             COALESCE(se.service, 0) service,
             COALESCE(ROUND(i.income * 0.94 - IIF(s.salary IS NOT NULL, s.salary, 0) - pvz.rent - IIF(se.service IS NOT NULL, se.service, 0), 2), 0) profit
         FROM
