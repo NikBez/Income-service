@@ -243,11 +243,11 @@ class IncomeSummaryView(APIView):
 
         # Получаем список операций без проведенной оплаты
         debt_operations = Income.objects.filter(status=False).order_by('date_of_operation')
-
+        test_date = path_date + relativedelta(months=1, day=1)
         # Получаем среднюю сумму заработка за последние N месяцев
         average_income = Income.objects.filter(
             date_of_operation__gte=path_date - relativedelta(months=settings.AVERAGE_PERIOD_LENGTH),
-            date_of_operation__lt=datetime.strptime(f'01-{path_date.month + 1}-{path_date.year}', '%d-%m-%Y') - relativedelta(day=1),
+            date_of_operation__lt=path_date + relativedelta(months=1, day=1),
             status=True,
         ).aggregate(average_income=Sum('sum_in_default_currency')/settings.AVERAGE_PERIOD_LENGTH)['average_income'] or 0.0
 
