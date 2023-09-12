@@ -409,7 +409,7 @@ class WBPaymentList(ListView):
         pvz_id = self.kwargs.get('pvz_id')
 
         if pvz_id is not None:
-            queryset = queryset.filter(pvz_id=pvz_id).order_by('from_date')
+            queryset = queryset.filter(pvz_id=pvz_id).order_by('-from_date')
         return queryset
 
 
