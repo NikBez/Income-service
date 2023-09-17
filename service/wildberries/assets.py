@@ -66,7 +66,7 @@ def delete_wallet_transaction(payment_id: int):
     '''
     Процедура удаляет транзакцию при удалении платежа.
     '''
-    transaction_to_delete = WalletTransaction.objects.get(object_id=payment_id)
+    transaction_to_delete = WalletTransaction.objects.filter(object_id=payment_id).first()
     if transaction_to_delete:
         update_wallet_total(transaction_to_delete.wallet_id.id, 'IN', transaction_to_delete.transaction_sum)
         transaction_to_delete.delete()
