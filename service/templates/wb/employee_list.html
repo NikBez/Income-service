@@ -19,7 +19,6 @@
             <table class="table table-hover">
                 <thead>
                 <th>ФИО</th>
-                <th>ПВЗ</th>
                 <th>Ставка за смену</th>
                  <th>Сумма к удержанию</th>
                 <th>Дата трудоустройства</th>
@@ -28,7 +27,6 @@
                 {% for line in object_list %}
                     <tr>
                         <td>{{ line.name }}</td>
-                        <td>{{ line.pvz_id }}</td>
                         <td>{{ line.salary }}</td>
                         <td>{{ line.penalty }}</td>
                         <td>{{ line.date_of_start }}</td>

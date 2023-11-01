@@ -1,4 +1,5 @@
 {% extends 'wb/index.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 
 
@@ -8,7 +9,7 @@
         <div class="row my-2">
             <div class="col-2 text-start mb-3">
                 <div class="btn-group" role="group" aria-label="Basic outlined example">
-                    <a class="btn btn-outline-dark btn-sm btn-block" href="{% url 'pvz_monitor' employee.pvz_id_id %}">Назад</a>
+                    <a class="btn btn-outline-dark btn-sm btn-block" href="{% url 'pvz_monitor' pvz_id %}">Назад</a>
                 </div>
             </div>
             <div class="col-10">
@@ -49,12 +50,12 @@
                         <td>{{ line.surcharge_penalty }}₽</td>
                          <td>{{ line.total }}₽</td>
                         {% if line.is_closed %}
-                             <td class="text-end"><a href="{% url 'list_pvz_payment' employee.id start_date end_date line.id %}" type="button" class="btn btn-secondary btn-sm">Отменить оплату</a></td>
+                             <td class="text-end"><a href="{% url 'list_pvz_payment' employee.id start_date end_date line.id pvz_id %}" type="button" class="btn btn-secondary btn-sm">Отменить оплату</a></td>
                         {% else %}
-                             <td class="text-end"><a href="{% url 'list_pvz_payment' employee.id start_date end_date line.id %}" type="button" class="btn btn-secondary btn-sm">Оплатить</a></td>
+                             <td class="text-end"><a href="{% url 'list_pvz_payment' employee.id start_date end_date line.id pvz_id %}" type="button" class="btn btn-secondary btn-sm">Оплатить</a></td>
                         {% endif %}
-                        <td class="text-end"><a href="{% url 'edit_pvz_payment' line.id employee.id start_date end_date %}" class="btn btn-outline-secondary btn-sm">  Редактировать </a></td>
-                        <td class="text-end"><a href="{% url 'delete_pvz_payment' line.id employee.id start_date end_date %}" class="btn btn-outline-secondary btn-sm"> Удалить </a></td>
+                        <td class="text-end"><a href="{% url 'edit_pvz_payment' line.id employee.id start_date end_date pvz_id %}" class="btn btn-outline-secondary btn-sm">  Редактировать </a></td>
+                        <td class="text-end"><a href="{% url 'delete_pvz_payment' line.id employee.id start_date end_date pvz_id %}" class="btn btn-outline-secondary btn-sm"> Удалить </a></td>
                     </tr>
                 {% endfor %}
             </table>

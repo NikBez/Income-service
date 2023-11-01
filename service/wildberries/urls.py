@@ -32,13 +32,13 @@ urlpatterns = [
     path('wb-payments/create/<int:pvz_id>/<str:cr_start_week>/<str:cr_end_week>/', WBPaymentCreate.as_view(),
          name='create_wb_payment'),
 
-    path('pvz-payments/<int:employee_id>/<str:cr_start_week>/<str:cr_end_week>/<int:doc_id>/',
+    path('pvz-payments/<int:employee_id>/<str:cr_start_week>/<str:cr_end_week>/<int:doc_id>/<int:pvz_id>/',
          PVZPaimentList.as_view(),
          name='list_pvz_payment'
          ),
-    path('pvz-payments/<int:pk>/<int:employee_id>/<str:start_week>/<str:end_week>/edit/', PVZPaimentUpdate.as_view(),
+    path('pvz-payments/<int:pk>/<int:employee_id>/<str:start_week>/<str:end_week>/<int:pvz_id>/edit/', PVZPaimentUpdate.as_view(),
          name='edit_pvz_payment'),
-    path('pvz-payments/<int:pk>/<int:employee_id>/<str:start_week>/<str:end_week>/delete/', PVZPaimentDelete.as_view(),
+    path('pvz-payments/<int:pk>/<int:employee_id>/<str:start_week>/<str:end_week>/<int:pvz_id>/delete/', PVZPaimentDelete.as_view(),
          name='delete_pvz_payment'),
     path('pvz-payments/create/<int:employee_id>/<int:pvz_id>/<str:cr_start_week>/<str:cr_end_week>/',
          PVZPaimentCreate.as_view(), name='create_pvz_payment'),

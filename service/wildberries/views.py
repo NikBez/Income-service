@@ -238,8 +238,10 @@ class PVZPaimentList(ListView):
         employee_id = self.kwargs.get('employee_id')
         start_date = self.kwargs.get('cr_start_week')
         end_date = self.kwargs.get('cr_end_week')
+        pvz_id = self.kwargs.get('pvz_id')
         context['start_date'] = start_date
         context['end_date'] = end_date
+        context['pvz_id'] = pvz_id
 
         context['employee'] = get_object_or_404(Employee, pk=employee_id)
         return context
@@ -280,20 +282,28 @@ class PVZPaimentUpdate(UpdateView):
 
     def get_success_url(self):
         employee_id = self.object.employee_id_id
-
         start_week = self.kwargs.get('start_week')
         end_week = self.kwargs.get('end_week')
+        pvz_id = self.kwargs.get('pvz_id')
+
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week,
-                                    'doc_id': 0})
+                            kwargs={
+                                'employee_id': employee_id,
+                                'cr_start_week': start_week,
+                                'cr_end_week': end_week,
+                                'doc_id': 0,
+                                'pvz_id': pvz_id,
+                            }
+                            )
 
     def get_initial(self):
         initial = super().get_initial()
         employee = self.object.employee_id
+        pvz_id = self.kwargs.get('pvz_id')
         date_of_operation = dateformat.format(self.object.date, 'd-m-Y')
 
         initial['date'] = date_of_operation
-        initial['pvz_id'] = employee.pvz_id
+        initial['pvz_id'] = pvz_id
         initial['employee_id'] = employee
         initial['bet'] = employee.salary
         initial['penalty'] = employee.penalty
@@ -302,8 +312,10 @@ class PVZPaimentUpdate(UpdateView):
     def form_valid(self, form):
         instance = form.save(commit=False)
         employee = instance.employee_id
+        pvz_id = self.kwargs.get('pvz_id')
+        pvz = get_object_or_404(PVZ, pk=pvz_id)
         current_data = get_object_or_404(PVZPaiment, pk=self.object.id)
-        instance.pvz_id = employee.pvz_id
+        instance.pvz_id = pvz
 
         update_employee_penalty(employee,
                                 instance.add_penalty - current_data.add_penalty,
@@ -325,6 +337,12 @@ class PVZPaimentDelete(DeleteView):
     model = PVZPaiment
     template_name = 'wb/pvz_payment_delete.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pvz_id = self.kwargs.get('pvz_id')
+        context['pvz_id'] = pvz_id
+        return context
+
     def form_valid(self, form):
         employee_id = self.object.employee_id
         add_penalty = self.object.add_penalty
@@ -338,9 +356,16 @@ class PVZPaimentDelete(DeleteView):
         employee_id = self.object.employee_id_id
         start_week = self.kwargs.get('start_week')
         end_week = self.kwargs.get('end_week')
+        pvz_id = self.kwargs.get('pvz_id')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week,
-                                    'doc_id': 0})
+                            kwargs={
+                                'employee_id': employee_id,
+                                'cr_start_week': start_week,
+                                'cr_end_week': end_week,
+                                'doc_id': 0,
+                                'pvz_id': pvz_id,
+                            }
+                            )
 
 
 class PVZPaimentCreate(CreateView):
@@ -351,10 +376,11 @@ class PVZPaimentCreate(CreateView):
     def get_initial(self):
         initial = super().get_initial()
         employee_id = self.kwargs.get('employee_id')
+        pvz_id = self.kwargs.get('pvz_id')
         current_date = dateformat.format(datetime.utcnow().date(), 'd-m-Y')
         employee = get_object_or_404(Employee, pk=employee_id)
 
-        initial['pvz_id'] = employee.pvz_id
+        initial['pvz_id'] = pvz_id
         initial['date'] = current_date
         initial['employee_id'] = employee.pk
         initial['bet'] = employee.salary
@@ -374,8 +400,10 @@ class PVZPaimentCreate(CreateView):
     def form_valid(self, form):
         instance = form.save(commit=False)
         employee_id = self.kwargs.get('employee_id')
+        pvz_id = self.kwargs.get('pvz_id')
         employee = get_object_or_404(Employee, pk=employee_id)
-        instance.pvz_id = employee.pvz_id
+        pvz = get_object_or_404(PVZ, pk=pvz_id)
+        instance.pvz_id = pvz
         instance.employee_id = employee
         update_employee_penalty(employee, instance.add_penalty, instance.surcharge_penalty)
         instance.save()
@@ -388,9 +416,16 @@ class PVZPaimentCreate(CreateView):
         employee_id = self.object.employee_id_id
         start_week = self.kwargs.get('cr_start_week')
         end_week = self.kwargs.get('cr_end_week')
+        pvz_id = self.kwargs.get('pvz_id')
         return reverse_lazy('list_pvz_payment',
-                            kwargs={'employee_id': employee_id, 'cr_start_week': start_week, 'cr_end_week': end_week,
-                                    'doc_id': 0})
+                            kwargs={
+                                'employee_id': employee_id,
+                                'cr_start_week': start_week,
+                                'cr_end_week': end_week,
+                                'doc_id': 0,
+                                'pvz_id': pvz_id,
+                            }
+                        )
 
 
 class WBPaymentList(ListView):

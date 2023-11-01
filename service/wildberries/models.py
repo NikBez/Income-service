@@ -20,10 +20,9 @@ class PVZ(models.Model):
 
 class Employee(models.Model):
     name = models.CharField('ФИО сотрудника', max_length=200, unique=True, default='Unnamed')
-    pvz_id = models.ForeignKey(
+    pvz_id = models.ManyToManyField(
         'PVZ',
         verbose_name='ПВЗ сотрудника',
-        on_delete=models.CASCADE,
         related_name='employees'
     )
     date_of_start = models.DateField('Дата трудоустройства', null=True, blank=True)

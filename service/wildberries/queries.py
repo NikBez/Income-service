@@ -188,6 +188,10 @@ week_employee_report = '''
     FROM wildberries_pvzpaiment pp
     WHERE JULIANDAY(pp.date) BETWEEN JULIANDAY(:start_date) and JULIANDAY(:end_date) and pp.pvz_id_id = :pvz_id and is_closed=False
     GROUP BY pp.employee_id_id 
+    ), employee_ids as (
+    SELECT employee_id 
+    FROM wildberries_employee_pvz_id wep
+    WHERE pvz_id = :pvz_id
     )
     SELECT
         we.id id,
@@ -215,7 +219,7 @@ week_employee_report = '''
         WHERE JULIANDAY(pp.date) BETWEEN JULIANDAY(:start_date) and JULIANDAY(:end_date) and pp.pvz_id_id = :pvz_id
         GROUP BY pp.employee_id_id 
     ) pp ON we.id = pp.employee_id_id LEFT JOIN sub ON we.id=sub.employee_id 
-    WHERE we.pvz_id_id = :pvz_id AND (pp.total <> 0 or we.is_archived=False)
+    WHERE we.id in employee_ids AND (pp.total <> 0 or we.is_archived=False)
 '''
 
 weekly_pvz_outcomes = '''

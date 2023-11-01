@@ -1,5 +1,4 @@
 {% extends 'wb/index.html' %}
-{% load static %}
 {% block body %}
 
 
@@ -197,7 +196,7 @@
                             <td>{{ employee.payed | default:"0" | floatformat:"g" }}₽</td>
                             <td>{{ employee.total | default:"0" | floatformat:"g" }}₽</td>
                             <td class="text-end"><a href="{% url 'create_pvz_payment' employee.id static_data.pvz_total.id cr_start_week cr_end_week %}" type="button" class="btn btn-secondary btn-sm">+ Смена</a></td>
-                            <td class="text-end"><a href="{% url 'list_pvz_payment' employee.id cr_start_week cr_end_week 0 %}" type="button" class="btn btn-secondary btn-sm">Детально</a></td>
+                            <td class="text-end"><a href="{% url 'list_pvz_payment' employee.id cr_start_week cr_end_week 0 static_data.pvz_total.id %}" type="button" class="btn btn-secondary btn-sm">Детально</a></td>
                         </tr>
                     {% endfor %}
                 </table>

@@ -7,11 +7,11 @@
         <div class="row my-2">
             <div class="col">
               <h1>Удаляем выплату зарплаты "{{ object }}"</h1>
-              <p>Уверены что хотите удалить эу запись?</p>
+              <p>Уверены что хотите удалить эту запись?</p>
               <form method="post">
                 {% csrf_token %}
                 <button type="submit" class="mt-4 btn btn-outline-secondary btn-lg">Да, удалить</button>
-                <a class="mt-4 btn btn-outline-secondary btn-lg" href="{% url 'sources' %}">Отменить</a>
+                <a class="mt-4 btn btn-outline-secondary btn-lg" href="{% url 'pvz_monitor' pvz_id %}">Отменить</a>
               </form>
             </div>
         </div>
